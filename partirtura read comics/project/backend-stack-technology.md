@@ -98,6 +98,19 @@ Any deviation is a bug. The audit of 2026-09 found that `Hangfire.AspNetCore` ha
 | `AI:OpenRouter:ApiKey` | OpenRouter API key | No |
 | `AI:Ollama:Endpoint` | Ollama local endpoint | No |
 
+## Seeing SQL queries in development
+
+`appsettings.Development.json` raises the Serilog level of `Microsoft.EntityFrameworkCore.Database.Command`
+to `Information`, so the console and `Logs/comiclibrary-*.log` show **every SQL statement** with its
+parameters and duration. Use it to detect N+1 problems: a list endpoint should show one query per
+result set (plus the `COUNT` for pagination), never one query per item.
+
+Parameter values are logged as `?`. Do **not** enable `EnableSensitiveDataLogging()` globally: queries
+receive tokens and other secrets as parameters. Enable it temporarily (Development only) when debugging
+a specific statement.
+
+Production keeps the `Microsoft` override at `Warning`, so the SQL is not logged there.
+
 ## Constraints
 
 - Stable compatibility over latest version.

@@ -1,4 +1,5 @@
 using Application.Constants;
+using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
 using Domain.Enums;
@@ -51,7 +52,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
         return (items, totalCount);
     }
 
-    public async Task<(IReadOnlyList<WorkList>, int)> GetCatalogPagedAsync(
+    public async Task<(IReadOnlyList<WorkListCardData> Items, int TotalCount)> GetCatalogPagedAsync(
         int currentPage,
         int pageSize,
         string? search,
@@ -78,6 +79,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
         query = ApplyCatalogOrdering(query, orderBy, orderDir);
 
         var items = await query
+            .Select(workList => new WorkListCardData(workList, workList.WorkListItems.Count()))
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken)

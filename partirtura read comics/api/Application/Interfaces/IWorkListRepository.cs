@@ -20,7 +20,7 @@ public interface IWorkListRepository
         string orderDir,
         CancellationToken cancellationToken = default);
 
-    Task<(IReadOnlyList<WorkList>, int)> GetCatalogPagedAsync(
+    Task<(IReadOnlyList<WorkListCardData> Items, int TotalCount)> GetCatalogPagedAsync(
         int currentPage,
         int pageSize,
         string? search,

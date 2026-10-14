@@ -565,8 +565,10 @@ public class WorkListService : IWorkListService
             work.IsActive);
     }
 
-    private static CatalogListCardDto ToCatalogCardDto(WorkList workList)
+    private static CatalogListCardDto ToCatalogCardDto(WorkListCardData workListData)
     {
+        var workList = workListData.WorkList;
+
         return new CatalogListCardDto(
             workList.Id,
             workList.Name,
@@ -574,7 +576,7 @@ public class WorkListService : IWorkListService
             workList.ListType.Name,
             workList.Color,
             ImageUrlBuilder.ToUrl(workList.Cover),
-            workList.WorkListItems.Count);
+            workListData.WorkCount);
     }
 
     private static CatalogListDetailDto ToCatalogDetailDto(WorkList workList)
