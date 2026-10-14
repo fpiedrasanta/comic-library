@@ -52,7 +52,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
         return (items, totalCount);
     }
 
-    public async Task<(IReadOnlyList<WorkListCardData> Items, int TotalCount)> GetCatalogPagedAsync(
+    public async Task<(IReadOnlyList<WorkListCardData> Items, int TotalCount)> GetCatalogPagedAsync(long? userId, 
         int currentPage,
         int pageSize,
         string? search,
@@ -79,7 +79,23 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
         query = ApplyCatalogOrdering(query, orderBy, orderDir);
 
         var items = await query
-            .Select(workList => new WorkListCardData(workList, workList.WorkListItems.Count()))
+            .Select(workList => new WorkListCardData(
+                workList,
+                workList.WorkListItems.Count(),
+                workList.WorkListItems.Any() == false
+                    ? (int?)0
+                    : workList.WorkListItems.Any(item =>
+                            _context.WorkReadingProgresses.Any(progress =>
+                                progress.User!.Id == userId &&
+                                progress.Work!.Id == item.Work.Id))
+                        ? workList.WorkListItems.Count(item =>
+                            _context.WorkReadingProgresses.Any(progress =>
+                                progress.User!.Id == userId &&
+                                progress.Work!.Id == item.Work.Id &&
+                                progress.State == ReadingState.Completed))
+                            * 100 / workList.WorkListItems.Count()
+                        : (int?)null,
+                workList.RatingCount == 0 ? null : workList.AverageRating))
             .Skip((currentPage - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken)

@@ -3,6 +3,7 @@ using Application.DTOs;
 using Application.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace Api.Controllers;
 
@@ -52,14 +53,22 @@ public class CatalogController : ControllerBase
     [HttpGet("lists")]
     public async Task<IActionResult> GetLists([FromQuery] GetCatalogListsRequest request, CancellationToken cancellationToken)
     {
-        var result = await _workListService.GetCatalogPagedAsync(request, cancellationToken);
+        var userId = GetUserId();
+        var result = await _workListService.GetCatalogPagedAsync(request, userId, cancellationToken);
         return Ok(new ApiResponse<ListResponse<CatalogListCardDto>>(true, "OK", StatusCodes.Status200OK, result));
     }
 
     [HttpGet("lists/{id:long}")]
     public async Task<IActionResult> GetList(long id, CancellationToken cancellationToken)
     {
-        var result = await _workListService.GetCatalogByIdAsync(id, cancellationToken);
+        var userId = GetUserId();
+        var result = await _workListService.GetCatalogByIdAsync(id, userId, cancellationToken);
         return Ok(new ApiResponse<CatalogListDetailDto>(true, "OK", StatusCodes.Status200OK, result));
+    }
+
+    private long? GetUserId()
+    {
+        var userIdClaim = User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+        return long.TryParse(userIdClaim, out var parsedId) ? parsedId : null;
     }
 }

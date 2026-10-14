@@ -81,14 +81,14 @@ public class CatalogControllerContractTests
         AssertShape(typeof(CatalogPublisherCardDto), "Id", "Name", "Color", "UrlImage");
         AssertShape(typeof(CatalogFranchiseCardDto), "Id", "Name", "Color", "UrlImage", "Publisher");
         AssertShape(typeof(CatalogSeriesCardDto), "Id", "Name", "Color", "UrlImage", "Franchise", "Publisher");
-        AssertShape(typeof(CatalogListCardDto), "Id", "Name", "ListTypeId", "ListTypeName", "Color", "UrlCover", "WorkCount");
+        AssertShape(typeof(CatalogListCardDto), "Id", "Name", "ListTypeId", "ListTypeName", "Color", "UrlCover", "WorkCount", "ReadingProgressPercentage", "AverageRating", "RatingCount");
         AssertShape(typeof(CatalogNodeDto), "Id", "Name", "Color");
     }
 
     [Fact]
     public void CatalogListDetailDto_ExposesRequiredFields()
     {
-        AssertShape(typeof(CatalogListDetailDto), "Id", "Name", "ListTypeId", "ListTypeName", "Description", "Color", "UrlCover", "WorkCount", "Works");
+        AssertShape(typeof(CatalogListDetailDto), "Id", "Name", "ListTypeId", "ListTypeName", "Description", "Color", "UrlCover", "WorkCount", "ReadingProgressPercentage", "AverageRating", "RatingCount", "Works");
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class CatalogControllerContractTests
     [Fact]
     public void CatalogListWorkDto_ExposesRequiredFields()
     {
-        AssertShape(typeof(CatalogListWorkDto), "Id", "Title", "Description", "PublisherId", "PublisherName", "PublisherColor", "FranchiseId", "FranchiseName", "FranchiseColor", "SeriesId", "SeriesName", "SeriesColor", "PublicationDate", "UrlCover", "WorkTypeId", "WorkTypeName", "NumberValue", "CreatedAt");
+        AssertShape(typeof(CatalogListWorkDto), "Id", "Title", "Description", "PublisherId", "PublisherName", "PublisherColor", "FranchiseId", "FranchiseName", "FranchiseColor", "SeriesId", "SeriesName", "SeriesColor", "PublicationDate", "UrlCover", "WorkTypeId", "WorkTypeName", "NumberValue", "CreatedAt", "ReadingProgressPercentage");
     }
 
     private static void AssertRequestShape(Type requestType)

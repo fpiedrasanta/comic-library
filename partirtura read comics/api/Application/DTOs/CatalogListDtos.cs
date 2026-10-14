@@ -20,7 +20,10 @@ public record CatalogListCardDto(
     string ListTypeName,
     string? Color,
     string? UrlCover,
-    int WorkCount);
+    int WorkCount,
+    int? ReadingProgressPercentage,
+    double? AverageRating,
+    int RatingCount);
 
 public record CatalogListDetailDto(
     long Id,
@@ -31,6 +34,9 @@ public record CatalogListDetailDto(
     string? Color,
     string? UrlCover,
     int WorkCount,
+    int? ReadingProgressPercentage,
+    double? AverageRating,
+    int RatingCount,
     IReadOnlyList<CatalogListWorkItemDto> Works);
 
 public record CatalogListWorkItemDto(
@@ -55,4 +61,5 @@ public record CatalogListWorkDto(
     long? WorkTypeId,
     string? WorkTypeName,
     string? NumberValue,
-    DateTime CreatedAt);
+    DateTime CreatedAt,
+    int? ReadingProgressPercentage);

@@ -4,4 +4,6 @@ namespace Application.DTOs;
 
 public record WorkListCardData(
     WorkList WorkList,
-    int WorkCount);
+    int WorkCount,
+    int? ReadingProgressPercentage,
+    double? AverageRating);
