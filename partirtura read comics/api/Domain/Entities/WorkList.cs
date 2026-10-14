@@ -16,5 +16,16 @@ public class WorkList
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>
+    /// Number of active ratings for this list. Maintained when a list rating is created.
+    /// </summary>
+    public int RatingCount { get; set; } = 0;
+
+    /// <summary>
+    /// Average of the active ratings of this list on a 1-5 scale.
+    /// Maintained when a list rating is created or edited.
+    /// </summary>
+    public double AverageRating { get; set; } = 0.0;
+
     public virtual ICollection<WorkListItem> WorkListItems { get; set; } = new List<WorkListItem>();
 }

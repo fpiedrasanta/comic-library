@@ -166,9 +166,11 @@
   - `Visibility Visibility`
   - `bool IsActive` (default `true`)
   - `DateTime CreatedAt`
+  - `int RatingCount` (default `0`)
+  - `double AverageRating` (default `0`)
 - **Navigation Properties**:
   - `virtual ICollection<WorkListItem> WorkListItems`
-- **Notes**: Logical deletion via `IsActive`. Navigation properties are `virtual` for lazy loading. `OwnerType` determines whether `Owner` (User) is null (`System`) or set (`User`). Database check constraint enforces that `System` lists have no owner and `User` lists have an owner. `Name` is indexed for catalog searches.
+- **Notes**: Logical deletion via `IsActive`. Navigation properties are `virtual` for lazy loading. `OwnerType` determines whether `Owner` (User) is null (`System`) or set (`User`). Database check constraint enforces that `System` lists have no owner and `User` lists have an owner. `Name` is indexed for catalog searches. **Rating accumulators**: `RatingCount` (active ratings) and `AverageRating` (average of the active ratings on a 1-5 scale) are stored on the list to avoid recalculating them on every read; they are maintained when a `ListRating` is created or edited. A list without ratings has `RatingCount = 0` and `AverageRating = 0`.
 
 ## WorkListItem
 

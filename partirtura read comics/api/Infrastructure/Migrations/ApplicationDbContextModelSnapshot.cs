@@ -242,6 +242,73 @@ namespace Infrastructure.Migrations
                     b.ToTable("Languages", (string)null);
                 });
 
+            modelBuilder.Entity("Domain.Entities.ListRating", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Review")
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Stars")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("WorkListId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkListId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("ListRatings", (string)null);
+                });
+
+            modelBuilder.Entity("Domain.Entities.ListReadingProgress", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("CurrentWorkId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTimeOffset?>("LastReadAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<long>("UserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("WorkListId")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CurrentWorkId");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("WorkListId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("ListReadingProgresses", (string)null);
+                });
+
             modelBuilder.Entity("Domain.Entities.ListType", b =>
                 {
                     b.Property<long>("Id")
@@ -817,6 +884,9 @@ namespace Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("bigint");
 
+                    b.Property<double>("AverageRating")
+                        .HasColumnType("double");
+
                     b.Property<string>("Color")
                         .HasMaxLength(7)
                         .HasColumnType("varchar(7)");
@@ -848,6 +918,9 @@ namespace Infrastructure.Migrations
                         .HasColumnType("bigint");
 
                     b.Property<int>("OwnerType")
+                        .HasColumnType("int");
+
+                    b.Property<int>("RatingCount")
                         .HasColumnType("int");
 
                     b.Property<int>("Visibility")
@@ -1058,6 +1131,50 @@ namespace Infrastructure.Migrations
                     b.Navigation("Image");
 
                     b.Navigation("Publisher");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ListRating", b =>
+                {
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.WorkList", "WorkList")
+                        .WithMany()
+                        .HasForeignKey("WorkListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+
+                    b.Navigation("WorkList");
+                });
+
+            modelBuilder.Entity("Domain.Entities.ListReadingProgress", b =>
+                {
+                    b.HasOne("Domain.Entities.Work", "CurrentWork")
+                        .WithMany()
+                        .HasForeignKey("CurrentWorkId");
+
+                    b.HasOne("Domain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.WorkList", "WorkList")
+                        .WithMany()
+                        .HasForeignKey("WorkListId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CurrentWork");
+
+                    b.Navigation("User");
+
+                    b.Navigation("WorkList");
                 });
 
             modelBuilder.Entity("Domain.Entities.Page", b =>
