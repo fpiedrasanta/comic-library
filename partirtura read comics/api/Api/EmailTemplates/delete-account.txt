@@ -1,0 +1,15 @@
+¿SEGURO QUE TE QUERÉS IR DE COMIC LIBRARY? 💔
+
+Recibimos tu solicitud para dar de baja tu cuenta. 
+
+Antes de avanzar, queremos contarte que tus colecciones, tus lecturas guardadas y tu progreso van a quedar esperándote por un tiempo antes de eliminarse por completo. Siempre podés hacer una pausa y retomar tus cómics favoritos cuando quieras.
+
+Si aun así deseas continuar con la baja, ingresá este código para confirmar:
+
+{{code}}
+
+Este código vence en {{time to expire}}.
+
+Te vamos a extrañar mucho en la comunidad. Si alguna vez decidís volver, acá vas a tener tu lugar.
+
+Si no solicitaste este cambio, podés ignorar este correo y tu cuenta seguirá intacta.

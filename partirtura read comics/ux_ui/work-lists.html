@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listado de Obras (Work Lists) - NEPS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- NAVEGACIÓN LATERAL (SIDEBAR) -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&amp;lt;neps<span class="text-nepsAccent">/&amp;gt;</span></div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="admin-franquicias.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Franquicias
+        </a>
+        <a href="admin-editoriales.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Editoriales
+        </a>
+        <a href="work-lists.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          Listas de Obras
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">FP</div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Super Admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <h1 class="text-sm font-bold text-white tracking-tight">Administración de Listas de Obras</h1>
+        <span class="text-[10px] bg-nepsInput text-nepsMuted px-2 py-0.5 rounded-full border border-nepsBorder font-mono">OwnerType = System</span>
+      </div>
+
+      <button onclick="openModal('modalCreateWorkList')" class="px-4 py-2 bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold rounded-xl text-xs shadow-lg shadow-nepsPrimary/20 transition-all flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        <span>Nueva Lista</span>
+      </button>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+
+      <!-- BANNER DE FEEDBACK DE OPERACIÓN EXITOSA -->
+      <div id="toastSuccess" class="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-start justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3 text-emerald-300">
+          <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p class="font-medium">La lista de obras <strong class="text-white">"Mejores Shonen del Año"</strong> se actualizó correctamente.</p>
+        </div>
+        <button onclick="this.parentElement.classList.add('hidden')" class="text-nepsMuted hover:text-white">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+
+      <!-- BANNER DE ESTADO ERROR -->
+      <div id="alertError" class="hidden bg-nepsAccent/10 border border-nepsAccent/30 rounded-xl p-4 flex items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3 text-nepsAccent">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p class="font-medium">Ocurrió un error al consultar las listas de obras. Inténtalo de nuevo.</p>
+        </div>
+        <button class="px-3 py-1.5 bg-nepsAccent text-white font-bold rounded-xl text-xs">Reintentar</button>
+      </div>
+
+      <!-- CONTROLES DE BÚSQUEDA Y FILTROS -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-4 sm:p-5 space-y-4">
+        
+        <!-- BÚSQUEDA GENERAL ÚNICA CON INDICACIÓN VISUAL -->
+        <div class="space-y-1.5">
+          <div class="relative w-full">
+            <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-nepsMuted">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+            </span>
+            <input type="text" placeholder="Buscar..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-10 pr-4 py-2.5 outline-none transition-colors">
+          </div>
+          <p class="text-[10px] text-nepsMuted flex items-center gap-1 pl-1">
+            <svg class="w-3 h-3 text-nepsPrimary flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <span>La búsqueda contempla: <strong>nombre de la lista</strong>, <strong>título de obra incluida</strong> o <strong>número de obra incluida</strong>.</span>
+          </p>
+        </div>
+
+        <!-- FILTROS REQUERIDOS &amp; ORDENAMIENTO DUAL SEPARADO -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 pt-3 border-t border-nepsBorder/60">
+          
+          <!-- FILTRO: FRANQUICIA -->
+          <div class="space-y-1 col-span-2 sm:col-span-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Franquicia</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary truncate">
+              <option value="">Todas las franquicias</option>
+              <option value="1">Dragon Ball</option>
+              <option value="2">One Piece</option>
+              <option value="3">Batman</option>
+            </select>
+          </div>
+
+          <!-- FILTRO: EDITORIAL -->
+          <div class="space-y-1 col-span-2 sm:col-span-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Editorial</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary truncate">
+              <option value="">Todas las editoriales</option>
+              <option value="1">Shueisha</option>
+              <option value="2">Ivrea Argentina</option>
+              <option value="3">Panini Manga</option>
+            </select>
+          </div>
+
+          <!-- FILTRO: TIPO DE LISTA -->
+          <div class="space-y-1 col-span-2 sm:col-span-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Tipo de lista</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary truncate">
+              <option value="">Todos los tipos</option>
+              <option value="favoritos">Favoritos</option>
+              <option value="destacados">Recomendados</option>
+              <option value="lecturas">Lectura Obligatoria</option>
+            </select>
+          </div>
+
+          <!-- FILTRO: ESTADO -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Estado</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="">Todos</option>
+              <option value="activa" selected>Activas</option>
+              <option value="inactiva">Inactivas</option>
+            </select>
+          </div>
+
+          <!-- FILTRO: FECHA DESDE -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Fecha Desde</label>
+            <input type="date" class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1 outline-none focus:border-nepsPrimary [color-scheme:dark]">
+          </div>
+
+          <!-- FILTRO: FECHA HASTA -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Fecha Hasta</label>
+            <input type="date" class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1 outline-none focus:border-nepsPrimary [color-scheme:dark]">
+          </div>
+
+          <!-- ORDENAMIENTO SEPARADO: CAMPO / CRITERIO -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Ordenar por</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary truncate">
+              <option value="fecha" selected>Fecha creación</option>
+              <option value="nombre">Nombre</option>
+            </select>
+          </div>
+
+          <!-- ORDENAMIENTO SEPARADO: DIRECCIÓN -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Sentido</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="desc" selected>Descendente</option>
+              <option value="asc">Ascendente</option>
+            </select>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TABLA DE LISTADO DE WORK LISTS -->
+      <div id="tableContainer" class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-nepsBorder bg-nepsInput/40 text-[11px] uppercase tracking-wider text-nepsMuted font-bold">
+                <th class="py-3.5 px-6 w-16 text-center">Cover</th>
+                <th class="py-3.5 px-6">Fecha de creación</th>
+                <th class="py-3.5 px-6">Nombre</th>
+                <th class="py-3.5 px-6">Tipo</th>
+                <th class="py-3.5 px-6 text-center">Estado</th>
+                <th class="py-3.5 px-6 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-nepsBorder/60 text-xs">
+              
+              <!-- REGISTRO 1: ACTIVA -->
+              <tr class="hover:bg-nepsInput/30 transition-colors">
+                <td class="py-3 px-6 text-center">
+                  <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Cover Lista" class="w-10 h-10 object-cover rounded-lg border border-nepsBorder mx-auto shadow-sm" />
+                </td>
+                <td class="py-4 px-6 text-nepsMuted font-mono text-[11px]">14/09/2026</td>
+                <td class="py-4 px-6 font-bold text-white">Mejores Shonen del Año</td>
+                <td class="py-4 px-6">
+                  <span class="bg-nepsInput border border-nepsBorder text-slate-300 px-2.5 py-1 rounded-lg text-[11px] font-medium">Recomendados</span>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <span class="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-emerald-400 font-bold text-[10px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Activa
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button onclick="openModal('modalEditWorkList')" class="px-2.5 py-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-200 rounded-lg border border-nepsBorder transition-colors font-medium text-xs">Editar</button>
+                    <button onclick="openConfirmModal('Mejores Shonen del Año', 'desactivar')" class="px-2.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent hover:text-white text-nepsAccent rounded-lg border border-nepsAccent/20 transition-all font-medium text-xs">Desactivar</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- REGISTRO 2: ACTIVA -->
+              <tr class="hover:bg-nepsInput/30 transition-colors">
+                <td class="py-3 px-6 text-center">
+                  <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Cover Lista" class="w-10 h-10 object-cover rounded-lg border border-nepsBorder mx-auto shadow-sm" />
+                </td>
+                <td class="py-4 px-6 text-nepsMuted font-mono text-[11px]">02/08/2026</td>
+                <td class="py-4 px-6 font-bold text-white">Colección Clásicos DC Comics</td>
+                <td class="py-4 px-6">
+                  <span class="bg-nepsInput border border-nepsBorder text-slate-300 px-2.5 py-1 rounded-lg text-[11px] font-medium">Favoritos</span>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <span class="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-emerald-400 font-bold text-[10px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Activa
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button onclick="openModal('modalEditWorkList')" class="px-2.5 py-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-200 rounded-lg border border-nepsBorder transition-colors font-medium text-xs">Editar</button>
+                    <button onclick="openConfirmModal('Colección Clásicos DC Comics', 'desactivar')" class="px-2.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent hover:text-white text-nepsAccent rounded-lg border border-nepsAccent/20 transition-all font-medium text-xs">Desactivar</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- REGISTRO 3: INACTIVA -->
+              <tr class="bg-nepsInput/20 opacity-60 hover:opacity-100 transition-opacity">
+                <td class="py-3 px-6 text-center">
+                  <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&amp;auto=format&amp;fit=crop&amp;q=80" alt="Cover Lista" class="w-10 h-10 object-cover rounded-lg border border-nepsBorder mx-auto shadow-sm grayscale" />
+                </td>
+                <td class="py-4 px-6 text-nepsMuted font-mono text-[11px]">15/01/2026</td>
+                <td class="py-4 px-6 font-bold text-slate-300">Lanzamientos Especiales Verano</td>
+                <td class="py-4 px-6">
+                  <span class="bg-nepsInput border border-nepsBorder text-slate-400 px-2.5 py-1 rounded-lg text-[11px] font-medium">Lectura Obligatoria</span>
+                </td>
+                <td class="py-4 px-6 text-center">
+                  <span class="inline-flex items-center gap-1.5 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded-full text-slate-400 font-bold text-[10px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Inactiva
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button onclick="openModal('modalEditWorkList')" class="px-2.5 py-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-300 rounded-lg border border-nepsBorder transition-colors font-medium text-xs">Editar</button>
+                    <button onclick="openConfirmModal('Lanzamientos Especiales Verano', 'reactivar')" class="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 hover:text-slate-950 text-emerald-400 font-bold rounded-lg border border-emerald-500/20 transition-all text-xs">Reactivar</button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CONTROLES DE PAGINACIÓN -->
+        <div class="px-6 py-3 border-t border-nepsBorder bg-nepsInput/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <p class="text-nepsMuted">Mostrando <strong class="text-white">1-3</strong> de <strong class="text-white">18</strong> listas oficiales</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 rounded-lg bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white transition-colors disabled:opacity-40" disabled>Anterior</button>
+            <button class="px-3 py-1.5 rounded-lg bg-nepsPrimary/10 border border-nepsPrimary/30 text-nepsPrimary font-bold">1</button>
+            <button class="px-3 py-1.5 rounded-lg bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white transition-colors">2</button>
+            <button class="px-3 py-1.5 rounded-lg bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white transition-colors">Siguiente</button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ESTADO: VACÍO / BÚSQUEDA SIN RESULTADOS (Oculto por defecto) -->
+      <div id="stateEmpty" class="hidden bg-nepsCard border border-nepsBorder rounded-2xl p-12 text-center space-y-3">
+        <div class="w-12 h-12 rounded-full bg-nepsInput border border-nepsBorder flex items-center justify-center mx-auto text-nepsMuted">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+        <h3 class="text-sm font-bold text-white">No se encontraron listas de obras</h3>
+        <p class="text-xs text-nepsMuted max-w-sm mx-auto">No hay registros que coincidan con la búsqueda por nombre, obra o los filtros aplicados.</p>
+      </div>
+
+      <!-- ESTADO: CARGA / LOADING SKELETON (Oculto por defecto) -->
+      <div id="stateLoading" class="hidden bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-4 animate-pulse">
+        <div class="h-8 bg-nepsInput rounded-xl w-full"></div>
+        <div class="space-y-3">
+          <div class="h-12 bg-nepsInput rounded-xl w-full"></div>
+          <div class="h-12 bg-nepsInput rounded-xl w-full"></div>
+          <div class="h-12 bg-nepsInput rounded-xl w-full"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL: CREAR LISTA DE OBRAS -->
+  <div id="modalCreateWorkList" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 max-w-md w-full space-y-5">
+      <div class="flex items-center justify-between border-b border-nepsBorder/60 pb-3">
+        <h3 class="text-base font-bold text-white">Nueva Lista de Obras</h3>
+        <button onclick="closeModal('modalCreateWorkList')" class="text-nepsMuted hover:text-white">✕</button>
+      </div>
+
+      <form class="space-y-4" onsubmit="event.preventDefault();">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">Nombre de la lista <span class="text-nepsAccent">*</span></label>
+          <input type="text" placeholder="Ej. Top Imperdibles 2026" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">URL del Cover (Imagen)</label>
+          <input type="url" placeholder="https://..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">Tipo de lista <span class="text-nepsAccent">*</span></label>
+          <select class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors" required>
+            <option value="" disabled selected>Seleccionar tipo...</option>
+            <option value="favoritos">Favoritos</option>
+            <option value="destacados">Recomendados</option>
+            <option value="lecturas">Lectura Obligatoria</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-nepsBorder/60">
+          <button type="button" onclick="closeModal('modalCreateWorkList')" class="px-4 py-2 bg-nepsInput text-nepsMuted hover:text-white border border-nepsBorder rounded-xl text-xs">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-nepsPrimary text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2">
+            <span>Guardar Lista</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDITAR LISTA DE OBRAS -->
+  <div id="modalEditWorkList" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 max-w-md w-full space-y-5">
+      <div class="flex items-center justify-between border-b border-nepsBorder/60 pb-3">
+        <h3 class="text-base font-bold text-white">Editar Lista de Obras</h3>
+        <button onclick="closeModal('modalEditWorkList')" class="text-nepsMuted hover:text-white">✕</button>
+      </div>
+
+      <form class="space-y-4" onsubmit="event.preventDefault();">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">Nombre de la lista <span class="text-nepsAccent">*</span></label>
+          <input type="text" value="Mejores Shonen del Año" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">URL del Cover (Imagen)</label>
+          <input type="url" value="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=100&amp;auto=format&amp;fit=crop&amp;q=80" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">Tipo de lista <span class="text-nepsAccent">*</span></label>
+          <select class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors" required>
+            <option value="favoritos">Favoritos</option>
+            <option value="destacados" selected>Recomendados</option>
+            <option value="lecturas">Lectura Obligatoria</option>
+          </select>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-nepsBorder/60">
+          <button type="button" onclick="closeModal('modalEditWorkList')" class="px-4 py-2 bg-nepsInput text-nepsMuted hover:text-white border border-nepsBorder rounded-xl text-xs">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-nepsPrimary text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2">
+            <span>Guardar Cambios</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN DE DESACTIVACIÓN / REACTIVACIÓN LÓGICA -->
+  <div id="confirmModal" class="hidden fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl max-w-md w-full p-6 space-y-5 shadow-2xl">
+      <div class="flex items-start gap-4">
+        <div id="modalIconBg" class="w-10 h-10 rounded-xl bg-nepsAccent/10 border border-nepsAccent/20 text-nepsAccent flex items-center justify-center flex-shrink-0">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h3 id="modalTitle" class="text-sm font-bold text-white">¿Desactivar Lista?</h3>
+          <p id="modalDescription" class="text-xs text-nepsMuted mt-1">Está a punto de desactivar la lista <strong id="modalListName" class="text-white"></strong>. La lista pasará a estado inactivo sin ser eliminada de forma física.</p>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-nepsBorder/60">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 bg-nepsInput hover:bg-nepsBorder text-nepsMuted hover:text-white border border-nepsBorder font-semibold rounded-xl text-xs transition-colors">
+          Cancelar
+        </button>
+        <button id="modalConfirmBtn" class="px-4 py-2 bg-nepsAccent hover:bg-rose-600 text-white font-bold rounded-xl text-xs transition-colors">
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LÓGICA MOCK DE INTERACCIÓN Y MODALES -->
+  <script>
+    function openModal(id) { 
+      document.getElementById(id).classList.remove('hidden'); 
+    }
+    
+    function closeModal(id) { 
+      document.getElementById(id).classList.add('hidden'); 
+    }
+
+    function openConfirmModal(nombre, accion) {
+      const modal = document.getElementById('confirmModal');
+      const title = document.getElementById('modalTitle');
+      const desc = document.getElementById('modalDescription');
+      const nameSpan = document.getElementById('modalListName');
+      const confirmBtn = document.getElementById('modalConfirmBtn');
+
+      nameSpan.textContent = nombre;
+      
+      if (accion === 'desactivar') {
+        title.textContent = '¿Desactivar Lista de Obras?';
+        desc.childNodes[0].textContent = 'Está a punto de desactivar la lista ';
+        confirmBtn.className = 'px-4 py-2 bg-nepsAccent hover:bg-rose-600 text-white font-bold rounded-xl text-xs transition-colors';
+        confirmBtn.textContent = 'Desactivar';
+      } else {
+        title.textContent = '¿Reactivar Lista de Obras?';
+        desc.childNodes[0].textContent = 'Está a punto de reactivar la lista ';
+        confirmBtn.className = 'px-4 py-2 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl text-xs transition-colors';
+        confirmBtn.textContent = 'Reactivar';
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModal').classList.add('hidden');
+    }
+  </script>
+
+</body>
+</html>

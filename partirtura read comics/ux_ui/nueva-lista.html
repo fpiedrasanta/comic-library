@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle de Lista - Fila Reordenable | NEPS</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .drag-ghost { opacity: 0.4; }
+  </style>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans relative p-4 sm:p-6 lg:p-8 space-y-8 max-w-7xl mx-auto">
+
+  <!-- BREADCRUMB / VOLVER -->
+  <div>
+    <a href="/lists" class="inline-flex items-center gap-1.5 text-xs text-nepsMuted hover:text-white transition-colors font-medium">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Volver a Exploración de Listas
+    </a>
+  </div>
+
+  <!-- HEADER DE LA LISTA -->
+  <header class="bg-nepsCard/90 border border-nepsBorder rounded-2xl p-5 sm:p-6 overflow-hidden shadow-2xl relative">
+    <div class="flex flex-col sm:flex-row items-center sm:items-start gap-6 relative z-10">
+      
+      <!-- Portada Vertical a la Izquierda -->
+      <div class="w-36 sm:w-44 md:w-48 flex-shrink-0">
+        <div class="w-full aspect-[2/3] bg-nepsInput rounded-xl overflow-hidden border border-white/10 shadow-lg relative">
+          <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80" alt="Orígenes" class="w-full h-full object-cover" />
+        </div>
+      </div>
+
+      <!-- Contenido a la Derecha (Título, Descripción, Avance + Continuar y Footer) -->
+      <div class="flex-1 flex flex-col justify-between self-stretch space-y-4 text-center sm:text-left">
+        
+        <div class="space-y-2">
+          <!-- Type Badge -->
+          <span class="inline-block text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-slate-800 text-slate-300 border border-slate-700">
+            ORIGENES
+          </span>
+
+          <!-- Título y Descripción -->
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Orígenes</h1>
+          <p class="text-xs sm:text-sm text-nepsMuted leading-relaxed max-w-2xl">
+            Diversos cómics con orígenes de diferentes personajes. Esta colección sigue el orden recomendado para entender el nacimiento del universo de superhéroes.
+          </p>
+        </div>
+
+        <!-- Bloque de Avance y Botón "Continuar leyendo" -->
+        <div class="bg-nepsInput/60 border border-nepsBorder/80 rounded-xl p-3.5 space-y-3">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-nepsMuted font-medium">Avance de la lista</span>
+            <span class="text-emerald-400 font-bold font-mono">40%</span>
+          </div>
+
+          <!-- Barra de Progreso -->
+          <div class="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-500 rounded-full transition-all duration-300" style="width: 40%;"></div>
+          </div>
+
+          <div class="flex flex-col sm:flex-row items-center justify-between gap-3 pt-1">
+            <span class="text-[11px] text-nepsMuted">4 de 10 obras completadas</span>
+            
+            <button type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition-colors shadow-lg shadow-emerald-500/10">
+              <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                <path d="M8 5v14l11-7z"/>
+              </svg>
+              Continuar leyendo
+            </button>
+          </div>
+        </div>
+
+        <!-- Footer del Header: Cantidad de obras -->
+        <div class="pt-3 border-t border-nepsBorder/60 flex items-center justify-center sm:justify-start gap-2 text-xs text-nepsMuted">
+          <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          <span class="font-semibold text-white">5 obras</span>
+        </div>
+
+      </div>
+
+    </div>
+  </header>
+
+
+  <!-- SECCIÓN DE OBRAS DE LA LISTA (FILAS HORIZONTALES CON DRAG & DROP) -->
+  <section class="space-y-4">
+    
+    <!-- Header de la Sección -->
+    <div class="flex items-center justify-between border-b border-nepsBorder pb-3">
+      <div class="flex items-center gap-2">
+        <h2 class="text-lg font-bold text-white">Obras de la Lista</h2>
+        <span class="text-[11px] font-mono text-nepsMuted bg-nepsInput border border-nepsBorder px-2 py-0.5 rounded-md">
+          Orden Personalizado
+        </span>
+      </div>
+      <p class="text-xs text-nepsMuted hidden sm:block">Arrastra las filas para reordenar las obras</p>
+    </div>
+
+    <!-- LISTADO DE FILAS HORIZONTALES -->
+    <div id="reorderable-list" class="space-y-2.5">
+      
+      <!-- ROW OBRA 01 (COMPLETADA 100%) -->
+      <div draggable="true" class="group bg-nepsCard border border-nepsBorder hover:border-slate-600 rounded-xl p-3 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-200">
+        
+        <!-- Drag Handle (Tirador) -->
+        <button type="button" class="cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-300 p-1 rounded transition-colors" title="Arrastrar para reordenar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+          </svg>
+        </button>
+
+        <!-- Número de Orden Secuencial -->
+        <span class="font-mono text-xs font-bold text-nepsMuted w-6 text-center">01</span>
+
+        <!-- Thumbnail Miniatura -->
+        <div class="w-10 h-14 bg-nepsInput rounded overflow-hidden flex-shrink-0 border border-white/10">
+          <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=150&auto=format&fit=crop&q=80" alt="Primera obra" class="w-full h-full object-cover" />
+        </div>
+
+        <!-- Info Principal y Barra de Progreso Individual -->
+        <div class="flex-1 min-w-0 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs sm:text-sm font-bold text-white truncate group-hover:text-nepsPrimary transition-colors">
+              Spider-Man / El golpe del Camaleón
+            </h3>
+            <span class="text-[11px] font-mono font-bold text-emerald-400">100%</span>
+          </div>
+
+          <div class="flex items-center gap-3 text-[11px] text-nepsMuted">
+            <span>Publisher • 32 páginas</span>
+          </div>
+
+          <!-- Progress bar individual -->
+          <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-500 rounded-full" style="width: 100%;"></div>
+          </div>
+        </div>
+
+        <!-- Botón / Acción Secundaria -->
+        <div class="flex-shrink-0 ml-1">
+          <button type="button" class="p-2 text-nepsMuted hover:text-white rounded-lg hover:bg-nepsInput transition-colors" title="Opciones">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ROW OBRA 02 (EN PROGRESO 65%) -->
+      <div draggable="true" class="group bg-nepsCard border border-nepsBorder hover:border-slate-600 rounded-xl p-3 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-200">
+        
+        <button type="button" class="cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-300 p-1 rounded transition-colors" title="Arrastrar para reordenar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+          </svg>
+        </button>
+
+        <span class="font-mono text-xs font-bold text-nepsMuted w-6 text-center">02</span>
+
+        <div class="w-10 h-14 bg-nepsInput rounded overflow-hidden flex-shrink-0 border border-white/10">
+          <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=150&auto=format&fit=crop&q=80" alt="Segunda obra" class="w-full h-full object-cover" />
+        </div>
+
+        <div class="flex-1 min-w-0 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs sm:text-sm font-bold text-white truncate group-hover:text-nepsPrimary transition-colors">
+              Batman: Año Uno
+            </h3>
+            <span class="text-[11px] font-mono font-bold text-emerald-400">65%</span>
+          </div>
+
+          <div class="flex items-center gap-3 text-[11px] text-nepsMuted">
+            <span>DC Comics • 48 páginas</span>
+          </div>
+
+          <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-500 rounded-full" style="width: 65%;"></div>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 ml-1">
+          <button type="button" class="p-2 text-nepsMuted hover:text-white rounded-lg hover:bg-nepsInput transition-colors" title="Opciones">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- ROW OBRA 03 (SIN EMPEZAR 0%) -->
+      <div draggable="true" class="group bg-nepsCard border border-nepsBorder hover:border-slate-600 rounded-xl p-3 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-200">
+        
+        <button type="button" class="cursor-grab active:cursor-grabbing text-slate-600 hover:text-slate-300 p-1 rounded transition-colors" title="Arrastrar para reordenar">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+          </svg>
+        </button>
+
+        <span class="font-mono text-xs font-bold text-nepsMuted w-6 text-center">03</span>
+
+        <div class="w-10 h-14 bg-nepsInput rounded overflow-hidden flex-shrink-0 border border-white/10">
+          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=150&auto=format&fit=crop&q=80" alt="Tercera obra" class="w-full h-full object-cover" />
+        </div>
+
+        <div class="flex-1 min-w-0 space-y-1.5">
+          <div class="flex items-center justify-between gap-2">
+            <h3 class="text-xs sm:text-sm font-bold text-white truncate group-hover:text-nepsPrimary transition-colors">
+              X-Men: Dios Ama, El Hombre Mata
+            </h3>
+            <span class="text-[11px] font-mono font-bold text-slate-500">0%</span>
+          </div>
+
+          <div class="flex items-center gap-3 text-[11px] text-nepsMuted">
+            <span>Marvel Comics • 24 páginas</span>
+          </div>
+
+          <div class="w-full h-1.5 bg-slate-800 rounded-full overflow-hidden">
+            <div class="h-full bg-emerald-500 rounded-full" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <div class="flex-shrink-0 ml-1">
+          <button type="button" class="p-2 text-nepsMuted hover:text-white rounded-lg hover:bg-nepsInput transition-colors" title="Opciones">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"/>
+            </svg>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</body>
+</html>

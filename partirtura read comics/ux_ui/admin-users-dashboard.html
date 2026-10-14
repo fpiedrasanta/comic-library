@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Consulta de Usuarios - Comic Library | NEPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <!-- Brand Header -->
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <!-- Links de Gestión -->
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Catálogo Cómics
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Usuarios
+        </a>
+        <a href="admin-settings.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Ajustes
+        </a>
+      </nav>
+    </div>
+
+    <!-- User Logged Foot -->
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">
+          FP
+        </div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Super Admin</p>
+        </div>
+      </div>
+      <a href="login.html" title="Cerrar sesión" class="text-nepsMuted hover:text-nepsAccent p-1.5 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <button onclick="document.getElementById('sidebar').classList.toggle('hidden')" class="md:hidden text-nepsMuted hover:text-white p-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <h1 class="text-sm font-bold text-white tracking-tight">Consulta de Usuarios</h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] text-nepsMuted bg-nepsCard px-2.5 py-1 rounded-md border border-nepsBorder">
+          Modo Lectura (Solo Consulta)
+        </span>
+      </div>
+    </header>
+
+    <!-- BODY CONTENT -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+
+      <!-- FILTROS Y BÚSQUEDA -->
+      <div class="bg-nepsCard border border-nepsBorder p-4 rounded-2xl space-y-3">
+        <!-- Buscador -->
+        <div class="relative w-full">
+          <input type="text" placeholder="Buscar por nombre, email, país..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-9 pr-4 py-2.5 outline-none transition-colors">
+          <svg class="w-4 h-4 text-nepsMuted absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+
+        <!-- Filtros y Ordenamiento -->
+        <div class="flex flex-wrap items-center justify-between gap-3 text-xs">
+          <!-- Filtros de Estado -->
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2">
+              <label class="text-nepsMuted text-[11px] font-medium">Activos:</label>
+              <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+                <option value="">Todos</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-nepsMuted text-[11px] font-medium">Baneados:</label>
+              <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+                <option value="">Todos</option>
+                <option value="si">Sí</option>
+                <option value="no">No</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Filtros de Ordenamiento (Por defecto: Fecha registro desc) -->
+          <div class="flex flex-wrap items-center gap-3 border-t sm:border-t-0 border-nepsBorder/60 pt-2 sm:pt-0 w-full sm:w-auto">
+            <div class="flex items-center gap-2">
+              <label class="text-nepsMuted text-[11px] font-medium">Ordenar por:</label>
+              <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+                <option value="apellido">Apellido</option>
+                <option value="fecha_registro" selected>Fecha de registro</option>
+                <option value="cantidad_baneos">Cantidad baneos</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-nepsMuted text-[11px] font-medium">Dirección:</label>
+              <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+                <option value="asc">Asc</option>
+                <option value="desc" selected>Desc</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CARDS GRILLA DE USUARIOS -->
+<div class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(380px,1fr))] gap-4">
+
+  <!-- CARD 1: Usuario Activo (Verde) -->
+  <div data-user-id="1" class="user-card cursor-pointer bg-nepsCard border border-nepsBorder rounded-xl p-4 flex flex-col justify-between space-y-4 hover:border-nepsBorder/80 transition-all min-w-full sm:min-w-[380px]">
+    <!-- Contenedor Flex con align-items: center -->
+    <div  class="flex items-center gap-3.5">
+      <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80" class="w-20 h-20 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0">
+      <div class="space-y-0.5 min-w-0 flex-1">
+        <p class="text-xs text-nepsMuted font-medium truncate">Nombre completo: <span class="text-white font-bold">Mariana Gómez</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">email: <span class="text-slate-300">marian.gomez@gmail.com</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">Nacionalidad: <span class="text-slate-300">Argentina</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">Fecha de registro: <span class="text-slate-300">14/08/2026 18:32</span></p>
+      </div>
+    </div>
+
+    <div class="border-t border-nepsBorder/60 pt-3 flex items-center justify-between text-xs">
+      <span class="text-nepsMuted text-[11px]">Cantidad baneos: <strong class="text-white">0</strong></span>
+      
+      <!-- Lucesita Verde -->
+      <div class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full" title="Usuario Habilitado">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+        <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide">Active</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 2: Baneo Temporal (Amarillo) -->
+  <div class="bg-nepsCard border border-nepsBorder rounded-xl p-4 flex flex-col justify-between space-y-4 hover:border-nepsBorder/80 transition-all min-w-full sm:min-w-[380px]">
+    <!-- Contenedor Flex con align-items: center -->
+    <div class="flex items-center gap-3.5">
+      <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80" class="w-20 h-20 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0">
+      <div class="space-y-0.5 min-w-0 flex-1">
+        <p class="text-xs text-nepsMuted font-medium truncate">Nombre completo: <span class="text-white font-bold">Carlos Rodríguez</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">email: <span class="text-slate-300">carlos.rod@hotmail.com</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">Nacionalidad: <span class="text-slate-300">Chile</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">Fecha de registro: <span class="text-slate-300">02/06/2026 09:15</span></p>
+      </div>
+    </div>
+
+    <div class="border-t border-nepsBorder/60 pt-3 flex items-center justify-between text-xs">
+      <span class="text-nepsMuted text-[11px]">Cantidad baneos: <strong class="text-amber-400 font-bold">2</strong></span>
+      
+      <!-- Lucesita Amarilla -->
+      <div class="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full" title="Baneado Temporalmente">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+        <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wide">Temp Ban</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- CARD 3: Baneo Permanente / Inactivo (Rojo) -->
+  <div class="bg-nepsCard border border-nepsBorder rounded-xl p-4 flex flex-col justify-between space-y-4 hover:border-nepsBorder/80 transition-all min-w-full sm:min-w-[380px]">
+    <!-- Contenedor Flex con align-items: center -->
+    <div class="flex items-center gap-3.5">
+      <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80" class="w-20 h-20 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0">
+      <div class="space-y-0.5 min-w-0 flex-1">
+        <p class="text-xs text-nepsMuted font-medium truncate">Nombre completo: <span class="text-white font-bold">Lucas Fernández</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">email: <span class="text-slate-300">lfernandez@yahoo.com</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">Nacionalidad: <span class="text-slate-300">Uruguay</span></p>
+        <p class="text-xs text-nepsMuted font-medium truncate">Fecha de registro: <span class="text-slate-300">11/01/2025 21:40</span></p>
+      </div>
+    </div>
+
+    <div class="border-t border-nepsBorder/60 pt-3 flex items-center justify-between text-xs">
+      <span class="text-nepsMuted text-[11px]">Cantidad baneos: <strong class="text-nepsAccent font-bold">5</strong></span>
+      
+      <!-- Lucesita Roja -->
+      <div class="flex items-center gap-1.5 bg-nepsAccent/10 border border-nepsAccent/20 px-2 py-0.5 rounded-full" title="No Activo / Baneo Permanente">
+        <span class="w-2 h-2 rounded-full bg-nepsAccent"></span>
+        <span class="text-[10px] font-bold text-nepsAccent uppercase tracking-wide">Inactive</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+      <!-- PAGINADOR FOOTER REDISEÑADO -->
+<div class="bg-nepsCard border border-nepsBorder rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+  
+  <!-- Info de registros -->
+  <div class="flex items-center gap-2">
+    <span class="w-2 h-2 rounded-full bg-nepsPrimary/60"></span>
+    <span class="text-xs text-nepsMuted font-medium">
+      Mostrando <strong class="text-white">12</strong> de <strong class="text-white">7.850</strong> usuarios
+    </span>
+  </div>
+
+  <!-- Botonera Unificada -->
+  <div class="flex items-center gap-2">
+    <!-- Navegación Izquierda -->
+    <div class="flex items-center bg-nepsInput border border-nepsBorder rounded-xl p-1 shadow-inner">
+      <!-- Primero -->
+      <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent" title="Primera página">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+      </button>
+      <!-- Anterior -->
+      <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent" title="Página anterior">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+    </div>
+
+    <!-- Selector de Página Editable -->
+    <div class="flex items-center gap-2 bg-nepsInput border border-nepsBorder px-3 py-1 rounded-xl">
+      <span class="text-[11px] font-semibold uppercase tracking-wider text-nepsMuted">Pág.</span>
+      <input type="number" min="1" max="655" value="1" class="w-10 text-center bg-nepsBg border border-nepsBorder focus:border-nepsPrimary text-xs font-bold text-nepsPrimary py-1 rounded-md outline-none transition-all shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+      <span class="text-xs text-nepsMuted font-medium">/ 655</span>
+    </div>
+
+    <!-- Navegación Derecha -->
+    <div class="flex items-center bg-nepsInput border border-nepsBorder rounded-xl p-1 shadow-inner">
+      <!-- Siguiente -->
+      <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all" title="Página siguiente">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+      </button>
+      <!-- Último -->
+      <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all" title="Última página">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M6 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+
+</div>
+
+    </main>
+
+  </div>
+
+<!-- CÓDIGO DEL MODAL Y SCRIPT (Agregar al final de tu HTML, antes de </body>) -->
+
+<!-- MODAL DE INSPECCIÓN DE IMAGEN / USUARIO -->
+<div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+  
+  <div class="bg-nepsCard border border-nepsBorder rounded-2xl max-w-lg w-full overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200" id="modalContainer">
+    
+    <!-- Header del Modal -->
+    <div class="px-5 py-3.5 border-b border-nepsBorder flex items-center justify-between bg-nepsInput/50">
+      <div class="flex items-center gap-2">
+        <svg class="w-4 h-4 text-nepsPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+        <span class="text-xs font-bold text-white tracking-tight">Inspección de Avatar</span>
+      </div>
+      <button id="closeModalBtn" class="text-nepsMuted hover:text-white p-1 rounded-lg hover:bg-nepsBorder/50 transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Preview de la Imagen Principal -->
+    <div class="p-4 bg-nepsBg/50 flex items-center justify-center border-b border-nepsBorder min-h-[250px] max-h-[60vh] overflow-hidden">
+      <img id="modalImg" src="" alt="Avatar Zoom" class="max-h-[50vh] w-auto object-contain rounded-lg border border-nepsBorder/80 shadow-md">
+    </div>
+
+    <!-- Detalle del Usuario -->
+    <div class="p-5 space-y-3">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 id="modalName" class="text-sm font-bold text-white">---</h3>
+          <p id="modalEmail" class="text-xs text-nepsMuted">---</p>
+        </div>
+        <span id="modalStatus" class="text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border">---</span>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 text-xs border-t border-nepsBorder/60 pt-3 text-nepsMuted">
+        <div>Nacionalidad: <strong id="modalCountry" class="text-slate-200">---</strong></div>
+        <div>Baneos: <strong id="modalBans" class="text-slate-200">---</strong></div>
+        <div class="col-span-2">Registro: <strong id="modalDate" class="text-slate-200">---</strong></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- LÓGICA JAVASCRIPT -->
+<script>
+  // Datos simulados para las cards (puedes pasar este JSON directamente en datasets de HTML)
+  const usersData = {
+    "1": {
+      name: "Mariana Gómez",
+      email: "marian.gomez@gmail.com",
+      country: "Argentina",
+      date: "14/08/2026 18:32",
+      bans: "0",
+      status: "Active",
+      statusClass: "bg-emerald-500/10 border-emerald-500/20 text-emerald-400",
+      img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80"
+    },
+    "2": {
+      name: "Carlos Rodríguez",
+      email: "carlos.rod@hotmail.com",
+      country: "Chile",
+      date: "02/06/2026 09:15",
+      bans: "2",
+      status: "Temp Ban",
+      statusClass: "bg-amber-500/10 border-amber-500/20 text-amber-400",
+      img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=800&q=80"
+    },
+    "3": {
+      name: "Lucas Fernández",
+      email: "lfernandez@yahoo.com",
+      country: "Uruguay",
+      date: "11/01/2025 21:40",
+      bans: "5",
+      status: "Inactive",
+      statusClass: "bg-nepsAccent/10 border-nepsAccent/20 text-nepsAccent",
+      img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=800&q=80"
+    }
+  };
+
+  const modal = document.getElementById('userModal');
+  const modalContainer = document.getElementById('modalContainer');
+  const closeModalBtn = document.getElementById('closeModalBtn');
+
+  // Abrir Modal
+  function openModal(userId) {
+    const data = usersData[userId];
+    if (!data) return;
+
+    document.getElementById('modalImg').src = data.img;
+    document.getElementById('modalName').textContent = data.name;
+    document.getElementById('modalEmail').textContent = data.email;
+    document.getElementById('modalCountry').textContent = data.country;
+    document.getElementById('modalDate').textContent = data.date;
+    document.getElementById('modalBans').textContent = data.bans;
+
+    const statusEl = document.getElementById('modalStatus');
+    statusEl.textContent = data.status;
+    statusEl.className = `text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border ${data.statusClass}`;
+
+    modal.classList.remove('opacity-0', 'pointer-events-none');
+    modalContainer.classList.remove('scale-95');
+    modalContainer.classList.add('scale-100');
+  }
+
+  // Cerrar Modal
+  function closeModal() {
+    modal.classList.add('opacity-0', 'pointer-events-none');
+    modalContainer.classList.remove('scale-100');
+    modalContainer.classList.add('scale-95');
+  }
+
+  // Escuchar Clics en la Grilla
+  document.querySelectorAll('.user-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.getAttribute('data-user-id');
+      openModal(id);
+    });
+  });
+
+  // Eventos de Cierre
+  closeModalBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+</script>
+
+</body>
+</html>

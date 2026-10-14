@@ -1,0 +1,9 @@
+dotnet test "C:/Users/fpiedrasanta/Desktop/read comics/partirtura read comics/tests/Infrastructure.Tests/Infrastructure.Tests.csproj" --filter "FullyQualifiedName~EditExistingNumberWorkflowIntegrationTests"
+
+dotnet test "C:/Users/fpiedrasanta/Desktop/read comics/partirtura read comics/tests/Infrastructure.Tests/Infrastructure.Tests.csproj" --filter "FullyQualifiedName~EditGraphicNovelWorkflowIntegrationTests"
+
+dotnet test "C:/Users/fpiedrasanta/Desktop/read comics/partirtura read comics/tests/Infrastructure.Tests/Infrastructure.Tests.csproj" --filter "FullyQualifiedName~FullWorkflowIntegrationTests"
+
+dotnet test "C:/Users/fpiedrasanta/Desktop/read comics/partirtura read comics/tests/Infrastructure.Tests/Infrastructure.Tests.csproj" --filter "FullyQualifiedName~ListWorksIntegrationTests"
+
+dotnet test "C:/Users/fpiedrasanta/Desktop/read comics/partirtura read comics/tests/Infrastructure.Tests/Infrastructure.Tests.csproj" --filter "FullyQualifiedName~PersonAdministrationIntegrationTests"

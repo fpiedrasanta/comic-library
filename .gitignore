@@ -1,0 +1,44 @@
+# ---- Secretos y credenciales (NO subir al repo) ----
+api keys.txt
+google secret.txt
+client_secret_*.json
+partirtura read comics/api/Api/appsettings*.json
+
+# ---- .NET / C# ----
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.suo
+*.publishsettings
+*.pubxml.user
+.vs/
+
+# ---- Node / React / Vite ----
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.tsbuildinfo
+coverage/
+playwright-report/
+test-results/
+TestResults/
+*.trx
+
+# ---- Logs ----
+Logs/
+*.log
+
+# ---- Almacenamiento en runtime del API (subidas de usuarios, portadas, temporales) ----
+partirtura read comics/api/Api/Storage/
+
+# ---- Artefactos de pruebas manuales ----
+test-last-*.txt
+*qa-email.txt
+
+# ---- Sistema operativo / editores ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/

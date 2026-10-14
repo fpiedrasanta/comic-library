@@ -1,0 +1,39 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace [Project].Controllers;
+
+[ApiController]
+[Route("api/images")]
+public class ImagesController : ControllerBase
+{
+    private IUnitOfWork dataBase;
+	private IWebHostEnvironment env;
+    
+    public ImagesController(IUnitOfWork unitOfWork, IWebHostEnvironment env)
+    {
+        this.dataBase = unitOfWork;
+        this.env = env;
+    }
+
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetImage(long id, CancellationToken cancellationToken)
+    {
+        var image = await this.dataBase.Files.GetById(id)
+        if (image is null)
+        {
+            throw new BusinessNotFoundException("La imagen no existe en la base de datos");
+        }
+
+		FileStorageService fileStorage = new FileStorageService(this.env);
+        var physicalPath = fileStorage.GetPhysicalPath(image.StoragePath);
+
+        if (string.IsNullOrWhiteSpace(physicalPath) || !System.IO.File.Exists(physicalPath))
+        {
+            throw new BusinessNotFoundException("No se encontró la imagen fisica");
+        }
+
+        var contentType = string.IsNullOrWhiteSpace(image.ContentType) ? "application/octet-stream" : image.ContentType;
+        return PhysicalFile(physicalPath, contentType);
+    }
+}

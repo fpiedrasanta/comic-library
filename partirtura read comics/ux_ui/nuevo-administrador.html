@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurar Administrador - NEPS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="admin-admins-list.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Administradores
+        </a>
+        <a href="admin-bans.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          Baneos & Sanciones
+        </a>
+        <a href="admin-users-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Usuarios
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">FP</div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Super Admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="admin-admins-list.html" class="flex items-center gap-1.5 text-xs font-semibold text-nepsMuted hover:text-white bg-nepsCard border border-nepsBorder hover:border-nepsMuted px-3 py-1.5 rounded-lg transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Volver al Listado</span>
+        </a>
+        <div class="h-4 w-px bg-nepsBorder hidden sm:block"></div>
+        <h1 id="screenTitle" class="text-sm font-bold text-white tracking-tight hidden sm:block">Crear Administrador</h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span id="modeBadge" class="text-[11px] text-nepsPrimary bg-nepsPrimary/10 px-2.5 py-1 rounded-md border border-nepsPrimary/20 font-semibold uppercase tracking-wider">
+          Modo Creación
+        </span>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-4xl w-full mx-auto">
+
+      <!-- HEADER DE LA PANTALLA -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-nepsBorder/60 pb-4">
+        <div>
+          <h2 id="pageHeadline" class="text-lg font-bold text-white tracking-tight">Nuevo Usuario Administrador</h2>
+          <p class="text-xs text-nepsMuted mt-0.5">Complete la información requerida para otorgar acceso administrativo a la plataforma.</p>
+        </div>
+
+        <!-- BADGES INFORMATIVOS DE ROL Y ESTADO EN MODO EDICIÓN -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center gap-1.5 bg-nepsInput border border-nepsBorder px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-300" title="El rol asignado es inmutable">
+            <svg class="w-3.5 h-3.5 text-nepsPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            <span>Rol: <strong class="text-white">Administrator</strong></span>
+          </div>
+
+          <div id="accountStatusBadge" class="hidden flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold text-emerald-400">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Cuenta Activa</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- FORMULARIO PRINCIPAL -->
+      <form id="adminForm" onsubmit="handleFormSubmit(event)" class="bg-nepsCard border border-nepsBorder rounded-2xl p-5 sm:p-7 space-y-6">
+        
+        <!-- ALERT DE ERROR GENERAL DE BACKEND (Oculto por defecto) -->
+        <div id="backendErrorAlert" class="hidden bg-nepsAccent/10 border border-nepsAccent/30 rounded-xl p-4 flex items-start gap-3">
+          <svg class="w-5 h-5 text-nepsAccent flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <div class="text-xs space-y-0.5">
+            <p class="font-bold text-nepsAccent">No se pudo procesar la solicitud</p>
+            <p id="backendErrorMessage" class="text-nepsMuted">El correo electrónico ingresado ya se encuentra registrado por otro usuario.</p>
+          </div>
+        </div>
+
+        <!-- SECCIÓN DE AVATAR -->
+        <div class="space-y-2">
+          <label class="text-xs font-bold text-white block">Avatar de la Cuenta</label>
+          <div class="flex items-center gap-4">
+            <div class="relative group">
+              <img id="avatarPreview" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=160&q=80" class="w-20 h-20 rounded-2xl object-cover bg-nepsInput border border-nepsBorder group-hover:border-nepsPrimary transition-colors">
+              <div class="absolute inset-0 bg-slate-950/40 rounded-2xl opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity cursor-pointer">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h0.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              </div>
+            </div>
+            <div class="space-y-1">
+              <button type="button" class="px-3 py-1.5 bg-nepsInput hover:bg-nepsBorder text-white border border-nepsBorder font-semibold rounded-lg text-xs transition-colors">
+                Subir nueva imagen
+              </button>
+              <p class="text-[11px] text-nepsMuted">Recomendado: JPG o PNG de al menos 400x400px.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- GRILLA DE CAMPOS: NOMBRE Y APELLIDO -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          
+          <!-- CAMPO: NOMBRE -->
+          <div class="space-y-1.5">
+            <label for="firstName" class="text-xs font-bold text-white flex items-center gap-1">
+              Nombre <span class="text-nepsAccent">*</span>
+            </label>
+            <input type="text" id="firstName" required placeholder="Ej. Ignacio" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+            <p id="firstNameError" class="hidden text-[11px] text-nepsAccent">El nombre es obligatorio.</p>
+          </div>
+
+          <!-- CAMPO: APELLIDO -->
+          <div class="space-y-1.5">
+            <label for="lastName" class="text-xs font-bold text-white flex items-center gap-1">
+              Apellido <span class="text-nepsAccent">*</span>
+            </label>
+            <input type="text" id="lastName" required placeholder="Ej. Rossi" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+            <p id="lastNameError" class="hidden text-[11px] text-nepsAccent">El apellido es obligatorio.</p>
+          </div>
+
+        </div>
+
+        <!-- GRILLA DE CAMPOS: EMAIL Y PAÍS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          
+          <!-- CAMPO: EMAIL -->
+          <div class="space-y-1.5">
+            <label for="email" class="text-xs font-bold text-white flex items-center gap-1">
+              Correo Electrónico <span class="text-nepsAccent">*</span>
+            </label>
+            <input type="email" id="email" required placeholder="ejemplo@neps.io" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+            <p id="emailError" class="hidden text-[11px] text-nepsAccent">Ingrese una dirección de correo válida.</p>
+          </div>
+
+          <!-- CAMPO: PAÍS (Selector drop-down) -->
+          <div class="space-y-1.5">
+            <label for="country" class="text-xs font-bold text-white flex items-center gap-1">
+              País <span class="text-nepsAccent">*</span>
+            </label>
+            <select id="country" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+              <option value="" disabled selected>Seleccione un país...</option>
+              <option value="AR">Argentina</option>
+              <option value="CL">Chile</option>
+              <option value="UY">Uruguay</option>
+              <option value="CO">Colombia</option>
+              <option value="MX">México</option>
+              <option value="ES">España</option>
+            </select>
+            <p id="countryError" class="hidden text-[11px] text-nepsAccent">Debe seleccionar un país de la lista.</p>
+          </div>
+
+        </div>
+
+        <!-- GRILLA DE CAMPOS: CONTRASEÑAS (SOLO EN MODO CREACIÓN) -->
+        <div id="passwordSection" class="grid grid-cols-1 sm:grid-cols-2 gap-5 border-t border-nepsBorder/60 pt-5">
+          
+          <!-- CAMPO: CONTRASEÑA -->
+          <div class="space-y-1.5">
+            <label for="password" class="text-xs font-bold text-white flex items-center gap-1">
+              Contraseña <span class="text-nepsAccent">*</span>
+            </label>
+            <input type="password" id="password" placeholder="••••••••••••" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+            <p class="text-[11px] text-nepsMuted">Mínimo 8 caracteres, al menos un número o símbolo.</p>
+          </div>
+
+          <!-- CAMPO: CONFIRMAR CONTRASEÑA -->
+          <div class="space-y-1.5">
+            <label for="confirmPassword" class="text-xs font-bold text-white flex items-center gap-1">
+              Confirmar Contraseña <span class="text-nepsAccent">*</span>
+            </label>
+            <input type="password" id="confirmPassword" placeholder="••••••••••••" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+            <p id="passwordMismatchError" class="hidden text-[11px] text-nepsAccent">Las contraseñas no coinciden.</p>
+          </div>
+
+        </div>
+
+        <!-- BOTONERA DE ACCIONES -->
+        <div class="border-t border-nepsBorder/60 pt-5 flex flex-col-reverse sm:flex-row items-center justify-end gap-3">
+          
+          <!-- BOTÓN CANCELAR -->
+          <a href="admin-admins-list.html" class="w-full sm:w-auto px-5 py-2.5 bg-nepsInput hover:bg-nepsBorder text-nepsMuted hover:text-white border border-nepsBorder font-semibold rounded-xl text-xs transition-all text-center">
+            Cancelar
+          </a>
+
+          <!-- BOTÓN GUARDAR -->
+          <button type="submit" id="btnSubmit" class="w-full sm:w-auto px-6 py-2.5 bg-nepsPrimary hover:bg-sky-300 text-slate-950 font-bold rounded-xl text-xs shadow-lg shadow-nepsPrimary/10 transition-all flex items-center justify-center gap-2">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <span id="btnSubmitText">Guardar Administrador</span>
+          </button>
+
+        </div>
+
+      </form>
+
+    </main>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN ANTES DE GUARDAR -->
+  <div id="modalConfirmSave" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsPrimary/40 rounded-2xl p-6 max-w-md w-full space-y-4 shadow-2xl">
+      <div class="w-12 h-12 rounded-xl bg-nepsPrimary/10 border border-nepsPrimary/20 flex items-center justify-center text-nepsPrimary">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+      </div>
+
+      <div class="space-y-1">
+        <h3 id="modalConfirmTitle" class="text-base font-bold text-white">¿Estás seguro que deseas crear al administrador?</h3>
+        <p class="text-xs text-nepsMuted">Revise la información del usuario antes de confirmar la operación.</p>
+      </div>
+
+      <!-- RESUMEN DE CAMBIOS / DATOS -->
+      <div class="bg-nepsInput border border-nepsBorder rounded-xl p-3 text-xs space-y-1">
+        <p class="text-nepsMuted">Nombre completo: <strong id="summaryName" class="text-white">Ignacio Rossi</strong></p>
+        <p class="text-nepsMuted">Correo electrónico: <strong id="summaryEmail" class="text-white">ejemplo@neps.io</strong></p>
+        <p class="text-nepsMuted">Rol asignado: <strong class="text-nepsPrimary font-bold">Administrator</strong></p>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 bg-nepsInput hover:bg-nepsBorder text-nepsMuted hover:text-white border border-nepsBorder font-semibold rounded-xl text-xs transition-colors">
+          Cancelar
+        </button>
+        <button id="btnConfirmExecute" onclick="executeSave()" class="px-5 py-2 bg-nepsPrimary hover:bg-sky-300 text-slate-950 font-bold rounded-xl text-xs transition-colors flex items-center gap-2">
+          <span>Confirmar y Guardar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LÓGICA DE DUALIDAD DE MODO Y MANEJO DE ESTADOS -->
+  <script>
+    let isEditMode = false;
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      // Armar resumen para el modal
+      const fn = document.getElementById('firstName').value;
+      const ln = document.getElementById('lastName').value;
+      const em = document.getElementById('email').value;
+
+      document.getElementById('summaryName').textContent = `${fn} ${ln}`;
+      document.getElementById('summaryEmail').textContent = em;
+
+      document.getElementById('modalConfirmTitle').textContent = isEditMode 
+        ? `¿Estás seguro que deseas guardar los cambios de ${fn} ${ln}?`
+        : `¿Estás seguro que deseas crear al administrador ${fn} ${ln}?`;
+
+      document.getElementById('modalConfirmSave').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('modalConfirmSave').classList.add('hidden');
+    }
+
+    function executeSave() {
+      const btn = document.getElementById('btnConfirmExecute');
+      btn.disabled = true;
+      btn.innerHTML = `<svg class="w-4 h-4 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg> <span>Procesando...</span>`;
+
+      // Simular guardado exitoso y redirección al listado
+      setTimeout(() => {
+        window.location.href = "admin-admins-list.html?status=success";
+      }, 1200);
+    }
+
+    // FUNCIÓN AUXILIAR FRONTEND: ALTERNAR A MODO EDICIÓN PRECARGADO
+    function setEditMode(adminData) {
+      isEditMode = true;
+      document.getElementById('screenTitle').textContent = "Editar Administrador";
+      document.getElementById('pageHeadline').textContent = "Modificación de Administrador";
+      
+      const badge = document.getElementById('modeBadge');
+      badge.textContent = "Modo Edición";
+      badge.className = "text-[11px] text-amber-400 bg-amber-500/10 px-2.5 py-1 rounded-md border border-amber-500/20 font-semibold uppercase tracking-wider";
+
+      document.getElementById('accountStatusBadge').classList.remove('hidden');
+      document.getElementById('passwordSection').classList.add('hidden'); // Ocultar bloque contraseñas
+
+      if (adminData) {
+        document.getElementById('firstName').value = adminData.firstName || '';
+        document.getElementById('lastName').value = adminData.lastName || '';
+        document.getElementById('email').value = adminData.email || '';
+        document.getElementById('country').value = adminData.country || '';
+        if (adminData.avatar) document.getElementById('avatarPreview').src = adminData.avatar;
+      }
+    }
+  </script>
+
+</body>
+</html>

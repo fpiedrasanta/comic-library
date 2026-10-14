@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Recuperar Contraseña - Comic Library Admin | NEPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          },
+          boxShadow: {
+            'glow-blue': '0 4px 25px rgba(56, 189, 248, 0.12)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col justify-between relative overflow-x-hidden">
+
+  <!-- Glows de Fondo -->
+  <div class="fixed top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_85%_15%,rgba(244,63,94,0.05)_0%,transparent_70%)] pointer-events-none"></div>
+  <div class="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_15%_85%,rgba(56,189,248,0.05)_0%,transparent_70%)] pointer-events-none"></div>
+
+  <header class="p-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="login.html" class="flex items-center gap-2">
+        <div class="text-2xl font-bold tracking-tight text-white">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-xs uppercase tracking-widest text-nepsMuted font-semibold border-l border-nepsBorder pl-3 ml-1">Admin Control Panel</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center px-4 py-8 relative z-10">
+    <div class="w-full max-w-md bg-nepsCard border border-nepsBorder rounded-2xl p-6 sm:p-8 shadow-glow-blue space-y-6">
+      
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-nepsPrimary/10 text-nepsPrimary border border-nepsPrimary/20 mb-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+        </div>
+        <h1 class="text-xl font-bold text-white">¿Olvidaste tu contraseña?</h1>
+        <p class="text-xs text-nepsMuted">Ingresá tu correo electrónico registrado para enviarte un código de verificación.</p>
+      </div>
+
+      <form action="verify-code.html" class="space-y-4">
+        <div class="space-y-1.5">
+          <label class="block text-xs font-semibold text-nepsText">Correo Electrónico</label>
+          <input type="email" placeholder="admin@neps.dev" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-xs text-white placeholder-slate-600 rounded-lg px-3.5 py-2.5 outline-none transition-all">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-nepsPrimary hover:bg-sky-300 text-nepsBg font-bold text-xs rounded-lg shadow-glow-blue transition-all active:scale-[0.98] mt-2">
+          Enviar Código
+        </button>
+      </form>
+
+      <div class="text-center pt-2 border-t border-nepsBorder/60">
+        <a href="login.html" class="inline-flex items-center gap-1.5 text-xs text-nepsMuted hover:text-white transition-colors">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          Volver al inicio de sesión
+        </a>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="py-6 text-center text-xs text-nepsMuted border-t border-nepsBorder/50">
+    &copy; 2026 Comic Library Admin. Sistema Privado.
+  </footer>
+</body>
+</html>

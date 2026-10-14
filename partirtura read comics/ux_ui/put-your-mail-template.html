@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recuperar Contraseña - Comic Library</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff',
+                            500: '#6366f1',
+                            600: '#4f46e5',
+                            700: '#4338ca',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="h-full flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 font-sans antialiased bg-slate-900 text-slate-200">
+
+    <!-- Card Principal -->
+    <div class="w-full max-w-md bg-slate-800 border border-slate-700 rounded-2xl p-6 sm:p-8 shadow-2xl">
+        
+        <!-- Header -->
+        <div class="text-center mb-6">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-full bg-indigo-500/10 text-indigo-400 text-2xl font-bold mb-3 ring-1 ring-indigo-500/20">
+                📖
+            </div>
+            <h1 class="text-2xl font-extrabold text-white tracking-tight">Comic Library</h1>
+            <p class="text-xs uppercase tracking-widest text-indigo-400 font-semibold mt-1">Recuperación de Cuenta</p>
+        </div>
+
+        <!-- Formulario de Solicitud -->
+        <div id="request-state">
+            <div class="text-center mb-6">
+                <h2 class="text-lg font-bold text-white mb-2">¿Olvidaste tu contraseña?</h2>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                    Ingresá tu correo electrónico. Si la cuenta existe en nuestro sistema, te enviaremos un código para restablecer tu contraseña.
+                </p>
+            </div>
+
+            <form id="forgot-password-form" class="space-y-5" onsubmit="handleSubmit(event)">
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-300 mb-1.5">Correo electrónico</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+                            ✉️
+                        </div>
+                        <input type="email" id="email" name="email" required placeholder="tu@email.com"
+                            class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 text-sm transition">
+                    </div>
+                </div>
+
+                <button type="submit" 
+                    class="w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-sm shadow-lg shadow-indigo-600/20 transition duration-150 ease-in-out active:scale-[0.99]">
+                    Enviar código de recuperación
+                </button>
+            </form>
+        </div>
+
+        <!-- Estado de Confirmación (Oculto por defecto) -->
+        <div id="success-state" class="hidden text-center py-2">
+            <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-500/10 text-emerald-400 text-xl font-bold mb-4 ring-1 ring-emerald-500/20">
+                ✉️
+            </div>
+            <h2 class="text-lg font-bold text-white mb-2">Revisá tu correo</h2>
+            <p class="text-sm text-slate-300 leading-relaxed mb-6">
+                Si la dirección ingresada coincide con una cuenta activa en **Comic Library**, recibirás un correo con un código de verificación en los próximos minutos.
+            </p>
+            
+            <div class="p-3.5 bg-slate-900/60 border border-slate-700/60 rounded-xl mb-6 text-left">
+                <p class="text-xs text-slate-400 leading-normal">
+                    💡 <strong>¿No lo recibiste?</strong> Revisá la carpeta de correo no deseado (spam) o intentá nuevamente en unos minutos.
+                </p>
+            </div>
+
+            <a href="#" id="continue-link" class="inline-block w-full py-3 px-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl text-sm text-center shadow-lg shadow-indigo-600/20 transition">
+                Ingresar código de verificación
+            </a>
+        </div>
+
+        <!-- Footer / Volver -->
+        <div class="mt-6 pt-5 border-t border-slate-700/60 text-center">
+            <a href="login.html" class="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-white transition font-medium">
+                <span>←</span> Volver al inicio de sesión
+            </a>
+        </div>
+
+    </div>
+
+    <script>
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            // Simulación de envío: Oculta el form y muestra la confirmación sin revelar si existe el mail
+            document.getElementById('request-state').classList.add('hidden');
+            document.getElementById('success-state').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

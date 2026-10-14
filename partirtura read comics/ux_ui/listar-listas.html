@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Exploración de Listas - Comic Library | NEPS</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          },
+          boxShadow: {
+            'glow-custom': '0 8px 30px -5px var(--glow-color, rgba(56, 189, 248, 0.15))',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans relative overflow-x-hidden flex flex-col justify-between">
+
+  <!-- GLOWS AMBIENTALES DE FONDO -->
+  <div class="fixed top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_85%_15%,rgba(168,85,247,0.06)_0%,transparent_70%)] pointer-events-none"></div>
+  <div class="fixed top-1/2 left-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_15%_50%,rgba(56,189,248,0.05)_0%,transparent_70%)] pointer-events-none"></div>
+
+  <!-- NAVBAR HEADER -->
+  <header class="border-b border-nepsBorder bg-nepsBg/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="#" class="text-2xl font-bold tracking-tight text-white">
+          &lt;neps&lt;span class="text-nepsAccent"&gt;/&lt;/span&gt;&gt;
+        </a>
+        <span class="text-xs uppercase tracking-widest text-nepsMuted font-semibold hidden md:inline-block border-l border-nepsBorder pl-3">
+          Descubrir / Listas
+        </span>
+      </div>
+
+      <!-- DEMO STATE CONTROLS -->
+      <div class="flex items-center gap-1.5 bg-nepsInput border border-nepsBorder p-1 rounded-xl text-[11px]">
+        <span class="text-nepsMuted font-mono px-2 hidden lg:inline">ESTADOS DEMO:</span>
+        <button onclick="showState('grid')" class="px-2.5 py-1 rounded-lg font-semibold bg-nepsPrimary text-nepsBg">Grilla</button>
+        <button onclick="showState('loading')" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white">Loading</button>
+        <button onclick="showState('empty')" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white">Sin resultados</button>
+        <button onclick="showState('error')" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white">Error</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL (TASK-UXUI-0027) -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 flex-grow w-full space-y-8">
+
+    <!-- SECCIÓN ENCABEZADO Y BUSCADOR -->
+    <section class="space-y-6">
+      <div class="space-y-1">
+        <div class="flex items-center gap-2">
+          <span class="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-purple-500/10 text-purple-400 border border-purple-500/20">
+            Colecciones Temáticas
+          </span>
+        </div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+          Listas de Lectura
+        </h1>
+        <p class="text-xs text-nepsMuted max-w-2xl">
+          Descubre guías de lectura, arcos argumentales y colecciones curadas organizadas por la comunidad y las editoriales.
+        </p>
+      </div>
+
+      <!-- CONTENEDOR DE BÚSQUEDA Y FILTROS -->
+      <div class="bg-nepsCard/60 border border-nepsBorder rounded-2xl p-4 sm:p-5 space-y-4 backdrop-blur-sm shadow-xl">
+        
+        <!-- BUSCADOR (Nombre OR Descripción) -->
+        <div class="relative w-full">
+          <input type="text" id="lists-search-input" 
+            placeholder="Buscar listas por nombre o sinopsis/descripción..." 
+            class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-nepsText placeholder-slate-500 rounded-xl pl-11 pr-10 py-3 text-xs sm:text-sm outline-none transition-all shadow-inner">
+          <svg class="w-5 h-5 text-nepsMuted absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+
+        <!-- FILTROS CON JERARQUÍA VISUAL (Editorial -> Franquicia -> Serie) Y TIPO DE LISTA -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-nepsBorder/60">
+          
+          <!-- FILTRO 1: EDITORIAL -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-sky-400"></span>
+              Editorial
+            </label>
+            <div class="relative">
+              <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-slate-200 rounded-xl px-3 py-2.5 appearance-none focus:border-nepsPrimary outline-none cursor-pointer pr-8">
+                <option value="">Todas las Editoriales</option>
+                <option value="marvel">Marvel Comics</option>
+                <option value="dc">DC Comics</option>
+                <option value="shueisha">Shueisha</option>
+              </select>
+              <svg class="w-4 h-4 text-nepsMuted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- FILTRO 2: FRANQUICIA (Dependiente de Editorial) -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+              <span class="text-nepsMuted">└</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-purple-400"></span>
+              Franquicia
+            </label>
+            <div class="relative">
+              <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-slate-200 rounded-xl px-3 py-2.5 appearance-none focus:border-nepsPrimary outline-none cursor-pointer pr-8">
+                <option value="">Todas las Franquicias</option>
+                <option value="xmen">X-Men</option>
+                <option value="batman">Batman</option>
+                <option value="dragonball">Dragon Ball</option>
+              </select>
+              <svg class="w-4 h-4 text-nepsMuted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- FILTRO 3: SERIE (Dependiente de Franquicia) -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+              <span class="text-nepsMuted pl-2">└</span>
+              <span class="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
+              Serie
+            </label>
+            <div class="relative">
+              <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-slate-200 rounded-xl px-3 py-2.5 appearance-none focus:border-nepsPrimary outline-none cursor-pointer pr-8">
+                <option value="">Todas las Series</option>
+                <option value="houseofm">House of M (2005)</option>
+                <option value="dbs">Dragon Ball Super</option>
+              </select>
+              <svg class="w-4 h-4 text-nepsMuted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- FILTRO 4: TIPO DE LISTA -->
+          <div class="space-y-1.5">
+            <label class="text-[11px] font-semibold text-slate-300 flex items-center gap-1.5">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
+              Tipo de Lista
+            </label>
+            <div class="relative">
+              <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-slate-200 rounded-xl px-3 py-2.5 appearance-none focus:border-nepsPrimary outline-none cursor-pointer pr-8">
+                <option value="">Todos los tipos</option>
+                <option value="cronologica">Orden Cronológico</option>
+                <option value="evento">Evento / Crossover</option>
+                <option value="recomendados">Esenciales / Imperdibles</option>
+                <option value="guia">Guía de Inicio</option>
+              </select>
+              <svg class="w-4 h-4 text-nepsMuted absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTADO 1: GRILLA DE CARDS DE LIST -->
+    <section id="view-grid" class="space-y-4">
+      <div class="flex items-center justify-between text-xs text-nepsMuted border-b border-nepsBorder/60 pb-2">
+        <p>Mostrando <span class="font-bold text-white">5</span> listas encontradas</p>
+      </div>
+
+      <!-- GRILLA RESPONSIVE (Adapta columnas para portadas verticales) -->
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        
+        <!-- CARD 1: EVENTO / CROSSOVER (Color Distintivo: #f51b00 / Rojo) -->
+        <a href="/lists/1" class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 cursor-pointer relative"
+           style="--glow-color: rgba(245, 27, 0, 0.25);"
+           onmouseenter="this.style.borderColor='rgba(245, 27, 0, 0.7)'; this.style.boxShadow='0 12px 30px -5px rgba(245, 27, 0, 0.3)';"
+           onmouseleave="this.style.borderColor='#2d2c33'; this.style.boxShadow='none';">
+          
+          <!-- COVER VERTICAL TIPO PORTADA CÓMIC (Sin padding interno, object-cover) -->
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=500&auto=format&fit=crop&q=80" 
+                 alt="Orden de lectura: Guerras Secretas" 
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <!-- Borde superior/acento de color representativo -->
+            <div class="absolute top-0 left-0 right-0 h-1" style="background-color: #f51b00;"></div>
+          </div>
+
+          <!-- CONTENIDO DE LA CARD (Únicamente: Tipo, Nombre y Cantidad de obras) -->
+          <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border" 
+                    style="background-color: rgba(245, 27, 0, 0.15); border-color: rgba(245, 27, 0, 0.4); color: #ff523b;">
+                Evento / Crossover
+              </span>
+              <h3 class="text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-2 leading-snug" title="Guerras Secretas: Saga Completa Marvel">
+                Guerras Secretas: Saga Completa Marvel
+              </h3>
+            </div>
+            
+            <p class="text-[11px] font-medium text-nepsMuted flex items-center gap-1 pt-1 border-t border-nepsBorder/40">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              24 obras
+            </p>
+          </div>
+        </a>
+
+        <!-- CARD 2: NOMBRE LARGO (Color Distintivo: #8b5cf6 / Violeta) -->
+        <a href="/lists/2" class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 cursor-pointer relative"
+           onmouseenter="this.style.borderColor='rgba(139, 92, 246, 0.7)'; this.style.boxShadow='0 12px 30px -5px rgba(139, 92, 246, 0.3)';"
+           onmouseleave="this.style.borderColor='#2d2c33'; this.style.boxShadow='none';">
+          
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=500&auto=format&fit=crop&q=80" 
+                 alt="X-Men: Era de Apocalipsis - Guía Esencial de Lectura Definitiva" 
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-0 left-0 right-0 h-1" style="background-color: #8b5cf6;"></div>
+          </div>
+
+          <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border" 
+                    style="background-color: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.4); color: #c084fc;">
+                Orden Cronológico
+              </span>
+              <!-- Nombre largo para verificar que la card adapte el texto sin romper -->
+              <h3 class="text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-2 leading-snug" title="X-Men: Era de Apocalipsis - Guía Esencial de Lectura Definitiva Vol. 1">
+                X-Men: Era de Apocalipsis - Guía Esencial de Lectura Definitiva Vol. 1
+              </h3>
+            </div>
+            
+            <p class="text-[11px] font-medium text-nepsMuted flex items-center gap-1 pt-1 border-t border-nepsBorder/40">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              42 obras
+            </p>
+          </div>
+        </a>
+
+        <!-- CARD 3: CASO LIST SIN IMAGEN / COVER FALTANTE (Color Distintivo: #06b6d4 / Cían) -->
+        <a href="/lists/3" class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 cursor-pointer relative"
+           onmouseenter="this.style.borderColor='rgba(6, 182, 212, 0.7)'; this.style.boxShadow='0 12px 30px -5px rgba(6, 182, 212, 0.3)';"
+           onmouseleave="this.style.borderColor='#2d2c33'; this.style.boxShadow='none';">
+          
+          <!-- COVER FALTANTE TRATADO CON FALLBACK Y COLOR ACCENT -->
+          <div class="w-full aspect-[2/3] bg-slate-950 border-b border-nepsBorder/60 flex flex-col items-center justify-center p-4 text-center relative group-hover:bg-slate-900/90 transition-colors">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-400 mb-2">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+              </svg>
+            </div>
+            <span class="text-[10px] font-mono text-nepsMuted">Sin portada disponible</span>
+            <div class="absolute top-0 left-0 right-0 h-1" style="background-color: #06b6d4;"></div>
+          </div>
+
+          <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border" 
+                    style="background-color: rgba(6, 182, 212, 0.15); border-color: rgba(6, 182, 212, 0.4); color: #22d3ee;">
+                Guía de Inicio
+              </span>
+              <h3 class="text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-2 leading-snug" title="Batman: Por dónde empezar a leer">
+                Batman: Por dónde empezar a leer
+              </h3>
+            </div>
+            
+            <p class="text-[11px] font-medium text-nepsMuted flex items-center gap-1 pt-1 border-t border-nepsBorder/40">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              10 obras
+            </p>
+          </div>
+        </a>
+
+        <!-- CARD 4: IMPERDIBLES (Color Distintivo: #10b981 / Verde Emerald) -->
+        <a href="/lists/4" class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 cursor-pointer relative"
+           onmouseenter="this.style.borderColor='rgba(16, 185, 129, 0.7)'; this.style.boxShadow='0 12px 30px -5px rgba(16, 185, 129, 0.3)';"
+           onmouseleave="this.style.borderColor='#2d2c33'; this.style.boxShadow='none';">
+          
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=80" 
+                 alt="Manga Shonen: Mejores arcos de entrenamiento" 
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-0 left-0 right-0 h-1" style="background-color: #10b981;"></div>
+          </div>
+
+          <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border" 
+                    style="background-color: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #34d399;">
+                Esenciales / Imperdibles
+              </span>
+              <h3 class="text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-2 leading-snug" title="Manga Shonen: Los mejores arcos de la historia">
+                Manga Shonen: Los mejores arcos de la historia
+              </h3>
+            </div>
+            
+            <p class="text-[11px] font-medium text-nepsMuted flex items-center gap-1 pt-1 border-t border-nepsBorder/40">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              18 obras
+            </p>
+          </div>
+        </a>
+
+        <!-- CARD 5: CRONOLÓGICO (Color Distintivo: #f59e0b / Ámbar) -->
+        <a href="/lists/5" class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 cursor-pointer relative"
+           onmouseenter="this.style.borderColor='rgba(245, 158, 11, 0.7)'; this.style.boxShadow='0 12px 30px -5px rgba(245, 158, 11, 0.3)';"
+           onmouseleave="this.style.borderColor='#2d2c33'; this.style.boxShadow='none';">
+          
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=500&auto=format&fit=crop&q=80" 
+                 alt="Saga de Marineford: Canon Completo" 
+                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-0 left-0 right-0 h-1" style="background-color: #f59e0b;"></div>
+          </div>
+
+          <div class="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
+            <div class="space-y-1.5">
+              <span class="inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border" 
+                    style="background-color: rgba(245, 158, 11, 0.15); border-color: rgba(245, 158, 11, 0.4); color: #fbbf24;">
+                Orden Cronológico
+              </span>
+              <h3 class="text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-2 leading-snug" title="One Piece: Saga de Marineford">
+                One Piece: Saga de Marineford
+              </h3>
+            </div>
+            
+            <p class="text-[11px] font-medium text-nepsMuted flex items-center gap-1 pt-1 border-t border-nepsBorder/40">
+              <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              15 obras
+            </p>
+          </div>
+        </a>
+
+      </div>
+    </section>
+
+    <!-- ESTADO 2: LOADING (CARGA INICIAL / CARGA DEL LISTADO SKELETONS) -->
+    <section id="view-loading" class="hidden space-y-4">
+      <div class="text-xs text-nepsMuted border-b border-nepsBorder/60 pb-2">
+        <span class="font-mono animate-pulse">Cargando listas de lectura...</span>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
+        <!-- SKELETON ITEM 1 -->
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden space-y-3 p-3 animate-pulse">
+          <div class="w-full aspect-[2/3] bg-nepsInput rounded-xl"></div>
+          <div class="h-3 w-16 bg-nepsInput rounded"></div>
+          <div class="h-4 bg-nepsInput rounded w-4/5"></div>
+          <div class="h-3 bg-nepsInput rounded w-1/3 pt-2"></div>
+        </div>
+        <!-- SKELETON ITEM 2 -->
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden space-y-3 p-3 animate-pulse">
+          <div class="w-full aspect-[2/3] bg-nepsInput rounded-xl"></div>
+          <div class="h-3 w-16 bg-nepsInput rounded"></div>
+          <div class="h-4 bg-nepsInput rounded w-3/4"></div>
+          <div class="h-3 bg-nepsInput rounded w-1/3 pt-2"></div>
+        </div>
+        <!-- SKELETON ITEM 3 -->
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden space-y-3 p-3 animate-pulse hidden sm:block">
+          <div class="w-full aspect-[2/3] bg-nepsInput rounded-xl"></div>
+          <div class="h-3 w-16 bg-nepsInput rounded"></div>
+          <div class="h-4 bg-nepsInput rounded w-full"></div>
+          <div class="h-3 bg-nepsInput rounded w-1/3 pt-2"></div>
+        </div>
+        <!-- SKELETON ITEM 4 -->
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden space-y-3 p-3 animate-pulse hidden md:block">
+          <div class="w-full aspect-[2/3] bg-nepsInput rounded-xl"></div>
+          <div class="h-3 w-16 bg-nepsInput rounded"></div>
+          <div class="h-4 bg-nepsInput rounded w-2/3"></div>
+          <div class="h-3 bg-nepsInput rounded w-1/3 pt-2"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ESTADO 3: SIN RESULTADOS (EMPTY STATE) -->
+    <section id="view-empty" class="hidden py-16 text-center bg-nepsCard/40 border border-nepsBorder rounded-2xl space-y-4">
+      <div class="w-14 h-14 bg-nepsInput border border-nepsBorder rounded-2xl flex items-center justify-center mx-auto text-nepsMuted">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+        </svg>
+      </div>
+      <div class="space-y-1 max-w-sm mx-auto px-4">
+        <h3 class="text-base font-bold text-white">No se encontraron listas</h3>
+        <p class="text-xs text-nepsMuted">No existen colecciones que coincidan con los términos de búsqueda o los filtros seleccionados.</p>
+      </div>
+      <button onclick="showState('grid')" class="px-4 py-2 bg-nepsInput hover:bg-nepsCard border border-nepsBorder text-xs text-white font-semibold rounded-xl transition-all">
+        Limpiar filtros y búsqueda
+      </button>
+    </section>
+
+    <!-- ESTADO 4: ERROR -->
+    <section id="view-error" class="hidden py-16 text-center bg-red-950/10 border border-red-500/20 rounded-2xl space-y-4">
+      <div class="w-14 h-14 bg-red-500/10 border border-red-500/30 text-red-400 rounded-2xl flex items-center justify-center mx-auto">
+        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+      <div class="space-y-1 max-w-sm mx-auto px-4">
+        <h3 class="text-base font-bold text-white">Ocurrió un error al cargar las listas</h3>
+        <p class="text-xs text-nepsMuted">No fue posible conectar con el servidor para obtener los datos. Por favor reintenta.</p>
+      </div>
+      <button onclick="showState('grid')" class="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-xs text-red-300 font-semibold rounded-xl transition-all">
+        Reintentar
+      </button>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-nepsBorder bg-nepsBg py-6 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-nepsMuted">
+      &copy; 2026 Comic Library — Referencia visual <span class="text-white font-mono">TASK-UXUI-0027</span>
+    </div>
+  </footer>
+
+  <!-- SCRIPT DE INTERACTIVIDAD PARA DEMO DE ESTADOS -->
+  <script>
+    function showState(stateName) {
+      ['grid', 'loading', 'empty', 'error'].forEach(s => {
+        document.getElementById(`view-${s}`).classList.add('hidden');
+      });
+      document.getElementById(`view-${stateName}`).classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>

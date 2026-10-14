@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Escala de Avance de Lectura - Comic Library | NEPS</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          },
+          boxShadow: {
+            'glow-yellow': '0 0 10px rgba(250, 204, 21, 0.6)',
+            'glow-orange': '0 0 10px rgba(249, 115, 22, 0.6)',
+            'glow-green': '0 0 10px rgba(52, 211, 153, 0.6)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans relative flex flex-col justify-between">
+
+  <!-- NAVBAR SUPERIOR -->
+  <header class="border-b border-nepsBorder bg-nepsBg/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-8">
+        <a href="#" class="flex items-center gap-2 group">
+          <div class="text-2xl font-bold tracking-tight text-white transition-transform group-hover:scale-105">
+            &amp;lt;neps<span class="text-nepsAccent">/&amp;gt;</span>
+          </div>
+          <span class="text-xs uppercase tracking-widest text-nepsMuted font-semibold hidden md:inline-block border-l border-nepsBorder pl-3 ml-1">
+            Comic Library
+          </span>
+        </a>
+
+        <nav class="hidden lg:flex items-center gap-1 text-xs font-medium">
+          <a href="#" class="text-nepsMuted hover:text-white px-3 py-1.5 rounded-lg hover:bg-nepsCard transition-colors">Inicio</a>
+          <a href="#" class="bg-nepsCard text-nepsPrimary border border-nepsPrimary/30 px-3 py-1.5 rounded-lg shadow-sm">Catálogo</a>
+        </nav>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2">
+          <div class="w-8 h-8 rounded-lg bg-slate-800 border border-nepsBorder flex items-center justify-center font-bold text-xs text-nepsPrimary">A</div>
+          <div class="hidden md:block text-left">
+            <p class="text-xs font-semibold text-white">Administrator</p>
+            <p class="text-[10px] text-nepsMuted">Administrator</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL DE MUESTRA -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 flex-grow w-full space-y-6">
+    
+    <div class="border-b border-nepsBorder pb-3 flex justify-between items-center">
+      <h1 class="text-base font-bold text-white">Muestra de Estados de Lectura por Color</h1>
+      <span class="text-xs text-nepsMuted font-mono">0% &amp;bull; 10% &amp;bull; 60% &amp;bull; 100%</span>
+    </div>
+
+    <!-- GRILLA CON LAS 4 VARIANTES -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
+      
+      <!-- ========================================================= -->
+      <!-- 1. SIN LEER / 0% (NO MUESTRA NADA DE AVANCE)             -->
+      <!-- ========================================================= -->
+      <article class="bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/60 rounded-2xl overflow-hidden group transition-all duration-300 flex flex-col justify-between shadow-sm">
+        <div class="relative w-full aspect-[2/3] overflow-hidden bg-nepsInput">
+          <img src="https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          
+          <div class="absolute top-2 left-2 flex flex-wrap gap-1">
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Zenescope</span>
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Fly</span>
+          </div>
+
+          <span class="absolute bottom-2 right-2 bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+            SERIE
+          </span>
+          <!-- SIN BARRA DE PROGRESO INFERIOR -->
+        </div>
+
+        <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <span class="inline-block text-[10px] bg-nepsInput text-nepsPrimary border border-nepsPrimary/30 px-2 py-0.5 rounded font-mono font-bold">
+              Nº REGULAR - 0001
+            </span>
+            <h3 class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors line-clamp-1" title="Fly Vol.2 #01">
+              Fly Vol.2 #01
+            </h3>
+          </div>
+
+          <div class="pt-2 border-t border-nepsBorder/60 grid grid-cols-2 gap-1 text-[10px] text-nepsMuted">
+            <div>
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">PUBLICADO</span>
+              <strong class="text-slate-300 font-normal">1/10/2012</strong>
+            </div>
+            <div class="text-right">
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">SUBIDO</span>
+              <strong class="text-slate-300 font-normal">10/7/2026</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================= -->
+      <!-- 2. 10% LEÍDO (INICIO - AMARILLO)                          -->
+      <!-- ========================================================= -->
+      <article class="bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/60 rounded-2xl overflow-hidden group transition-all duration-300 flex flex-col justify-between shadow-sm">
+        <div class="relative w-full aspect-[2/3] overflow-hidden bg-nepsInput">
+          <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          
+          <div class="absolute top-2 left-2 flex flex-wrap gap-1">
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Zenescope</span>
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Fly</span>
+          </div>
+
+          <!-- BADGE DE PROGRESO 10% -->
+          <div class="absolute bottom-3 left-2">
+            <span class="bg-[#0b0f19]/85 backdrop-blur-md border border-amber-500/40 text-amber-400 text-[9px] font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-md">
+              <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+              10%
+            </span>
+          </div>
+
+          <span class="absolute bottom-2 right-2 bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+            SERIE
+          </span>
+
+          <!-- BARRA AMARILLA AL 10% -->
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/60">
+            <div class="bg-amber-400 h-full shadow-glow-yellow" style="width: 10%;"></div>
+          </div>
+        </div>
+
+        <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <span class="inline-block text-[10px] bg-nepsInput text-nepsPrimary border border-nepsPrimary/30 px-2 py-0.5 rounded font-mono font-bold">
+              Nº REGULAR - 0002
+            </span>
+            <h3 class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors line-clamp-1" title="Fly Vol.2 #02">
+              Fly Vol.2 #02
+            </h3>
+          </div>
+
+          <div class="pt-2 border-t border-nepsBorder/60 grid grid-cols-2 gap-1 text-[10px] text-nepsMuted">
+            <div>
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">PUBLICADO</span>
+              <strong class="text-slate-300 font-normal">1/11/2012</strong>
+            </div>
+            <div class="text-right">
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">SUBIDO</span>
+              <strong class="text-slate-300 font-normal">10/7/2026</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================= -->
+      <!-- 3. 60% LEÍDO (EN CURSO - NARANJA)                         -->
+      <!-- ========================================================= -->
+      <article class="bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/60 rounded-2xl overflow-hidden group transition-all duration-300 flex flex-col justify-between shadow-sm">
+        <div class="relative w-full aspect-[2/3] overflow-hidden bg-nepsInput">
+          <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          
+          <div class="absolute top-2 left-2 flex flex-wrap gap-1">
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Zenescope</span>
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Fly</span>
+          </div>
+
+          <!-- BADGE DE PROGRESO 60% -->
+          <div class="absolute bottom-3 left-2">
+            <span class="bg-[#0b0f19]/85 backdrop-blur-md border border-orange-500/40 text-orange-400 text-[9px] font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-md">
+              <span class="w-1.5 h-1.5 rounded-full bg-orange-400 animate-pulse"></span>
+              60%
+            </span>
+          </div>
+
+          <span class="absolute bottom-2 right-2 bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+            SERIE
+          </span>
+
+          <!-- BARRA NARANJA AL 60% -->
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/60">
+            <div class="bg-orange-500 h-full shadow-glow-orange" style="width: 60%;"></div>
+          </div>
+        </div>
+
+        <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <span class="inline-block text-[10px] bg-nepsInput text-nepsPrimary border border-nepsPrimary/30 px-2 py-0.5 rounded font-mono font-bold">
+              Nº REGULAR - 0003
+            </span>
+            <h3 class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors line-clamp-1" title="Fly Vol.2 #03">
+              Fly Vol.2 #03
+            </h3>
+          </div>
+
+          <div class="pt-2 border-t border-nepsBorder/60 grid grid-cols-2 gap-1 text-[10px] text-nepsMuted">
+            <div>
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">PUBLICADO</span>
+              <strong class="text-slate-300 font-normal">1/12/2012</strong>
+            </div>
+            <div class="text-right">
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">SUBIDO</span>
+              <strong class="text-slate-300 font-normal">10/7/2026</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- ========================================================= -->
+      <!-- 4. 100% LEÍDO (COMPLETADO - VERDE)                         -->
+      <!-- ========================================================= -->
+      <article class="bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/60 rounded-2xl overflow-hidden group transition-all duration-300 flex flex-col justify-between shadow-sm">
+        <div class="relative w-full aspect-[2/3] overflow-hidden bg-nepsInput">
+          <img src="https://images.unsplash.com/photo-1568832359672-e36cf5d74f54?auto=format&amp;fit=crop&amp;w=400&amp;q=80" alt="Cover" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          
+          <div class="absolute top-2 left-2 flex flex-wrap gap-1">
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Zenescope</span>
+            <span class="bg-white text-slate-900 text-[9px] font-bold px-1.5 py-0.5 rounded shadow">Fly</span>
+          </div>
+
+          <!-- BADGE VERDE LEÍDO -->
+          <div class="absolute bottom-3 left-2">
+            <span class="bg-[#0b0f19]/85 backdrop-blur-md border border-emerald-500/40 text-emerald-400 text-[9px] font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-md">
+              ✓ LEÍDO
+            </span>
+          </div>
+
+          <span class="absolute bottom-2 right-2 bg-slate-950/80 backdrop-blur-md border border-white/20 text-white text-[9px] font-bold px-1.5 py-0.5 rounded uppercase">
+            SERIE
+          </span>
+
+          <!-- BARRA VERDE AL 100% -->
+          <div class="absolute bottom-0 left-0 right-0 h-1 bg-black/60">
+            <div class="bg-emerald-400 h-full w-full shadow-glow-green"></div>
+          </div>
+        </div>
+
+        <div class="p-3.5 space-y-2 flex-grow flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <span class="inline-block text-[10px] bg-nepsInput text-nepsPrimary border border-nepsPrimary/30 px-2 py-0.5 rounded font-mono font-bold">
+              Nº REGULAR - 0004
+            </span>
+            <h3 class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors line-clamp-1" title="Fly Vol.2 #04">
+              Fly Vol.2 #04
+            </h3>
+          </div>
+
+          <div class="pt-2 border-t border-nepsBorder/60 grid grid-cols-2 gap-1 text-[10px] text-nepsMuted">
+            <div>
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">PUBLICADO</span>
+              <strong class="text-slate-300 font-normal">1/1/2013</strong>
+            </div>
+            <div class="text-right">
+              <span class="block text-[9px] text-slate-500 uppercase font-medium">SUBIDO</span>
+              <strong class="text-slate-300 font-normal">10/7/2026</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+
+  </main>
+
+</body>
+</html>

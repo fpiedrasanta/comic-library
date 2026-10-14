@@ -1,0 +1,2 @@
+@echo off
+curl.exe -s -w "\nHTTP_CODE:%{http_code}\n" -X POST http://localhost:5173/api/admin-numbers/1/content/retry -F file=@C:\Users\fpiedrasanta\Desktop\read comics\partirtura read comics\tests\Taskmaster Vol.3 #02.cbr

@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19] text-slate-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reader - TASK-UXUI-0030 | Comic Library &lt;neps/&gt;</title>
+  <!-- Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          },
+          boxShadow: {
+            'glow-blue': '0 4px 25px rgba(56, 189, 248, 0.12)',
+            'glow-pink': '0 4px 25px rgba(244, 63, 94, 0.12)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Transición visual de cambio de página (Simulación hoja física) */
+    .page-turn-next {
+      animation: pageTurnNext 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transform-origin: left center;
+    }
+    .page-turn-prev {
+      animation: pageTurnPrev 0.4s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+      transform-origin: right center;
+    }
+
+    @keyframes pageTurnNext {
+      0% { transform: perspective(1200px) rotateY(0deg) scale(1); opacity: 1; }
+      50% { transform: perspective(1200px) rotateY(-18deg) scale(0.98); opacity: 0.85; }
+      100% { transform: perspective(1200px) rotateY(0deg) scale(1); opacity: 1; }
+    }
+
+    @keyframes pageTurnPrev {
+      0% { transform: perspective(1200px) rotateY(0deg) scale(1); opacity: 1; }
+      50% { transform: perspective(1200px) rotateY(18deg) scale(0.98); opacity: 0.85; }
+      100% { transform: perspective(1200px) rotateY(0deg) scale(1); opacity: 1; }
+    }
+
+    /* Ocultar scrollbar pero permitir scroll/drag en zoom */
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="h-full bg-nepsBg text-nepsText font-sans select-none overflow-hidden relative">
+
+  <!-- CONTENEDOR PRINCIPAL DEL READER -->
+  <div id="reader-root" class="relative w-full h-full flex flex-col justify-between overflow-hidden bg-[#06080d]">
+
+    <!-- BARRA SUPERIOR (HEADER DISCRETO) -->
+    <header id="reader-header" class="relative z-30 flex items-center justify-between px-4 py-3 bg-nepsCard/90 border-b border-nepsBorder/80 backdrop-blur-md transition-all duration-300 transform translate-y-0">
+      <div class="flex items-center gap-3 min-w-0">
+        <a href="#" class="p-1.5 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors" title="Volver al detalle">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+        </a>
+        <div class="min-w-0">
+          <h1 class="text-xs font-bold text-white truncate">The Amazing Spider-Man: Cosmic Collision</h1>
+          <p class="text-[10px] text-nepsMuted truncate">Issue #15 &bull; Marvel Comics</p>
+        </div>
+      </div>
+
+      <!-- ACCIONES HEADER -->
+      <div class="flex items-center gap-1.5 sm:gap-2">
+        
+        <!-- SONIDO PAGE TURN TOGGLE -->
+        <button id="sound-toggle-btn" onclick="toggleSound()" class="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-nepsInput border border-nepsBorder text-[11px] font-medium text-slate-300 hover:border-nepsPrimary/50 transition">
+          <svg class="w-3.5 h-3.5 text-nepsPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.536 8.464a5 5 0 010 7.072m2.828-9.9a9 9 0 010 12.728M5.586 15H4a1 1 0 01-1-1v-4a1 1 0 011-1h1.586l4.707-4.707C10.923 3.663 12 4.109 12 5v14c0 .891-1.077 1.337-1.707.707L5.586 15z"/></svg>
+          Sonido <span id="sound-status-badge" class="font-bold text-emerald-400">[ ON ]</span>
+        </button>
+
+        <!-- FULLSCREEN -->
+        <button onclick="toggleFullscreenDemo()" class="p-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition" title="Pantalla completa">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+        </button>
+
+        <!-- BOTÓN ABRIR MENÚ OVERLAY -->
+        <button onclick="toggleMenu(true)" class="p-2 rounded-lg bg-nepsPrimary/10 border border-nepsPrimary/30 text-nepsPrimary hover:bg-nepsPrimary hover:text-nepsBg transition" title="Menú de Reader">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <!-- ÁREA CENTRAL DE LECTURA (CANVAS/IMAGE CONTAINER) -->
+    <main id="viewport-container" class="relative flex-1 w-full h-full overflow-hidden flex items-center justify-center p-2 sm:p-4">
+      
+      <!-- ZONAS TÁCTILES LATERALES DE NAVEGACIÓN -->
+      <div onclick="navigatePage('prev')" class="absolute left-0 top-0 bottom-0 w-1/5 sm:w-1/6 z-20 cursor-pointer opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-r from-black/60 to-transparent flex items-center justify-start pl-4 group" title="Página anterior">
+        <div class="w-10 h-10 rounded-full bg-nepsCard/80 border border-nepsBorder text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+        </div>
+      </div>
+
+      <div onclick="navigatePage('next')" class="absolute right-0 top-0 bottom-0 w-1/5 sm:w-1/6 z-20 cursor-pointer opacity-0 hover:opacity-100 transition-opacity bg-gradient-to-l from-black/60 to-transparent flex items-center justify-end pr-4 group" title="Página siguiente">
+        <div class="w-10 h-10 rounded-full bg-nepsCard/80 border border-nepsBorder text-white flex items-center justify-center group-hover:scale-110 transition-transform shadow-xl">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR DE PÁGINA (WRAPPER CON SOPORTE DE ZOOM/PAN) -->
+      <div id="page-wrapper" class="relative max-w-full max-h-full flex items-center justify-center transition-transform duration-200" style="transform: scale(1) translate(0px, 0px);">
+        
+        <!-- ESTADO 1: LECTURA NORMAL (IMAGEN PRINCIPAL) -->
+        <img id="comic-page-img" 
+             src="https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=1200&auto=format&fit=crop" 
+             alt="Comic Page" 
+             class="max-w-full max-h-[82vh] sm:max-h-[85vh] w-auto h-auto object-contain rounded-sm shadow-2xl ring-1 ring-white/10 select-none pointer-events-none" />
+
+        <!-- ESTADO 2: LOADING -->
+        <div id="state-loading-view" class="hidden flex-col items-center justify-center space-y-4 p-8 bg-nepsCard/40 border border-nepsBorder/50 rounded-2xl backdrop-blur-sm">
+          <div class="relative w-12 h-12 flex items-center justify-center">
+            <div class="absolute inset-0 rounded-full border-2 border-nepsPrimary/20 border-t-nepsPrimary animate-spin"></div>
+            <svg class="w-5 h-5 text-nepsPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          <p class="text-xs font-mono text-nepsMuted animate-pulse">Cargando página 12...</p>
+        </div>
+
+        <!-- ESTADO 3: ERROR -->
+        <div id="state-error-view" class="hidden flex-col items-center justify-center space-y-3 p-8 bg-nepsCard/90 border border-nepsAccent/30 rounded-2xl max-w-sm text-center shadow-2xl">
+          <div class="w-12 h-12 rounded-full bg-nepsAccent/10 border border-nepsAccent/30 text-nepsAccent flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h3 class="text-sm font-bold text-white">No se pudo cargar la página</h3>
+          <p class="text-xs text-nepsMuted leading-relaxed">Ocurrió un error al descargar la imagen de la página. Comprobá tu conexión.</p>
+          <button onclick="setViewState('normal')" class="mt-2 px-4 py-1.5 rounded-lg bg-nepsAccent text-white text-xs font-semibold hover:bg-rose-600 transition shadow-lg shadow-nepsAccent/20 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+            Reintentar
+          </button>
+        </div>
+
+        <!-- ESTADO 4: ÚLTIMA PÁGINA -->
+        <div id="state-end-view" class="hidden flex-col items-center justify-center space-y-4 p-8 bg-nepsCard/90 border border-nepsBorder rounded-2xl max-w-md text-center shadow-glow-blue">
+          <div class="w-12 h-12 rounded-full bg-nepsPrimary/10 border border-nepsPrimary/30 text-nepsPrimary flex items-center justify-center">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          </div>
+          <div class="space-y-1">
+            <h3 class="text-base font-bold text-white">¡Has completado la lectura!</h3>
+            <p class="text-xs text-nepsMuted">Llegaste a la última página de <span class="text-white font-medium">The Amazing Spider-Man #15</span>.</p>
+          </div>
+          <div class="flex gap-2 pt-2">
+            <button onclick="firstPage()" class="px-3.5 py-1.5 rounded-lg bg-nepsInput border border-nepsBorder text-xs text-slate-300 hover:text-white transition">
+              Releer desde el inicio
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- BARRA INFERIOR DE CONTROLES (DISCRETA) -->
+    <footer id="reader-footer" class="relative z-30 flex flex-wrap items-center justify-between gap-3 px-4 py-2.5 bg-nepsCard/90 border-t border-nepsBorder/80 backdrop-blur-md transition-all duration-300 transform translate-y-0">
+      
+      <!-- NAVEGACIÓN RÁPIDA (FIRST / PREV) -->
+      <div class="flex items-center gap-1">
+        <button onclick="firstPage()" class="p-1.5 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition" title="Primera página">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+        </button>
+        <button onclick="navigatePage('prev')" class="p-1.5 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition" title="Página anterior">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        </button>
+      </div>
+
+      <!-- INDICADOR DE PÁGINA (PÁGINA X DE Y) -->
+      <div class="flex items-center gap-2 bg-nepsInput border border-nepsBorder px-3 py-1 rounded-full text-xs font-mono text-slate-300 shadow-inner">
+        <span class="w-1.5 h-1.5 rounded-full bg-nepsPrimary"></span>
+        Página <span id="current-page-num" class="font-bold text-white">12</span> de <span id="total-pages-num" class="text-nepsMuted">32</span>
+      </div>
+
+      <!-- CONTROLES ZOOM & MODO INMERSIVO & NEXT / LAST -->
+      <div class="flex items-center gap-1">
+        <!-- CONTROLES ZOOM -->
+        <div class="hidden sm:flex items-center gap-1 bg-nepsInput/60 border border-nepsBorder/60 rounded-lg p-0.5 mr-2">
+          <button onclick="adjustZoom(-0.25)" class="p-1 rounded text-nepsMuted hover:text-white transition" title="Reducir zoom">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/></svg>
+          </button>
+          <span id="zoom-level-indicator" class="text-[10px] font-mono text-nepsMuted px-1 min-w-[36px] text-center">100%</span>
+          <button onclick="adjustZoom(0.25)" class="p-1 rounded text-nepsMuted hover:text-white transition" title="Aumentar zoom">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          </button>
+        </div>
+
+        <!-- MODO INMERSIVO -->
+        <button onclick="toggleImmersive(true)" class="p-1.5 rounded-lg text-nepsMuted hover:text-nepsPrimary hover:bg-nepsInput transition mr-1" title="Ocultar controles (Inmersivo)">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858-5.908a10.007 10.007 0 013.68-.823c4.478 0 8.268 2.943 9.542 7a10.05 10.05 0 01-2.072 3.829M3 3l18 18"/></svg>
+        </button>
+
+        <button onclick="navigatePage('next')" class="p-1.5 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition" title="Página siguiente">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </button>
+        <button onclick="lastPage()" class="p-1.5 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition" title="Última página">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+    </footer>
+
+    <!-- BOTÓN FLOTANTE SALIR DE MODO INMERSIVO -->
+    <button id="exit-immersive-btn" onclick="toggleImmersive(false)" class="hidden fixed top-4 right-4 z-40 p-2.5 rounded-full bg-nepsCard/90 border border-nepsBorder text-nepsPrimary hover:scale-110 transition shadow-2xl backdrop-blur-md group" title="Mostrar controles">
+      <svg class="w-5 h-5 group-hover:rotate-12 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+    </button>
+
+    <!-- MENÚ / PANEL SUPERPUESTO DE CONFIGURACIÓN -->
+    <div id="reader-menu-overlay" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex justify-end transition-opacity" onclick="toggleMenu(false)">
+      <div class="w-full max-w-sm h-full bg-nepsCard border-l border-nepsBorder p-6 flex flex-col justify-between shadow-2xl space-y-6" onclick="event.stopPropagation()">
+        
+        <div class="space-y-6">
+          <!-- HEADER MENÚ -->
+          <div class="flex items-center justify-between border-b border-nepsBorder pb-4">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-nepsPrimary" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+              <h2 class="text-sm font-bold text-white">Ajustes de Lectura</h2>
+            </div>
+            <button onclick="toggleMenu(false)" class="p-1 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
+          </div>
+
+          <!-- OPCIONES -->
+          <div class="space-y-4">
+            
+            <!-- SONIDO TOGGLE -->
+            <div class="flex items-center justify-between p-3 rounded-xl bg-nepsInput border border-nepsBorder">
+              <div>
+                <p class="text-xs font-semibold text-white">Sonido de página</p>
+                <p class="text-[10px] text-nepsMuted">Efecto físico al cambiar hoja</p>
+              </div>
+              <button onclick="toggleSound()" class="px-3 py-1 rounded-md bg-nepsCard border border-nepsBorder text-xs font-mono font-bold text-nepsPrimary">
+                <span id="sound-menu-toggle">ON</span>
+              </button>
+            </div>
+
+            <!-- ZOOM CONTROLES EN MENÚ -->
+            <div class="p-3 rounded-xl bg-nepsInput border border-nepsBorder space-y-2">
+              <p class="text-xs font-semibold text-white">Nivel de Zoom</p>
+              <div class="flex items-center justify-between gap-2">
+                <button onclick="adjustZoom(-0.25)" class="px-3 py-1 rounded bg-nepsCard border border-nepsBorder text-xs text-white hover:bg-nepsBorder">-25%</button>
+                <span id="zoom-menu-indicator" class="text-xs font-mono text-nepsPrimary font-bold">100%</span>
+                <button onclick="adjustZoom(0.25)" class="px-3 py-1 rounded bg-nepsCard border border-nepsBorder text-xs text-white hover:bg-nepsBorder">+25%</button>
+              </div>
+            </div>
+
+            <!-- MODO INMERSIVO -->
+            <button onclick="toggleMenu(false); toggleImmersive(true);" class="w-full flex items-center justify-between p-3 rounded-xl bg-nepsInput border border-nepsBorder hover:border-nepsPrimary/40 transition text-left">
+              <div>
+                <p class="text-xs font-semibold text-white">Activar Modo Inmersivo</p>
+                <p class="text-[10px] text-nepsMuted">Oculta las barras de navegación</p>
+              </div>
+              <svg class="w-4 h-4 text-nepsMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+
+            <!-- FULLSCREEN -->
+            <button onclick="toggleFullscreenDemo()" class="w-full flex items-center justify-between p-3 rounded-xl bg-nepsInput border border-nepsBorder hover:border-nepsPrimary/40 transition text-left">
+              <div>
+                <p class="text-xs font-semibold text-white">Pantalla Completa</p>
+                <p class="text-[10px] text-nepsMuted">Maximizar visor en el navegador</p>
+              </div>
+              <svg class="w-4 h-4 text-nepsMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-5h-4m4 0v4m0-4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+            </button>
+
+          </div>
+        </div>
+
+        <div class="pt-4 border-t border-nepsBorder text-center">
+          <button onclick="toggleMenu(false)" class="w-full py-2 rounded-xl bg-nepsPrimary/10 border border-nepsPrimary/30 text-nepsPrimary text-xs font-bold hover:bg-nepsPrimary hover:text-nepsBg transition">
+            Volver a la Lectura
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ========================================================================= -->
+  <!-- PANEL DE DEMOSTRACIÓN VISUAL DE LA MAQUETA (DEMO BAR - TASK-UXUI-0030)      -->
+  <!-- ========================================================================= -->
+  <div class="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 bg-nepsCard/95 border border-nepsBorder px-3 py-2 rounded-2xl shadow-2xl backdrop-blur-md flex flex-wrap items-center gap-3 text-xs max-w-[95vw] overflow-x-auto no-scrollbar">
+    
+    <div class="flex items-center gap-1.5 font-mono text-[10px] text-nepsPrimary font-bold pr-2 border-r border-nepsBorder">
+      <span class="w-2 h-2 rounded-full bg-nepsAccent animate-pulse"></span>
+      TASK-0030 DEMO
+    </div>
+
+    <!-- PROPORCIÓN DE PÁGINA -->
+    <div class="flex items-center gap-1">
+      <span class="text-[10px] text-nepsMuted uppercase font-bold">Formato:</span>
+      <button onclick="changePageAspect('vertical')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-slate-200">Vertical</button>
+      <button onclick="changePageAspect('horizontal')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-slate-200" title="Mafalda / Strips">Horizontal</button>
+      <button onclick="changePageAspect('square')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-slate-200">Cuadrada</button>
+      <button onclick="changePageAspect('double')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-slate-200" title="Página Doble">Doble</button>
+    </div>
+
+    <div class="h-4 w-px bg-nepsBorder"></div>
+
+    <!-- ESTADOS VISUALES -->
+    <div class="flex items-center gap-1">
+      <span class="text-[10px] text-nepsMuted uppercase font-bold">Estado:</span>
+      <button onclick="setViewState('normal')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-emerald-400 font-semibold">Normal</button>
+      <button onclick="setViewState('loading')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-amber-400 font-semibold">Loading</button>
+      <button onclick="setViewState('error')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-nepsAccent font-semibold">Error</button>
+      <button onclick="setViewState('end')" class="px-2 py-1 rounded bg-nepsInput border border-nepsBorder hover:border-nepsPrimary text-[11px] text-sky-400 font-semibold">Fin</button>
+    </div>
+
+  </div>
+
+
+  <!-- SCRIPT DE DEMOSTRACIÓN VISUAL (MAQUETA UX/UI) -->
+  <script>
+    let currentPage = 12;
+    const totalPages = 32;
+    let currentZoom = 1;
+    let soundEnabled = true;
+
+    // BANCO DE IMÁGENES SEGÚN PROPORCIÓN (DEMO VISUAL)
+    const aspectImages = {
+      vertical: 'https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=1200&auto=format&fit=crop',
+      horizontal: 'https://images.unsplash.com/photo-1578632767115-351597cf2477?q=80&w=1200&auto=format&fit=crop',
+      square: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1000&auto=format&fit=crop',
+      double: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1600&auto=format&fit=crop'
+    };
+
+    // CAMBIAR PROPORCIÓN DE PÁGINA
+    function changePageAspect(aspect) {
+      setViewState('normal');
+      const img = document.getElementById('comic-page-img');
+      img.src = aspectImages[aspect];
+      
+      // Reset zoom al cambiar formato
+      currentZoom = 1;
+      applyZoom();
+    }
+
+    // NAVEGACIÓN Y ANIMACIÓN DE CAMBIO DE PÁGINA
+    function navigatePage(direction) {
+      const pageWrapper = document.getElementById('page-wrapper');
+      
+      if (direction === 'next') {
+        if (currentPage < totalPages) {
+          currentPage++;
+          triggerPageAnimation('page-turn-next');
+        } else {
+          setViewState('end');
+          return;
+        }
+      } else if (direction === 'prev') {
+        if (currentPage > 1) {
+          currentPage--;
+          triggerPageAnimation('page-turn-prev');
+        }
+      }
+      
+      document.getElementById('current-page-num').innerText = currentPage;
+      if (document.getElementById('comic-page-img').classList.contains('hidden')) {
+        setViewState('normal');
+      }
+    }
+
+    function triggerPageAnimation(animClass) {
+      const pageWrapper = document.getElementById('page-wrapper');
+      pageWrapper.classList.remove('page-turn-next', 'page-turn-prev');
+      void pageWrapper.offsetWidth; // Trigger reflow
+      pageWrapper.classList.add(animClass);
+      
+      setTimeout(() => {
+        pageWrapper.classList.remove('page-turn-next', 'page-turn-prev');
+      }, 400);
+    }
+
+    function firstPage() {
+      currentPage = 1;
+      document.getElementById('current-page-num').innerText = currentPage;
+      setViewState('normal');
+      triggerPageAnimation('page-turn-prev');
+    }
+
+    function lastPage() {
+      currentPage = totalPages;
+      document.getElementById('current-page-num').innerText = currentPage;
+      setViewState('end');
+    }
+
+    // AJUSTE DE ZOOM
+    function adjustZoom(delta) {
+      currentZoom = Math.min(Math.max(0.75, currentZoom + delta), 2.5);
+      applyZoom();
+    }
+
+    function applyZoom() {
+      const wrapper = document.getElementById('page-wrapper');
+      wrapper.style.transform = `scale(${currentZoom}) translate(0px, 0px)`;
+      const percent = Math.round(currentZoom * 100) + '%';
+      document.getElementById('zoom-level-indicator').innerText = percent;
+      document.getElementById('zoom-menu-indicator').innerText = percent;
+    }
+
+    // TOGGLE SONIDO
+    function toggleSound() {
+      soundEnabled = !soundEnabled;
+      const statusText = soundEnabled ? '[ ON ]' : '[ OFF ]';
+      document.getElementById('sound-status-badge').innerText = statusText;
+      document.getElementById('sound-status-badge').className = soundEnabled ? 'font-bold text-emerald-400' : 'font-bold text-nepsMuted';
+      document.getElementById('sound-menu-toggle').innerText = soundEnabled ? 'ON' : 'OFF';
+    }
+
+    // MODO INMERSIVO
+    function toggleImmersive(enable) {
+      const header = document.getElementById('reader-header');
+      const footer = document.getElementById('reader-footer');
+      const exitBtn = document.getElementById('exit-immersive-btn');
+
+      if (enable) {
+        header.classList.add('-translate-y-full', 'opacity-0');
+        footer.classList.add('translate-y-full', 'opacity-0');
+        exitBtn.classList.remove('hidden');
+      } else {
+        header.classList.remove('-translate-y-full', 'opacity-0');
+        footer.classList.remove('translate-y-full', 'opacity-0');
+        exitBtn.classList.add('hidden');
+      }
+    }
+
+    // FULLSCREEN DEMO
+    function toggleFullscreenDemo() {
+      if (!document.fullscreenElement) {
+        document.documentElement.requestFullscreen().catch(() => {});
+      } else {
+        if (document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      }
+    }
+
+    // TOGGLE MENÚ OVERLAY
+    function toggleMenu(show) {
+      const overlay = document.getElementById('reader-menu-overlay');
+      if (show) {
+        overlay.classList.remove('hidden');
+      } else {
+        overlay.classList.add('hidden');
+      }
+    }
+
+    // CONMUTADOR DE ESTADOS VISUALES
+    function setViewState(state) {
+      const img = document.getElementById('comic-page-img');
+      const loading = document.getElementById('state-loading-view');
+      const error = document.getElementById('state-error-view');
+      const end = document.getElementById('state-end-view');
+
+      img.classList.add('hidden');
+      loading.classList.add('hidden');
+      loading.classList.remove('flex');
+      error.classList.add('hidden');
+      error.classList.remove('flex');
+      end.classList.add('hidden');
+      end.classList.remove('flex');
+
+      if (state === 'normal') {
+        img.classList.remove('hidden');
+      } else if (state === 'loading') {
+        loading.classList.remove('hidden');
+        loading.classList.add('flex');
+      } else if (state === 'error') {
+        error.classList.remove('hidden');
+        error.classList.add('flex');
+      } else if (state === 'end') {
+        end.classList.remove('hidden');
+        end.classList.add('flex');
+      }
+    }
+  </script>
+</body>
+</html>

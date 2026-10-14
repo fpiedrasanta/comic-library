@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificar Código - Comic Library Admin | NEPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          },
+          boxShadow: {
+            'glow-blue': '0 4px 25px rgba(56, 189, 248, 0.12)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col justify-between relative overflow-x-hidden">
+
+  <!-- Glows de Fondo -->
+  <div class="fixed top-0 right-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_85%_15%,rgba(244,63,94,0.05)_0%,transparent_70%)] pointer-events-none"></div>
+  <div class="fixed bottom-0 left-0 w-[500px] h-[500px] bg-[radial-gradient(circle_at_15%_85%,rgba(56,189,248,0.05)_0%,transparent_70%)] pointer-events-none"></div>
+
+  <header class="p-6">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <a href="login.html" class="flex items-center gap-2">
+        <div class="text-2xl font-bold tracking-tight text-white">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-xs uppercase tracking-widest text-nepsMuted font-semibold border-l border-nepsBorder pl-3 ml-1">Admin Control Panel</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="flex-grow flex items-center justify-center px-4 py-8 relative z-10">
+    <div class="w-full max-w-md bg-nepsCard border border-nepsBorder rounded-2xl p-6 sm:p-8 shadow-glow-blue space-y-6">
+      
+      <div class="text-center space-y-2">
+        <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-nepsPrimary/10 text-nepsPrimary border border-nepsPrimary/20 mb-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+        <h1 class="text-xl font-bold text-white">Ingresá tu código</h1>
+        <p class="text-xs text-nepsMuted">Enviamos una clave de 6 dígitos a <span class="text-white font-medium">a***n@neps.dev</span></p>
+      </div>
+
+      <form action="reset-password.html" class="space-y-6" id="otp-form">
+        
+        <!-- Recuadros para el Código OTP -->
+        <div class="flex items-center justify-between gap-2">
+          <input type="text" maxlength="1" class="otp-input w-12 h-14 bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-center text-xl font-bold text-white rounded-xl outline-none transition-all" autofocus>
+          <input type="text" maxlength="1" class="otp-input w-12 h-14 bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-center text-xl font-bold text-white rounded-xl outline-none transition-all">
+          <input type="text" maxlength="1" class="otp-input w-12 h-14 bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-center text-xl font-bold text-white rounded-xl outline-none transition-all">
+          <input type="text" maxlength="1" class="otp-input w-12 h-14 bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-center text-xl font-bold text-white rounded-xl outline-none transition-all">
+          <input type="text" maxlength="1" class="otp-input w-12 h-14 bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-center text-xl font-bold text-white rounded-xl outline-none transition-all">
+          <input type="text" maxlength="1" class="otp-input w-12 h-14 bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-center text-xl font-bold text-white rounded-xl outline-none transition-all">
+        </div>
+
+        <button type="submit" class="w-full py-2.5 bg-nepsPrimary hover:bg-sky-300 text-nepsBg font-bold text-xs rounded-lg shadow-glow-blue transition-all active:scale-[0.98]">
+          Verificar Código
+        </button>
+      </form>
+
+      <div class="text-center pt-2 border-t border-nepsBorder/60">
+        <p class="text-xs text-nepsMuted">
+          ¿No recibiste el correo? 
+          <button type="button" class="text-nepsPrimary hover:underline font-medium">Reenviar código</button>
+        </p>
+      </div>
+
+    </div>
+  </main>
+
+  <footer class="py-6 text-center text-xs text-nepsMuted border-t border-nepsBorder/50">
+    &copy; 2026 Comic Library Admin. Sistema Privado.
+  </footer>
+
+  <script>
+    // Autofocus automático entre los 6 recuadros
+    const inputs = document.querySelectorAll('.otp-input');
+    inputs.forEach((input, index) => {
+      input.addEventListener('keyup', (e) => {
+        if (e.key >= 0 && e.key <= 9) {
+          if (index < inputs.length - 1) inputs[index + 1].focus();
+        } else if (e.key === 'Backspace') {
+          if (index > 0) inputs[index - 1].focus();
+        }
+      });
+    });
+  </script>
+</body>
+</html>

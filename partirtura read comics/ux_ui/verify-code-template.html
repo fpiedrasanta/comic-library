@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Verificar Código - Comic Library | NEPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          },
+          boxShadow: { 'glow-blue': '0 4px 25px rgba(56, 189, 248, 0.12)' }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex items-center justify-center p-4 relative overflow-x-hidden">
+
+  <div class="fixed bottom-0 left-0 w-[400px] h-[400px] bg-[radial-gradient(circle_at_15%_85%,rgba(244,63,94,0.08)_0%,transparent_70%)] pointer-events-none"></div>
+
+  <main class="w-full max-w-md bg-nepsCard border border-nepsBorder rounded-2xl p-6 sm:p-8 shadow-glow-blue relative z-10">
+    
+    <div class="text-center mb-6">
+      <div class="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-nepsAccent/10 text-nepsAccent mb-3 border border-nepsAccent/20">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+      </div>
+      <h1 class="text-xl font-bold text-white tracking-tight">Verificá tu correo</h1>
+      <p class="text-xs text-nepsMuted mt-1 leading-relaxed">
+        Ingresá el código de 6 dígitos enviado a<br>
+        <span id="target-email" class="text-nepsPrimary font-semibold">tu@email.com</span>
+      </p>
+    </div>
+
+    <form id="otp-form" class="space-y-6">
+      <div class="flex justify-between items-center gap-1.5 sm:gap-2" id="otp-inputs">
+        <input type="text" maxlength="1" class="otp-box w-10 sm:w-12 h-12 sm:h-14 text-center text-xl font-bold bg-nepsInput border border-nepsBorder rounded-lg focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-white outline-none transition-all duration-200" autofocus>
+        <input type="text" maxlength="1" class="otp-box w-10 sm:w-12 h-12 sm:h-14 text-center text-xl font-bold bg-nepsInput border border-nepsBorder rounded-lg focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-white outline-none transition-all duration-200">
+        <input type="text" maxlength="1" class="otp-box w-10 sm:w-12 h-12 sm:h-14 text-center text-xl font-bold bg-nepsInput border border-nepsBorder rounded-lg focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-white outline-none transition-all duration-200">
+        <input type="text" maxlength="1" class="otp-box w-10 sm:w-12 h-12 sm:h-14 text-center text-xl font-bold bg-nepsInput border border-nepsBorder rounded-lg focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-white outline-none transition-all duration-200">
+        <input type="text" maxlength="1" class="otp-box w-10 sm:w-12 h-12 sm:h-14 text-center text-xl font-bold bg-nepsInput border border-nepsBorder rounded-lg focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-white outline-none transition-all duration-200">
+        <input type="text" maxlength="1" class="otp-box w-10 sm:w-12 h-12 sm:h-14 text-center text-xl font-bold bg-nepsInput border border-nepsBorder rounded-lg focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-white outline-none transition-all duration-200">
+      </div>
+
+      <button type="submit"
+        class="w-full bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold py-2.5 px-4 rounded-lg transition-all duration-200 text-xs sm:text-sm shadow-glow-blue active:scale-[0.99]">
+        Validar código
+      </button>
+    </form>
+
+    <div class="text-center text-xs text-nepsMuted mt-6 pt-4 border-t border-nepsBorder">
+      ¿No recibiste el código? 
+      <button id="btn-resend" class="text-nepsAccent hover:text-rose-400 font-semibold disabled:text-slate-600 disabled:no-underline ml-1" disabled>
+        Reenviar (<span id="timer">60</span>s)
+      </button>
+    </div>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const email = urlParams.get('email') || 'usuario@ejemplo.com';
+    const type = urlParams.get('type') || 'register';
+
+    document.getElementById('target-email').textContent = email;
+
+    const inputs = document.querySelectorAll('.otp-box');
+    inputs.forEach((input, index) => {
+      input.addEventListener('keyup', (e) => {
+        if (e.key >= '0' && e.key <= '9') {
+          if (index < inputs.length - 1) inputs[index + 1].focus();
+        } else if (e.key === 'Backspace') {
+          if (index > 0) inputs[index - 1].focus();
+        }
+      });
+      input.addEventListener('input', () => {
+        input.value = input.value.replace(/[^0-9]/g, '');
+      });
+    });
+
+    let timeLeft = 60;
+    const timerSpan = document.getElementById('timer');
+    const resendBtn = document.getElementById('btn-resend');
+
+    const countdown = setInterval(() => {
+      timeLeft--;
+      if (timerSpan) timerSpan.textContent = timeLeft;
+      if (timeLeft <= 0) {
+        clearInterval(countdown);
+        resendBtn.disabled = false;
+        resendBtn.textContent = "Reenviar código";
+      }
+    }, 1000);
+
+    resendBtn.addEventListener('click', () => {
+      Toastify({ text: "Nuevo código enviado a tu correo", duration: 3000, style: { background: "#10b981" } }).showToast();
+      resendBtn.disabled = true;
+      timeLeft = 60;
+      resendBtn.innerHTML = `Reenviar (<span id="timer">60</span>s)`;
+    });
+
+    document.getElementById('otp-form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = Array.from(inputs).map(i => i.value).join('');
+
+      if (code.length < 6) {
+        Toastify({ text: "Por favor, ingresá el código de 6 dígitos completo", duration: 3000, style: { background: "#f43f5e" } }).showToast();
+        return;
+      }
+
+      Swal.fire({
+        title: '¡Código verificado!',
+        text: type === 'recovery' ? 'Redirigiendo para restablecer tu contraseña...' : 'Tu correo ha sido validado con éxito.',
+        icon: 'success',
+        background: '#131a26',
+        color: '#f8fafc',
+        confirmButtonColor: '#38bdf8'
+      }).then(() => {
+        window.location.href = type === 'recovery' ? 'reset-password.html' : 'login.html';
+      });
+    });
+  </script>
+</body>
+</html>

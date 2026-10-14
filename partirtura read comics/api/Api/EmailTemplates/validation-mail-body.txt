@@ -1,0 +1,9 @@
+Hola,
+
+Tu código de verificación
+
+{{code}}
+
+Este código vence en {{time to expire}}.
+
+Si no solicitaste este correo, ignorá este mensaje.

@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listado de Series - NEPS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden relative">
+
+  <!-- TOAST DE OPERACIÓN EXITOSA -->
+  <div id="toast-success" class="fixed bottom-5 right-5 z-50 bg-emerald-950/90 border border-emerald-500/40 text-emerald-200 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-md transition-all duration-300 opacity-0 translate-y-5 pointer-events-none">
+    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0 text-emerald-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <h5 id="toast-title" class="text-xs font-bold text-white">Operación exitosa</h5>
+      <p id="toast-desc" class="text-[11px] text-emerald-300/80">La serie fue actualizada correctamente.</p>
+    </div>
+    <button onclick="hideToast()" class="ml-2 text-emerald-400/60 hover:text-emerald-200"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg></button>
+  </div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="listar-series.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Series
+        </a>
+        <a href="admin-franquicias.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Franquicias
+        </a>
+        <a href="admin-editoriales.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+          Editoriales
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">FP</div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Super Admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <h1 class="text-sm font-bold text-white tracking-tight">Comic Library — Catálogo de Series</h1>
+      </div>
+
+      <!-- DEMO STATE SWITCHER (HERRAMIENTA DE REVISIÓN UI/UX) -->
+      <div class="flex items-center gap-1.5 bg-nepsCard p-1 rounded-xl border border-nepsBorder text-[10px]">
+        <span class="text-nepsMuted font-bold px-1.5 hidden lg:inline">Estado UI:</span>
+        <button onclick="setUIState('default')" id="btn-state-default" class="px-2 py-0.5 rounded-lg font-bold bg-nepsPrimary text-nepsBg">Normal</button>
+        <button onclick="setUIState('loading')" id="btn-state-loading" class="px-2 py-0.5 rounded-lg font-semibold text-nepsMuted hover:text-white">Loading</button>
+        <button onclick="setUIState('empty')" id="btn-state-empty" class="px-2 py-0.5 rounded-lg font-semibold text-nepsMuted hover:text-white">Sin datos</button>
+        <button onclick="setUIState('error')" id="btn-state-error" class="px-2 py-0.5 rounded-lg font-semibold text-nepsMuted hover:text-white">Error</button>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+
+      <!-- HEADER DE PANTALLA -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-nepsBorder/60 pb-5">
+        <div>
+          <h2 class="text-xl font-bold text-white tracking-tight">Series</h2>
+          <p class="text-xs text-nepsMuted mt-1">Gestión administrativa de colecciones, volúmenes y tiradas pertenecientes a la biblioteca.</p>
+        </div>
+        <a href="form-serie.html" class="px-4 py-2.5 bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold text-xs rounded-xl shadow-lg shadow-nepsPrimary/20 transition-all flex items-center gap-2 self-start sm:self-auto">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+          <span>Nueva Serie</span>
+        </a>
+      </div>
+
+      <!-- BLOQUE DE BÚSQUEDA Y FILTROS -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-4 sm:p-5 space-y-4">
+        
+        <!-- BÚSQUEDA GENERAL -->
+        <div class="relative w-full">
+          <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-nepsMuted">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </span>
+          <input type="text" placeholder="Buscar serie, franquicia o editorial..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-10 pr-4 py-2.5 outline-none transition-colors">
+        </div>
+
+        <!-- FILTROS Y ORDENAMIENTO -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-7 gap-3 pt-2 border-t border-nepsBorder/60">
+          
+          <!-- FILTRO EDITORIAL -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Editorial</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="">Todas</option>
+              <option value="1">Shueisha</option>
+              <option value="2">DC Comics</option>
+              <option value="3">Marvel</option>
+            </select>
+          </div>
+
+          <!-- FILTRO FRANQUICIA -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Franquicia</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="">Todas</option>
+              <option value="1">Dragon Ball</option>
+              <option value="2">Batman</option>
+              <option value="3">Spider-Man</option>
+            </select>
+          </div>
+
+          <!-- FILTRO DESTACADAS -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Destacadas</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="">Todas</option>
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+
+          <!-- FILTRO VIGENTES -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Vigentes</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="">Todas</option>
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+
+          <!-- FILTRO ACTIVAS -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Activas</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="">Todas</option>
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+
+          <!-- ORDENAR POR -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Ordenar por</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="nombre">Nombre</option>
+              <option value="franquicia">Franquicia</option>
+              <option value="editorial">Editorial</option>
+              <option value="pais">País</option>
+            </select>
+          </div>
+
+          <!-- DIRECCIÓN -->
+          <div class="space-y-1">
+            <label class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider block">Dirección</label>
+            <select class="w-full bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="asc">ASC</option>
+              <option value="desc">DESC</option>
+            </select>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TABLA PRINCIPAL DE SERIES Y CONTENEDOR DE ESTADOS -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden shadow-xl min-h-[320px] flex flex-col justify-between">
+        
+        <!-- ESTADO: NORMAL (TABLA DE RESULTADOS) -->
+        <div id="view-default" class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-nepsBorder bg-nepsInput/40 text-[11px] uppercase tracking-wider text-nepsMuted font-bold">
+                <th class="py-3.5 px-4 w-16">Imagen</th>
+                <th class="py-3.5 px-4">Nombre</th>
+                <th class="py-3.5 px-4">Franquicia</th>
+                <th class="py-3.5 px-4">Editorial</th>
+                <th class="py-3.5 px-4 text-center w-16">Color</th>
+                <th class="py-3.5 px-4 text-center w-20">Destacada</th>
+                <th class="py-3.5 px-4 text-center w-20">Vigente</th>
+                <th class="py-3.5 px-4 text-center w-20">Activa</th>
+                <th class="py-3.5 px-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-nepsBorder/60 text-xs">
+              
+              <!-- ROW 1: SERIE ACTIVA / DESTACADA / VIGENTE -->
+              <tr id="row-1" class="hover:bg-nepsInput/30 transition-colors">
+                <td class="py-3 px-4">
+                  <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-lg object-cover bg-nepsInput border border-nepsBorder" alt="Dragon Ball Super">
+                </td>
+                <td class="py-3 px-4 font-bold text-white">Dragon Ball Super</td>
+                <td class="py-3 px-4 text-slate-300">Dragon Ball</td>
+                <td class="py-3 px-4 text-slate-400">Shueisha</td>
+                <td class="py-3 px-4 text-center">
+                  <div class="w-4 h-4 rounded-full border border-white/20 mx-auto shadow-sm" style="background-color: #38bdf8;" title="#38BDF8"></div>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-500/50" title="Sí"></span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 shadow-sm shadow-emerald-500/50" title="Sí"></span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <span class="text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold uppercase">Activa</span>
+                </td>
+                <td class="py-3 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <!-- ACCIÓN DESTACADA: GESTIÓN DE NÚMEROS -->
+                    <a href="listar-numeros.html?serie_id=1" class="px-2.5 py-1.5 bg-nepsPrimary/10 hover:bg-nepsPrimary/20 text-nepsPrimary font-semibold rounded-lg border border-nepsPrimary/30 transition-all flex items-center gap-1.5" title="Gestionar Números/Tomos">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                      <span>Números</span>
+                    </a>
+                    <!-- ACCIÓN: EDITAR -->
+                    <a href="form-serie.html?id=1" class="p-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-300 hover:text-white rounded-lg border border-nepsBorder transition-colors" title="Editar Serie">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </a>
+                    <!-- ACCIÓN: DESACTIVAR -->
+                    <button onclick="confirmAction('deactivate', 'Dragon Ball Super', 1)" class="p-1.5 bg-nepsInput hover:bg-rose-950/50 text-nepsAccent rounded-lg border border-nepsBorder hover:border-nepsAccent/40 transition-colors" title="Desactivar Serie">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- ROW 2: SERIE INACTIVA (REACTIVABLE) -->
+              <tr id="row-2" class="hover:bg-nepsInput/30 transition-colors bg-nepsInput/10">
+                <td class="py-3 px-4 opacity-50">
+                  <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-lg object-cover bg-nepsInput border border-nepsBorder" alt="Batman: The Long Halloween">
+                </td>
+                <td class="py-3 px-4 font-bold text-slate-400">Batman: The Long Halloween</td>
+                <td class="py-3 px-4 text-slate-400">Batman</td>
+                <td class="py-3 px-4 text-slate-500">DC Comics</td>
+                <td class="py-3 px-4 text-center">
+                  <span class="text-[10px] text-nepsMuted italic">Sin color</span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <span class="inline-block w-2 h-2 rounded-full bg-slate-600" title="No"></span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <span class="inline-block w-2 h-2 rounded-full bg-slate-600" title="No"></span>
+                </td>
+                <td class="py-3 px-4 text-center">
+                  <span class="text-[10px] bg-slate-500/10 text-slate-400 border border-slate-500/20 px-2 py-0.5 rounded font-bold uppercase">Inactiva</span>
+                </td>
+                <td class="py-3 px-4 text-right">
+                  <div class="flex items-center justify-end gap-1.5">
+                    <!-- ACCIÓN DESTACADA: GESTIÓN DE NÚMEROS -->
+                    <a href="listar-numeros.html?serie_id=2" class="px-2.5 py-1.5 bg-nepsPrimary/10 hover:bg-nepsPrimary/20 text-nepsPrimary font-semibold rounded-lg border border-nepsPrimary/30 transition-all flex items-center gap-1.5 opacity-60 hover:opacity-100" title="Gestionar Números/Tomos">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+                      <span>Números</span>
+                    </a>
+                    <!-- ACCIÓN: EDITAR -->
+                    <a href="form-serie.html?id=2" class="p-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-300 hover:text-white rounded-lg border border-nepsBorder transition-colors" title="Editar Serie">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </a>
+                    <!-- ACCIÓN: REACTIVAR -->
+                    <button onclick="confirmAction('reactivate', 'Batman: The Long Halloween', 2)" class="p-1.5 bg-nepsInput hover:bg-emerald-950/50 text-emerald-400 rounded-lg border border-nepsBorder hover:border-emerald-500/40 transition-colors" title="Reactivar Serie">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ESTADO: LOADING -->
+        <div id="view-loading" class="hidden p-12 text-center my-auto space-y-3">
+          <svg class="w-8 h-8 text-nepsPrimary animate-spin mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+          <p class="text-xs text-nepsMuted font-medium">Cargando series del catálogo...</p>
+        </div>
+
+        <!-- ESTADO: SIN RESULTADOS -->
+        <div id="view-empty" class="hidden p-12 text-center my-auto space-y-3">
+          <div class="w-12 h-12 bg-nepsInput rounded-2xl border border-nepsBorder flex items-center justify-center mx-auto text-nepsMuted">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          </div>
+          <h4 class="text-sm font-bold text-white">No se encontraron series</h4>
+          <p class="text-xs text-nepsMuted max-w-sm mx-auto">No hay resultados que coincidan con los filtros aplicados o la búsqueda realizada.</p>
+        </div>
+
+        <!-- ESTADO: ERROR -->
+        <div id="view-error" class="hidden p-12 text-center my-auto space-y-3">
+          <div class="w-12 h-12 bg-nepsAccent/10 rounded-2xl border border-nepsAccent/30 flex items-center justify-center mx-auto text-nepsAccent">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          </div>
+          <h4 class="text-sm font-bold text-white">Error al cargar las series</h4>
+          <p class="text-xs text-red-300/80 max-w-sm mx-auto">Ocurrió un problema de conexión al intentar obtener los datos. Por favor reintentá.</p>
+          <button onclick="setUIState('default')" class="px-4 py-2 bg-nepsInput hover:bg-nepsBorder text-white text-xs rounded-xl border border-nepsBorder transition-all">Reintentar</button>
+        </div>
+
+        <!-- PAGINACIÓN -->
+        <div class="px-4 py-3 border-t border-nepsBorder bg-nepsInput/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <p class="text-nepsMuted">Mostrando <strong class="text-white">1-2</strong> de <strong class="text-white">24</strong> series</p>
+          <div class="flex items-center gap-1">
+            <button class="px-3 py-1.5 rounded-lg bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white transition-colors disabled:opacity-40" disabled>Anterior</button>
+            <button class="px-3 py-1.5 rounded-lg bg-nepsPrimary/10 border border-nepsPrimary/30 text-nepsPrimary font-bold">1</button>
+            <button class="px-3 py-1.5 rounded-lg bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white transition-colors">2</button>
+            <button class="px-3 py-1.5 rounded-lg bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white transition-colors">Siguiente</button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN DE ACCIÓN (DESACTIVAR / REACTIVAR) -->
+  <div id="action-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center gap-3">
+        <div id="modal-icon-bg" class="w-10 h-10 rounded-xl flex items-center justify-center">
+          <svg id="modal-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h3 id="modal-title" class="text-sm font-bold text-white">¿Confirmar acción?</h3>
+          <p id="modal-target" class="text-xs text-nepsMuted">Serie elegida</p>
+        </div>
+      </div>
+
+      <p id="modal-description" class="text-xs text-slate-300">Descripción detallada del impacto de la acción.</p>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-nepsBorder">
+        <button id="modal-btn-cancel" onclick="closeActionModal()" class="px-4 py-2 bg-nepsInput hover:bg-nepsBorder border border-nepsBorder text-xs text-white font-semibold rounded-xl transition-all">
+          Cancelar
+        </button>
+        <button id="modal-btn-execute" onclick="executeAction()" class="px-5 py-2 text-nepsBg font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2">
+          <span id="modal-btn-text">Confirmar</span>
+          <svg id="modal-btn-spinner" class="w-3.5 h-3.5 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS DE INTERACCIÓN Y MANEJO DE ESTADOS -->
+  <script>
+    let activeAction = null; // 'deactivate' | 'reactivate'
+    let activeTargetId = null;
+
+    // INTERRUPTOR DE ESTADOS VISUALES (DEMO & TESTING)
+    function setUIState(state) {
+      const views = ['default', 'loading', 'empty', 'error'];
+      views.forEach(v => document.getElementById(`view-${v}`).classList.add('hidden'));
+      document.getElementById(`view-${state}`).classList.remove('hidden');
+
+      ['default', 'loading', 'empty', 'error'].forEach(b => {
+        const btn = document.getElementById(`btn-state-${b}`);
+        if(b === state) {
+          btn.className = "px-2 py-0.5 rounded-lg font-bold bg-nepsPrimary text-nepsBg";
+        } else {
+          btn.className = "px-2 py-0.5 rounded-lg font-semibold text-nepsMuted hover:text-white";
+        }
+      });
+    }
+
+    // ABRIR MODAL CON PARÁMETROS SEGÚN ACCIÓN
+    function confirmAction(type, name, id) {
+      activeAction = type;
+      activeTargetId = id;
+
+      const modalTitle = document.getElementById('modal-title');
+      const modalTarget = document.getElementById('modal-target');
+      const modalDesc = document.getElementById('modal-description');
+      const modalIconBg = document.getElementById('modal-icon-bg');
+      const modalBtn = document.getElementById('modal-btn-execute');
+      const modalBtnText = document.getElementById('modal-btn-text');
+
+      modalTarget.textContent = name;
+
+      if (type === 'deactivate') {
+        modalTitle.textContent = '¿Desactivar Serie?';
+        modalDesc.textContent = 'La serie pasará a estado inactivo y dejará de visibilizarse públicamente en los buscadores y catálogo general de la biblioteca.';
+        modalIconBg.className = 'w-10 h-10 rounded-xl bg-nepsAccent/10 border border-nepsAccent/20 text-nepsAccent flex items-center justify-center';
+        modalBtn.className = 'px-5 py-2 bg-nepsAccent hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2';
+        modalBtnText.textContent = 'Sí, Desactivar';
+      } else {
+        modalTitle.textContent = '¿Reactivar Serie?';
+        modalDesc.textContent = 'La serie se restaurará al estado activo y volverá a ser visible en las búsquedas y fichas asociadas.';
+        modalIconBg.className = 'w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center';
+        modalBtn.className = 'px-5 py-2 bg-emerald-500 hover:bg-emerald-400 text-nepsBg font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2';
+        modalBtnText.textContent = 'Sí, Reactivar';
+      }
+
+      document.getElementById('action-modal').classList.remove('hidden');
+    }
+
+    function closeActionModal() {
+      document.getElementById('action-modal').classList.add('hidden');
+    }
+
+    // EJECUTAR ACCIÓN CON PREVENCIÓN DE MULTIDISPARO
+    function executeAction() {
+      const btnExecute = document.getElementById('modal-btn-execute');
+      const btnCancel = document.getElementById('modal-btn-cancel');
+      const btnText = document.getElementById('modal-btn-text');
+      const btnSpinner = document.getElementById('modal-btn-spinner');
+      
+      btnExecute.disabled = true;
+      btnCancel.disabled = true;
+      btnText.textContent = 'Procesando...';
+      btnSpinner.classList.remove('hidden');
+
+      setTimeout(() => {
+        closeActionModal();
+        
+        // Reset modal state
+        btnExecute.disabled = false;
+        btnCancel.disabled = false;
+        btnSpinner.classList.add('hidden');
+
+        // Disparar Toast
+        if (activeAction === 'deactivate') {
+          showToast('Serie Desactivada', 'La serie se desactivó correctamente.');
+        } else {
+          showToast('Serie Reactivada', 'La serie volvió a estar activa.');
+        }
+      }, 1000);
+    }
+
+    // CONTROL DE TOAST NOTIFICATION
+    function showToast(title, desc) {
+      const toast = document.getElementById('toast-success');
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-desc').textContent = desc;
+
+      toast.classList.remove('opacity-0', 'translate-y-5', 'pointer-events-none');
+      
+      setTimeout(() => {
+        hideToast();
+      }, 4000);
+    }
+
+    function hideToast() {
+      const toast = document.getElementById('toast-success');
+      toast.classList.add('opacity-0', 'translate-y-5', 'pointer-events-none');
+    }
+  </script>
+
+</body>
+</html>

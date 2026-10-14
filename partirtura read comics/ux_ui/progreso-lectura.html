@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fly Vol.2 #02 - Detalle de Work | NEPS</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          },
+          boxShadow: {
+            'glow-blue': '0 4px 25px rgba(56, 189, 248, 0.2)',
+            'glow-pink': '0 4px 25px rgba(244, 63, 94, 0.2)',
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans relative overflow-x-hidden flex flex-col justify-between">
+
+  <!-- HEADER DE NAVEGACIÓN -->
+  <header class="border-b border-nepsBorder bg-nepsBg/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-8">
+        <a href="#" class="flex items-center gap-2 group">
+          <div class="text-2xl font-bold tracking-tight text-white transition-transform group-hover:scale-105">
+            &amp;lt;neps<span class="text-nepsAccent">/&amp;gt;</span>
+          </div>
+          <span class="text-xs uppercase tracking-widest text-nepsMuted font-semibold hidden md:inline-block border-l border-nepsBorder pl-3 ml-1">
+            Comic Library
+          </span>
+        </a>
+
+        <nav class="hidden lg:flex items-center gap-1 text-xs font-medium">
+          <a href="#" class="text-nepsMuted hover:text-white px-3 py-1.5 rounded-lg hover:bg-nepsCard transition-colors">Inicio</a>
+          <a href="#" class="bg-nepsCard text-nepsPrimary border border-nepsPrimary/30 px-3 py-1.5 rounded-lg shadow-sm">Catálogo</a>
+        </nav>
+      </div>
+
+      <div class="flex-1 max-w-md relative hidden sm:block">
+        <input type="text" placeholder="Buscar cómics, autores, números..." 
+          class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary focus:ring-1 focus:ring-nepsPrimary text-nepsText placeholder-slate-600 rounded-lg pl-9 pr-4 py-1.5 text-xs outline-none transition-all duration-200">
+        <svg class="w-4 h-4 text-nepsMuted absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+        </svg>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 p-1 rounded-xl">
+          <div class="w-8 h-8 rounded-lg bg-slate-800 border border-nepsBorder flex items-center justify-center font-bold text-xs text-nepsPrimary">A</div>
+          <div class="hidden md:block text-left pr-1">
+            <p class="text-xs font-semibold text-white">Administrator</p>
+            <p class="text-[10px] text-nepsMuted">Administrator</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 flex-grow w-full space-y-8">
+    
+    <!-- BOTÓN VOLVER -->
+    <div>
+      <a href="#" class="inline-flex items-center gap-1.5 text-xs text-nepsMuted hover:text-white font-medium transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        Volver al Catálogo
+      </a>
+    </div>
+
+    <!-- TARJETA PRINCIPAL DEL CÓMIC -->
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 md:p-8 shadow-2xl relative overflow-hidden">
+      
+      <!-- LÍNEA SUPERIOR DECORATIVA -->
+      <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-nepsAccent via-nepsPrimary to-nepsAccent opacity-80"></div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+        
+        <!-- COLUMNA IZQUIERDA: PORTADA Y ACCIÓN CON PROGRESO INTEGRADO -->
+        <div class="md:col-span-4 lg:col-span-3 space-y-4 max-w-[280px] mx-auto md:mx-0 w-full">
+          <div class="relative rounded-xl overflow-hidden border border-nepsBorder shadow-2xl group">
+            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&amp;fit=crop&amp;w=600&amp;q=80" alt="Fly Vol.2 #02 Cover" class="w-full aspect-[2/3] object-cover" />
+            <span class="absolute bottom-3 right-3 bg-slate-950/90 text-white font-bold text-[10px] px-2 py-0.5 rounded border border-white/20 uppercase">
+              Serie
+            </span>
+          </div>
+
+          <!-- BANDEROLA DE NÚMERO DE EDICIÓN -->
+          <div class="bg-nepsInput border border-nepsBorder text-amber-400 text-xs font-mono font-bold py-2 rounded-lg text-center tracking-wider shadow-inner">
+            Nº REGULAR - 0002
+          </div>
+
+          <!-- ========================================================= -->
+          <!-- PROPUESTA 1: BARRA DE PROGRESO DE LECTURA DEBAJO DE PORTADA -->
+          <!-- ========================================================= -->
+          <div class="bg-nepsInput/60 border border-nepsBorder rounded-xl p-3 space-y-2">
+            <div class="flex items-center justify-between text-[11px]">
+              <span class="text-nepsMuted font-medium">Tu avance</span>
+              <span class="text-nepsPrimary font-bold font-mono">68%</span>
+            </div>
+            <div class="w-full bg-nepsBg h-2 rounded-full overflow-hidden border border-nepsBorder/80 p-0.5">
+              <div class="bg-nepsPrimary h-full rounded-full transition-all duration-500 shadow-glow-blue" style="width: 68%;"></div>
+            </div>
+            <div class="flex justify-between items-center text-[10px] text-nepsMuted font-mono pt-0.5">
+              <span>Pág 22 de 32</span>
+              <span class="text-slate-400">Faltan ~3 min</span>
+            </div>
+          </div>
+
+          <!-- BOTÓN DE ACCIÓN PRINCIPAL (REEMPLAZA EL BOTÓN LEER POR CONTINUAR) -->
+          <button class="w-full bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold py-2.5 px-4 rounded-xl transition-all duration-200 text-xs shadow-glow-blue flex items-center justify-center gap-2 group active:scale-[0.98]">
+            <svg class="w-4 h-4 fill-current transition-transform group-hover:translate-x-0.5" viewBox="0 0 24 24">
+              <path d="M8 5v14l11-7z"/>
+            </svg>
+            Continuar Lectura
+          </button>
+        </div>
+
+        <!-- COLUMNA DERECHA: INFORMACIÓN DETALLADA -->
+        <div class="md:col-span-8 lg:col-span-9 space-y-6">
+          
+          <!-- TÍTULO PRINCIPAL Y VALORACIÓN -->
+          <div class="space-y-2">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">Fly Vol.2 #02</h1>
+            
+            <div class="flex items-center gap-2 text-xs">
+              <div class="flex text-amber-400">
+                ★★★★★
+              </div>
+              <span class="font-bold text-white">5.0</span>
+              <span class="text-nepsMuted">1 voto</span>
+            </div>
+          </div>
+
+          <!-- ========================================================= -->
+          <!-- PROPUESTA 2: PILL DE ESTADO EN FILA DE METADATOS         -->
+          <!-- ========================================================= -->
+          <div class="flex flex-wrap items-center gap-2">
+            <!-- BADGE DESTACADO DE PROGRESO DE LECTURA -->
+            <span class="inline-flex items-center gap-1.5 bg-nepsPrimary/10 border border-nepsPrimary/30 text-nepsPrimary text-xs font-semibold px-3 py-1 rounded-lg">
+              <span class="w-1.5 h-1.5 rounded-full bg-nepsPrimary animate-pulse"></span>
+              En progreso (68%)
+            </span>
+
+            <span class="inline-flex items-center gap-1.5 bg-nepsInput border border-nepsBorder text-slate-300 text-xs px-3 py-1 rounded-lg">
+              <svg class="w-3.5 h-3.5 text-nepsMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+              Español
+            </span>
+
+            <span class="inline-flex items-center gap-1.5 bg-nepsInput border border-nepsBorder text-slate-300 text-xs px-3 py-1 rounded-lg">
+              <svg class="w-3.5 h-3.5 text-nepsMuted" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+              1 de noviembre de 2012
+            </span>
+          </div>
+
+          <!-- SINOPSIS -->
+          <div class="space-y-1.5 pt-2">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-nepsMuted">Sinopsis</h2>
+            <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+              Eddie lucha por superar la muerte de su novia Danielle, mientras que Francis busca venganza contra el hombre responsable de la muerte de su padre, culminando en un acto violento y una explosión devastadora. El segundo número de la miniserie Fly: La caída, que explora las consecuencias trágicas y el descenso a la locura tras el uso de una droga experimental que otorgaba superpoderes.
+            </p>
+          </div>
+
+          <!-- TAGS Y PERSONAS -->
+          <div class="space-y-3 pt-2">
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2.5 py-1 rounded-md bg-nepsInput border border-nepsBorder text-xs text-slate-300 font-medium">ZENESCOPE</span>
+              <span class="px-2.5 py-1 rounded-md bg-nepsInput border border-nepsBorder text-xs text-slate-300 font-medium">FLY</span>
+              <span class="px-2.5 py-1 rounded-md bg-nepsInput border border-nepsBorder text-xs text-slate-300 font-medium">FLY VOL.2</span>
+            </div>
+
+            <div class="flex flex-wrap gap-2 text-xs">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-nepsInput border border-nepsBorder text-slate-300">
+                👤 Raven Gregory - Escritor
+              </span>
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-lg bg-nepsInput border border-nepsBorder text-slate-300">
+                👤 Robert Gill - Dibujante
+              </span>
+            </div>
+
+            <div class="flex flex-wrap gap-1.5 text-xs text-nepsMuted">
+              <span class="px-2.5 py-0.5 rounded bg-nepsInput/60 border border-nepsBorder/60">🏷️ drogas</span>
+              <span class="px-2.5 py-0.5 rounded bg-nepsInput/60 border border-nepsBorder/60">🏷️ Venganza</span>
+              <span class="px-2.5 py-0.5 rounded bg-nepsInput/60 border border-nepsBorder/60">🏷️ tragedia</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+
+    <!-- SECCIÓN SECUENCIA DE PUBLICACIÓN -->
+    <div class="space-y-4 pt-4">
+      <h2 class="text-base font-bold text-white tracking-tight">Secuencia de Publicación</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- ANTERIOR -->
+        <a href="#" class="p-3.5 rounded-xl bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/50 transition flex items-center gap-4 group">
+          <span class="text-nepsMuted group-hover:text-white">&amp;lt;&amp;lt;</span>
+          <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&amp;fit=crop&amp;w=200&amp;q=80" alt="Fly #01" class="w-10 h-14 object-cover rounded border border-nepsBorder flex-shrink-0" />
+          <div class="min-w-0">
+            <p class="text-[10px] text-nepsMuted uppercase font-mono">Anterior <span class="text-amber-400 font-bold">Nº REGULAR - 0001</span></p>
+            <p class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors truncate">Fly Vol.2 #01</p>
+          </div>
+        </a>
+
+        <!-- SIGUIENTE -->
+        <a href="#" class="p-3.5 rounded-xl bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/50 transition flex items-center justify-between gap-4 group text-right">
+          <div class="min-w-0 flex-1">
+            <p class="text-[10px] text-nepsMuted uppercase font-mono"><span class="text-amber-400 font-bold">Nº REGULAR - 0003</span> Siguiente</p>
+            <p class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors truncate">Fly Vol.2 #03</p>
+          </div>
+          <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&amp;fit=crop&amp;w=200&amp;q=80" alt="Fly #03" class="w-10 h-14 object-cover rounded border border-nepsBorder flex-shrink-0" />
+          <span class="text-nepsMuted group-hover:text-white">&amp;gt;&amp;gt;</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+</body>
+</html>

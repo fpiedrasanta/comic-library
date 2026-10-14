@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detalle de Work - Comic Library</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f6ff',
+              100: '#e0edff',
+              500: '#3b82f6',
+              600: '#2563eb',
+              900: '#1e3a8a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full font-sans bg-slate-950 text-slate-200 antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- CONTENEDOR PRINCIPAL / LAYOUT -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
+
+    <!-- SELECTOR DE ESTADOS (SOLO REFERENCIA DEMO) -->
+    <div class="p-4 rounded-xl bg-slate-900/80 border border-slate-800 flex flex-wrap items-center justify-between gap-4">
+      <div class="text-xs font-mono text-slate-400">
+        Ruta: <span class="text-brand-400 font-semibold">/works/{id}</span> &mdash; TASK-UXUI-0029
+      </div>
+      <div class="flex items-center gap-2 text-xs">
+        <a href="#state-data" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition">Estado Data</a>
+        <a href="#state-loading" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition">Estado Loading</a>
+        <a href="#state-not-found" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition">Estado Not Found</a>
+        <a href="#state-error" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 transition">Estado Error</a>
+      </div>
+    </div>
+
+
+    <!-- ========================================================================= -->
+    <!-- ESTADO: DATA (INFORMACIÓN COMPLETA)                                       -->
+    <!-- ========================================================================= -->
+    <section id="state-data" class="space-y-10">
+      
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-medium">
+        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+        ESTADO: DATA
+      </div>
+
+      <!-- NIVEL 1 & 2: IDENTIFICACIÓN PRINCIPAL Y SINOPSIS -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 lg:gap-12 items-start">
+        
+        <!-- Cover de la Work (Tratamiento Portada de Cómic) -->
+        <div class="md:col-span-4 lg:col-span-3 flex justify-center">
+          <div class="relative group w-full max-w-[280px] md:max-w-none">
+            <div class="absolute -inset-1 bg-gradient-to-r from-brand-600 to-indigo-600 rounded-2xl blur-lg opacity-20 group-hover:opacity-40 transition duration-500"></div>
+            <img 
+              src="https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?q=80&w=800&auto=format&fit=crop" 
+              alt="Cover de la Work" 
+              class="relative w-full aspect-[2/3] object-cover rounded-xl shadow-2xl ring-1 ring-white/10"
+            />
+          </div>
+        </div>
+
+        <!-- Metadatos Principales & Descripción -->
+        <div class="md:col-span-8 lg:col-span-9 space-y-6">
+          
+          <div class="space-y-3">
+            <!-- WorkType & Number -->
+            <div class="flex items-center gap-3 flex-wrap text-sm">
+              <span class="px-2.5 py-1 rounded-md bg-brand-500/10 border border-brand-500/20 text-brand-400 font-medium">
+                Comic Issue
+              </span>
+              <span class="px-2.5 py-1 rounded-md bg-amber-500/10 border border-amber-500/20 text-amber-400 font-bold font-mono">
+                #15
+              </span>
+            </div>
+
+            <!-- Title -->
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight">
+              The Amazing Spider-Man: Cosmic Collision
+            </h1>
+
+            <!-- Language & PublicationDate -->
+            <div class="flex flex-wrap items-center gap-4 text-xs sm:text-sm text-slate-400 pt-1">
+              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path></svg>
+                <span>Inglés (US)</span>
+              </div>
+              <div class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-800">
+                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 2 0 002-2V7a2 2 2 0 00-2-2H5a2 2 2 0 00-2 2v12a2 2 2 0 002 2z"></path></svg>
+                <span>15 Octubre 1964</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Description / Synopsis -->
+          <div class="space-y-2 pt-2 border-t border-slate-900">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Sinopsis</h2>
+            <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+              Peter Parker se enfrenta a una de sus mayores amenazas espaciales mientras intenta equilibrar su vida universitaria y sus responsabilidades familiares. En este número especial, la batalla alcanza proporciones cósmicas con la llegada imprevista de los Guardianes de la Galaxia en el centro de Nueva York.
+            </p>
+          </div>
+
+          <!-- Tags -->
+          <div class="space-y-2 pt-2">
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400">Tags</h2>
+            <div class="flex flex-wrap gap-2">
+              <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700 transition">#Superhéroes</span>
+              <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700 transition">#Aventura Espacial</span>
+              <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700 transition">#Años 60</span>
+              <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700 transition">#Crossover</span>
+              <span class="px-2.5 py-1 rounded-md text-xs font-medium bg-slate-900 text-slate-300 border border-slate-800 hover:border-slate-700 transition">#Multiverso</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- DIVIDER -->
+      <div class="border-t border-slate-900"></div>
+
+      <!-- NIVEL 2: CONTEXTO EDITORIAL (PUBLISHER, FRANCHISE, SERIES) -->
+      <div class="space-y-4">
+        <h2 class="text-lg font-bold text-white tracking-tight">Contexto Editorial</h2>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          
+          <!-- Publisher -->
+          <a href="#" class="group relative flex items-center gap-4 p-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 transition overflow-hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-red-600 rounded-l"></div>
+            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=200&auto=format&fit=crop" alt="Marvel Comics" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-slate-950" />
+            <div class="min-w-0">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-0.5">Publisher</span>
+              <h3 class="text-sm font-semibold text-white group-hover:text-brand-400 transition truncate">Marvel Comics</h3>
+            </div>
+          </a>
+
+          <!-- Franchise -->
+          <a href="#" class="group relative flex items-center gap-4 p-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 transition overflow-hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-amber-500 rounded-l"></div>
+            <img src="https://images.unsplash.com/photo-1635863138275-d9b33299680b?q=80&w=200&auto=format&fit=crop" alt="Spider-Man Universe" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-slate-950" />
+            <div class="min-w-0">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-0.5">Franchise</span>
+              <h3 class="text-sm font-semibold text-white group-hover:text-brand-400 transition truncate">Spider-Man Universe</h3>
+            </div>
+          </a>
+
+          <!-- Series -->
+          <a href="#" class="group relative flex items-center gap-4 p-3.5 rounded-xl bg-slate-900/60 hover:bg-slate-900 border border-slate-800/80 hover:border-slate-700 transition overflow-hidden">
+            <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-sky-500 rounded-l"></div>
+            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=200&auto=format&fit=crop" alt="The Amazing Spider-Man Series" class="w-14 h-14 rounded-lg object-cover flex-shrink-0 bg-slate-950" />
+            <div class="min-w-0">
+              <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500 block mb-0.5">Series</span>
+              <h3 class="text-sm font-semibold text-white group-hover:text-brand-400 transition truncate">The Amazing Spider-Man (1963-1998)</h3>
+            </div>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- NIVEL 3: SECUENCIA DE NAVEGACIÓN (PREVIOUS / NEXT WORK) -->
+      <div class="space-y-4">
+        <h2 class="text-lg font-bold text-white tracking-tight">Secuencia de Publicación</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          
+          <!-- PreviousWork -->
+          <a href="#" class="group flex items-center gap-4 p-3.5 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/60 hover:border-slate-700 transition">
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-brand-400 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            <img src="https://images.unsplash.com/photo-1568602471122-7832951cc4c5?q=80&w=200&auto=format&fit=crop" alt="Previous Work Cover" class="w-12 h-18 aspect-[2/3] object-cover rounded-md flex-shrink-0" />
+            <div class="min-w-0">
+              <div class="flex items-center gap-1.5 mb-0.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Anterior</span>
+                <span class="text-xs font-mono font-bold text-amber-400">#14</span>
+              </div>
+              <h3 class="text-sm font-semibold text-white group-hover:text-brand-400 transition truncate">The Amazing Spider-Man #14</h3>
+            </div>
+          </a>
+
+          <!-- NextWork -->
+          <a href="#" class="group flex items-center justify-end text-right gap-4 p-3.5 rounded-xl bg-slate-900/40 hover:bg-slate-900 border border-slate-800/60 hover:border-slate-700 transition">
+            <div class="min-w-0">
+              <div class="flex items-center justify-end gap-1.5 mb-0.5">
+                <span class="text-xs font-mono font-bold text-amber-400">#16</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Siguiente</span>
+              </div>
+              <h3 class="text-sm font-semibold text-white group-hover:text-brand-400 transition truncate">The Amazing Spider-Man #16</h3>
+            </div>
+            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=200&auto=format&fit=crop" alt="Next Work Cover" class="w-12 h-18 aspect-[2/3] object-cover rounded-md flex-shrink-0" />
+            <svg class="w-5 h-5 text-slate-500 group-hover:text-brand-400 transition flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+          </a>
+
+        </div>
+      </div>
+
+      <!-- NIVEL 2: PERSON ASSIGNMENTS (MÚLTIPLES ROLES) -->
+      <div class="space-y-4">
+        <h2 class="text-lg font-bold text-white tracking-tight">Equipo Creativo</h2>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          
+          <!-- Persona 1: Múltiples Roles -->
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+            <div class="font-semibold text-white text-sm">Stan Lee</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-medium border border-slate-700/50">Writer</span>
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-medium border border-slate-700/50">Editor</span>
+            </div>
+          </div>
+
+          <!-- Persona 2: Múltiples Roles -->
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+            <div class="font-semibold text-white text-sm">Steve Ditko</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-medium border border-slate-700/50">Penciller</span>
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-medium border border-slate-700/50">Inker</span>
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-medium border border-slate-700/50">Cover Artist</span>
+            </div>
+          </div>
+
+          <!-- Persona 3: Un Rol -->
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+            <div class="font-semibold text-white text-sm">Artie Simek</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-medium border border-slate-700/50">Letterer</span>
+            </div>
+          </div>
+
+          <!-- Persona 4: Un Rol -->
+          <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800/80 space-y-2">
+            <div class="font-semibold text-white text-sm">Stan Goldberg</div>
+            <div class="flex flex-wrap gap-1.5">
+              <span class="px-2 py-0.5 rounded bg-slate-800 text-slate-300 text-[11px] font-medium border border-slate-700/50">Colorist</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+
+    <!-- ========================================================================= -->
+    <!-- ESTADO: LOADING (SKELETON TAILWIND)                                       -->
+    <!-- ========================================================================= -->
+    <section id="state-loading" class="space-y-6 pt-12 border-t border-slate-900">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-medium">
+        ESTADO: LOADING
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-8 items-start animate-pulse">
+        <div class="md:col-span-4 lg:col-span-3">
+          <div class="w-full aspect-[2/3] bg-slate-900 rounded-xl"></div>
+        </div>
+        <div class="md:col-span-8 lg:col-span-9 space-y-4">
+          <div class="h-6 w-24 bg-slate-900 rounded"></div>
+          <div class="h-10 w-3/4 bg-slate-900 rounded-lg"></div>
+          <div class="flex gap-3">
+            <div class="h-8 w-28 bg-slate-900 rounded-lg"></div>
+            <div class="h-8 w-36 bg-slate-900 rounded-lg"></div>
+          </div>
+          <div class="space-y-2 pt-4">
+            <div class="h-4 w-full bg-slate-900 rounded"></div>
+            <div class="h-4 w-5/6 bg-slate-900 rounded"></div>
+            <div class="h-4 w-2/3 bg-slate-900 rounded"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ========================================================================= -->
+    <!-- ESTADO: NOT FOUND (404 / RECURSO INEXISTENTE)                            -->
+    <!-- ========================================================================= -->
+    <section id="state-not-found" class="space-y-6 pt-12 border-t border-slate-900">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-500/10 border border-slate-500/20 text-slate-400 text-xs font-medium">
+        ESTADO: NOT FOUND
+      </div>
+
+      <div class="p-12 text-center rounded-2xl bg-slate-900/40 border border-slate-800/80 max-w-xl mx-auto space-y-4">
+        <div class="w-16 h-16 mx-auto rounded-full bg-slate-800/60 flex items-center justify-center text-slate-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+        </div>
+        <h2 class="text-xl font-bold text-white">Work no encontrada</h2>
+        <p class="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto">
+          La obra que intentás consultar no existe o fue retirada del catálogo.
+        </p>
+        <div class="pt-2">
+          <a href="#" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-white text-sm font-medium transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            Volver al Catálogo
+          </a>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ========================================================================= -->
+    <!-- ESTADO: ERROR (ERROR RECUPERABLE)                                        -->
+    <!-- ========================================================================= -->
+    <section id="state-error" class="space-y-6 pt-12 border-t border-slate-900 mb-12">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-medium">
+        ESTADO: ERROR
+      </div>
+
+      <div class="p-12 text-center rounded-2xl bg-rose-950/10 border border-rose-900/30 max-w-xl mx-auto space-y-4">
+        <div class="w-16 h-16 mx-auto rounded-full bg-rose-900/20 flex items-center justify-center text-rose-400">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+        </div>
+        <h2 class="text-xl font-bold text-white">Error al obtener la Work</h2>
+        <p class="text-sm text-slate-400 leading-relaxed max-w-sm mx-auto">
+          Ocurrió un inconveniente al conectar con el servidor. Podés intentar recargar los datos.
+        </p>
+        <div class="pt-2">
+          <button type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-brand-600 hover:bg-brand-500 text-white text-sm font-medium transition shadow-lg shadow-brand-600/20">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+            Reintentar
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+</body>
+</html>

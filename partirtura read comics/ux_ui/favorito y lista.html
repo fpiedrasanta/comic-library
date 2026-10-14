@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WorkCard con Listas y Favoritos - Comic Library | NEPS</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans relative p-6 space-y-8">
+
+  <!-- SECCIÓN DE DEMO: WORKCARDS EN GRILLA -->
+  <div class="max-w-7xl mx-auto space-y-4">
+    <div class="flex items-center justify-between border-b border-nepsBorder pb-3">
+      <h1 class="text-xl font-bold text-white">Vista Previa Componente: WorkCard con Acciones</h1>
+      <p class="text-xs text-nepsMuted">Haz clic en el botón de lista en cualquier tarjeta para abrir el modal.</p>
+    </div>
+
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+      
+      <!-- WORKCARD 1 (CON NÚMERO) -->
+      <article class="bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/60 rounded-xl overflow-hidden group transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-glow-blue">
+        <div class="relative w-full aspect-[2/3] overflow-hidden bg-nepsInput">
+          <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&amp;auto=format&amp;fit=crop&amp;q=80" alt="Fly Vol.2 #05" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          
+          <div class="absolute top-2 left-2 right-2 flex flex-wrap gap-1 z-10 pointer-events-auto">
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-slate-900/80 border-slate-700 text-slate-200">Zenescope</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-purple-500/20 border-purple-500/40 text-purple-300">Fly</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-sky-500/20 border-sky-500/40 text-sky-300 ml-auto uppercase">Serie</span>
+          </div>
+        </div>
+
+        <div class="p-3 space-y-2 flex-grow flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <!-- FILA DE NÚMERO Y ACCIONES ALINEADAS A LA DERECHA -->
+            <div class="h-6 flex items-center justify-between gap-2">
+              <!-- Número opcional -->
+              <span class="text-[10px] bg-nepsInput text-nepsPrimary border border-nepsPrimary/30 px-1.5 py-0.5 rounded font-mono font-bold">
+                Nº REGULAR - 0005
+              </span>
+
+              <!-- Botones de Acción (Favoritos + Agregar a Lista) -->
+              <div class="flex items-center gap-1 ml-auto">
+                <!-- Botón Favorito (Estrella) -->
+                <button type="button" onclick="toggleFavorite(this)" title="Añadir a favoritos" 
+                  class="p-1 rounded-md bg-nepsInput border border-nepsBorder hover:border-amber-400/50 text-nepsMuted hover:text-amber-400 transition-colors">
+                  <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                  </svg>
+                </button>
+
+                <!-- Botón Agregar a Lista -->
+                <button type="button" onclick="openAddToListModal('Fly Vol.2 #05')" title="Agregar a una lista" 
+                  class="p-1 rounded-md bg-nepsInput border border-nepsBorder hover:border-nepsPrimary/50 text-nepsMuted hover:text-nepsPrimary transition-colors">
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <h3 class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors line-clamp-1" title="Fly Vol.2 #05">
+              Fly Vol.2 #05
+            </h3>
+          </div>
+
+          <div class="pt-2 border-t border-nepsBorder/50 grid grid-cols-2 gap-1 text-[10px] text-nepsMuted">
+            <div>
+              <span class="block text-[9px] text-slate-500 uppercase">Publicado</span>
+              <strong class="text-slate-300 font-normal">3/1/2013</strong>
+            </div>
+            <div class="text-right">
+              <span class="block text-[9px] text-slate-500 uppercase">Subido</span>
+              <strong class="text-slate-300 font-normal">10/7/2026</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- WORKCARD 2 (SIN NÚMERO - MANTIENE ALINEACIÓN DE BOTONES A LA DERECHA) -->
+      <article class="bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/60 rounded-xl overflow-hidden group transition-all duration-300 flex flex-col justify-between shadow-sm hover:shadow-glow-blue">
+        <div class="relative w-full aspect-[2/3] overflow-hidden bg-nepsInput">
+          <img src="https://images.unsplash.com/photo-1568832359672-e36cf5d74f54?w=400&amp;auto=format&amp;fit=crop&amp;q=80" alt="Special One Shot" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          
+          <div class="absolute top-2 left-2 right-2 flex flex-wrap gap-1 z-10 pointer-events-auto">
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-red-500/20 border-red-500/40 text-red-300">Marvel</span>
+            <span class="text-[9px] font-bold px-1.5 py-0.5 rounded border bg-emerald-500/20 border-emerald-500/40 text-emerald-300 ml-auto uppercase">Novela</span>
+          </div>
+        </div>
+
+        <div class="p-3 space-y-2 flex-grow flex flex-col justify-between">
+          <div class="space-y-1.5">
+            <!-- FILA SIN NÚMERO (LOS BOTONES PERMANECEN A LA DERECHA) -->
+            <div class="h-6 flex items-center justify-end gap-1">
+              <button type="button" onclick="toggleFavorite(this)" title="Añadir a favoritos" 
+                class="p-1 rounded-md bg-nepsInput border border-nepsBorder hover:border-amber-400/50 text-amber-400 transition-colors">
+                <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24">
+                  <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                </svg>
+              </button>
+
+              <button type="button" onclick="openAddToListModal('Spider-Man Special')" title="Agregar a una lista" 
+                class="p-1 rounded-md bg-nepsInput border border-nepsBorder hover:border-nepsPrimary/50 text-nepsMuted hover:text-nepsPrimary transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+              </button>
+            </div>
+
+            <h3 class="text-xs font-bold text-white group-hover:text-nepsPrimary transition-colors line-clamp-1" title="Spider-Man Special">
+              Spider-Man Special
+            </h3>
+          </div>
+
+          <div class="pt-2 border-t border-nepsBorder/50 grid grid-cols-2 gap-1 text-[10px] text-nepsMuted">
+            <div>
+              <span class="block text-[9px] text-slate-500 uppercase">Publicado</span>
+              <strong class="text-slate-300 font-normal">15/8/2024</strong>
+            </div>
+            <div class="text-right">
+              <span class="block text-[9px] text-slate-500 uppercase">Subido</span>
+              <strong class="text-slate-300 font-normal">10/7/2026</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL 1: SELECCIONAR / AGREGAR A LISTAS   -->
+  <!-- ========================================== -->
+  <div id="add-to-list-modal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl w-full max-w-md overflow-hidden shadow-2xl space-y-4 p-5 animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Header del Modal -->
+      <div class="flex items-center justify-between pb-3 border-b border-nepsBorder">
+        <div>
+          <h3 class="text-sm font-bold text-white">Agregar a lista</h3>
+          <p id="target-work-title" class="text-[11px] text-nepsPrimary font-medium truncate max-w-[260px]">Obra seleccionada</p>
+        </div>
+        <button onclick="closeModal('add-to-list-modal')" class="text-nepsMuted hover:text-white p-1 rounded-lg hover:bg-nepsInput transition-colors">✕</button>
+      </div>
+
+      <!-- Buscador + Botón (+) Crear Lista -->
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <input type="text" placeholder="Buscar lista..." 
+            class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-8 pr-3 py-2 outline-none transition-all">
+          <svg class="w-3.5 h-3.5 text-nepsMuted absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <button type="button" onclick="openCreateListModal()" title="Crear nueva lista"
+          class="bg-nepsPrimary hover:bg-sky-300 text-nepsBg font-bold text-xs px-3 py-2 rounded-xl transition-colors flex items-center gap-1 flex-shrink-0">
+          <span class="text-sm leading-none">+</span>
+          <span class="hidden sm:inline">Nueva</span>
+        </button>
+      </div>
+
+      <!-- LISTADO PAGINADO DE LISTAS (CON SCROLL LATERAL/VERTICAL) -->
+      <div class="max-h-56 overflow-y-auto space-y-1.5 pr-1" id="lists-container">
+        
+        <!-- ITEM DE LISTA 1 -->
+        <div class="flex items-center justify-between p-2.5 bg-nepsInput/60 border border-nepsBorder hover:border-nepsBorder/80 rounded-xl transition-colors group">
+          <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" checked class="w-4 h-4 rounded border-nepsBorder bg-nepsBg text-nepsPrimary focus:ring-nepsPrimary cursor-pointer">
+            <span class="text-xs text-slate-200 font-medium truncate group-hover:text-white">Pendientes de lectura</span>
+          </label>
+          <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity ml-2">
+            <button onclick="openEditListModal('Pendientes de lectura')" title="Editar nombre" class="p-1 text-nepsMuted hover:text-nepsPrimary rounded transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>
+            <button onclick="confirmDeleteList('Pendientes de lectura')" title="Eliminar lista" class="p-1 text-nepsMuted hover:text-nepsAccent rounded transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ITEM DE LISTA 2 -->
+        <div class="flex items-center justify-between p-2.5 bg-nepsInput/60 border border-nepsBorder hover:border-nepsBorder/80 rounded-xl transition-colors group">
+          <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" class="w-4 h-4 rounded border-nepsBorder bg-nepsBg text-nepsPrimary focus:ring-nepsPrimary cursor-pointer">
+            <span class="text-xs text-slate-200 font-medium truncate group-hover:text-white">Favoritos de Spider-Man</span>
+          </label>
+          <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity ml-2">
+            <button onclick="openEditListModal('Favoritos de Spider-Man')" title="Editar nombre" class="p-1 text-nepsMuted hover:text-nepsPrimary rounded transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>
+            <button onclick="confirmDeleteList('Favoritos de Spider-Man')" title="Eliminar lista" class="p-1 text-nepsMuted hover:text-nepsAccent rounded transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- ITEM DE LISTA 3 -->
+        <div class="flex items-center justify-between p-2.5 bg-nepsInput/60 border border-nepsBorder hover:border-nepsBorder/80 rounded-xl transition-colors group">
+          <label class="flex items-center gap-2.5 cursor-pointer flex-1 min-w-0">
+            <input type="checkbox" class="w-4 h-4 rounded border-nepsBorder bg-nepsBg text-nepsPrimary focus:ring-nepsPrimary cursor-pointer">
+            <span class="text-xs text-slate-200 font-medium truncate group-hover:text-white">Lecturas de fin de semana</span>
+          </label>
+          <div class="flex items-center gap-1 opacity-80 group-hover:opacity-100 transition-opacity ml-2">
+            <button onclick="openEditListModal('Lecturas de fin de semana')" title="Editar nombre" class="p-1 text-nepsMuted hover:text-nepsPrimary rounded transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"/></svg>
+            </button>
+            <button onclick="confirmDeleteList('Lecturas de fin de semana')" title="Eliminar lista" class="p-1 text-nepsMuted hover:text-nepsAccent rounded transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- BOTÓN "VER MÁS" PARA PAGINACIÓN -->
+      <div class="text-center pt-2 border-t border-nepsBorder">
+        <button type="button" class="text-xs text-nepsPrimary hover:underline font-semibold flex items-center justify-center gap-1 mx-auto">
+          <span>Ver más listas</span>
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      </div>
+
+      <!-- Footer del Modal -->
+      <div class="flex items-center justify-end gap-2 pt-2">
+        <button onclick="closeModal('add-to-list-modal')" class="px-4 py-2 bg-nepsPrimary hover:bg-sky-300 text-nepsBg font-bold text-xs rounded-xl transition-colors">
+          Listo
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL 2: CREAR / EDITAR NOMBRE DE LISTA  -->
+  <!-- ========================================== -->
+  <div id="create-edit-list-modal" class="hidden fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl p-5 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+      
+      <h3 id="modal-form-title" class="text-sm font-bold text-white">Crear lista</h3>
+
+      <div class="space-y-1.5">
+        <label class="block text-[11px] font-semibold text-nepsMuted">Nombre de la lista</label>
+        <input type="text" id="list-name-input" placeholder="Ingrese el nombre de la lista" 
+          class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-600 rounded-xl px-3.5 py-2.5 outline-none transition-all">
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-nepsBorder">
+        <button type="button" onclick="closeModal('create-edit-list-modal')" 
+          class="px-3.5 py-2 bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white text-xs font-medium rounded-xl transition-colors">
+          Cancelar
+        </button>
+        <button type="button" onclick="saveList()" 
+          class="px-4 py-2 bg-nepsPrimary hover:bg-sky-300 text-nepsBg font-bold text-xs rounded-xl transition-colors">
+          Guardar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ========================================== -->
+  <!-- MODAL 3: CONFIRMAR ELIMINACIÓN DE LISTA  -->
+  <!-- ========================================== -->
+  <div id="delete-warning-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-nepsCard border border-nepsAccent/30 rounded-2xl w-full max-w-sm overflow-hidden shadow-2xl p-5 space-y-4 text-center animate-in fade-in zoom-in-95 duration-150">
+      
+      <div class="w-12 h-12 rounded-full bg-nepsAccent/10 border border-nepsAccent/30 text-nepsAccent flex items-center justify-center mx-auto">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+      </div>
+
+      <div class="space-y-1">
+        <h3 class="text-sm font-bold text-white">¿Eliminar lista?</h3>
+        <p class="text-xs text-nepsMuted">
+          Esta acción eliminará la lista <span id="delete-list-name" class="text-white font-semibold">"Lista"&</span> y perderá todo el contenido de obras asociadas a ella.
+        </p>
+      </div>
+
+      <div class="flex items-center justify-center gap-2 pt-2 border-t border-nepsBorder">
+        <button type="button" onclick="closeModal('delete-warning-modal')" 
+          class="px-4 py-2 bg-nepsInput border border-nepsBorder text-nepsMuted hover:text-white text-xs font-medium rounded-xl transition-colors">
+          Cancelar
+        </button>
+        <button type="button" onclick="executeDeleteList()" 
+          class="px-4 py-2 bg-nepsAccent hover:bg-rose-600 text-white font-bold text-xs rounded-xl shadow-glow-pink transition-colors">
+          Sí, eliminar
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- LÓGICA DE CONTROL DE MODALES Y COMPORTAMIENTO -->
+  <script>
+    let selectedListName = '';
+
+    function toggleFavorite(btn) {
+      btn.classList.toggle('text-amber-400');
+      btn.classList.toggle('text-nepsMuted');
+    }
+
+    function openAddToListModal(workTitle) {
+      document.getElementById('target-work-title').innerText = workTitle;
+      document.getElementById('add-to-list-modal').classList.remove('hidden');
+    }
+
+    function openCreateListModal() {
+      document.getElementById('modal-form-title').innerText = 'Crear lista';
+      document.getElementById('list-name-input').value = '';
+      document.getElementById('create-edit-list-modal').classList.remove('hidden');
+    }
+
+    function openEditListModal(listName) {
+      document.getElementById('modal-form-title').innerText = 'Editar lista';
+      document.getElementById('list-name-input').value = listName;
+      document.getElementById('create-edit-list-modal').classList.remove('hidden');
+    }
+
+    function confirmDeleteList(listName) {
+      selectedListName = listName;
+      document.getElementById('delete-list-name').innerText = `"${listName}"`;
+      document.getElementById('delete-warning-modal').classList.remove('hidden');
+    }
+
+    function executeDeleteList() {
+      closeModal('delete-warning-modal');
+    }
+
+    function saveList() {
+      closeModal('create-edit-list-modal');
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.add('hidden');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administrar Work List - NEPS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="admin-franquicias.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+          Franquicias
+        </a>
+        <a href="admin-editoriales.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Editoriales
+        </a>
+        <a href="work-lists.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          Listas de Obras
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">FP</div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Super Admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="work-lists.html" class="flex items-center gap-1.5 text-xs font-semibold text-nepsMuted hover:text-white bg-nepsCard border border-nepsBorder hover:border-nepsMuted px-3 py-1.5 rounded-lg transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Volver al listado</span>
+        </a>
+        <div class="h-4 w-px bg-nepsBorder hidden sm:block"></div>
+        <h1 id="page-title-header" class="text-sm font-bold text-white tracking-tight hidden sm:block">Editar Work List</h1>
+      </div>
+
+      <!-- DEMO CONTROLS SWITCHER -->
+      <div class="flex items-center gap-1.5 bg-nepsCard p-1 rounded-xl border border-nepsBorder text-[11px] overflow-x-auto">
+        <button onclick="setFormState('edit')" id="btn-state-edit" class="px-2.5 py-1 rounded-lg font-bold bg-nepsPrimary text-nepsBg transition-all">Edición</button>
+        <button onclick="setFormState('create')" id="btn-state-create" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white transition-all">Alta</button>
+        <button onclick="setFormState('empty')" id="btn-state-empty" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white transition-all">Sin Obras</button>
+        <button onclick="setFormState('loading')" id="btn-state-loading" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white transition-all">Carga</button>
+        <button onclick="setFormState('error')" id="btn-state-error" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white transition-all">Errores</button>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-5xl w-full mx-auto">
+
+      <!-- BADGE INDICADOR DE ENTIDAD OFICIAL SYSTEM -->
+      <div class="bg-sky-500/10 border border-sky-500/20 rounded-2xl p-4 flex items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-sky-500/20 border border-sky-500/30 text-sky-400 flex items-center justify-center flex-shrink-0 font-mono font-bold text-xs">
+            SYS
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-xs font-bold text-white uppercase tracking-wider">Lista Oficial del Sistema</h2>
+              <span class="text-[10px] bg-sky-400/20 text-sky-300 font-mono px-2 py-0.5 rounded border border-sky-400/30">OwnerType = System</span>
+            </div>
+            <p class="text-[11px] text-nepsMuted mt-0.5">Esta lista es administrada globalmente y estará disponible como recomendada o curada para la comunidad.</p>
+          </div>
+        </div>
+        <div id="unsaved-changes-badge" class="hidden sm:flex items-center gap-1.5 bg-amber-500/10 text-amber-400 border border-amber-500/20 px-3 py-1 rounded-xl text-xs font-semibold">
+          <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+          Cambios sin guardar
+        </div>
+      </div>
+
+      <!-- ALERTA DE ERROR GENERAL DE NAVEGACIÓN O RED -->
+      <div id="global-error-banner" class="hidden bg-nepsAccent/10 border border-nepsAccent/30 rounded-2xl p-4 flex items-center justify-between gap-3 text-xs">
+        <div class="flex items-center gap-3 text-nepsAccent">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <p class="font-medium text-white">No se pudieron cargar las obras de la lista. Inténtalo de nuevo o revisá la conexión.</p>
+        </div>
+        <button class="px-3 py-1.5 bg-nepsAccent hover:bg-rose-600 text-white font-bold rounded-xl text-xs transition-colors">Reintentar</button>
+      </div>
+
+      <!-- SKELETON LOADING STATE -->
+      <div id="skeleton-loading-state" class="hidden space-y-6 animate-pulse">
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-4">
+          <div class="h-4 bg-nepsInput rounded w-1/4"></div>
+          <div class="h-10 bg-nepsInput rounded-xl w-full"></div>
+          <div class="h-20 bg-nepsInput rounded-xl w-full"></div>
+        </div>
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-4">
+          <div class="h-4 bg-nepsInput rounded w-1/3"></div>
+          <div class="h-16 bg-nepsInput rounded-xl w-full"></div>
+          <div class="h-16 bg-nepsInput rounded-xl w-full"></div>
+        </div>
+      </div>
+
+      <!-- FORMULARIO PRINCIPAL -->
+      <form id="work-list-form" enctype="multipart/form-data" onsubmit="event.preventDefault();" class="space-y-6">
+
+        <!-- ENCABEZADO DE TÍTULO Y ACCIÓN DE ESTADO (ACTIVAR/DESACTIVAR) -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-nepsBorder/60 pb-5">
+          <div>
+            <h2 id="form-main-title" class="text-xl font-bold text-white tracking-tight">Editar Lista: Mejores Shonen del Año</h2>
+            <p id="form-main-subtitle" class="text-xs text-nepsMuted mt-1">Configurá la información general y gestioná las obras pertenecientes a esta lista curada.</p>
+          </div>
+
+          <!-- BOTÓN Y BADGE DE ESTADO (SÓLO EN MODO EDICIÓN) -->
+          <div id="status-action-container" class="flex items-center gap-3">
+            <span id="status-badge" class="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-emerald-400 font-bold text-xs">
+              <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-400"></span>
+              <span id="status-text">Activa</span>
+            </span>
+            <button type="button" onclick="toggleWorkListStatus()" id="btn-toggle-status" class="px-3.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent text-nepsAccent hover:text-white border border-nepsAccent/20 rounded-xl text-xs font-semibold transition-all">
+              Desactivar Lista
+            </button>
+          </div>
+        </div>
+
+        <!-- SECCIÓN 1: DATOS GENERALES DE LA LISTA -->
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-5 space-y-5 shadow-xl">
+          <div class="flex items-center justify-between border-b border-nepsBorder/60 pb-3">
+            <h3 class="text-xs font-bold text-nepsMuted uppercase tracking-wider">1. Información de la Lista</h3>
+            <span class="text-[10px] text-nepsMuted">* Campos obligatorios</span>
+          </div>
+
+          <!-- FILA 1: NAME & COLOR -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- NAME -->
+            <div class="md:col-span-2 space-y-1.5">
+              <label for="list-name" class="text-xs font-semibold text-white block">Nombre de la Lista <span class="text-nepsAccent">*</span></label>
+              <input type="text" id="list-name" name="Name" required value="Mejores Shonen del Año" placeholder="Ej: Lecturas recomendadas de verano" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+              <p id="error-list-name" class="hidden text-[11px] text-nepsAccent mt-1">El nombre de la lista es requerido y debe tener al menos 3 caracteres.</p>
+            </div>
+
+            <!-- COLOR -->
+            <div class="space-y-1.5">
+              <label class="text-xs font-semibold text-white block">Color Distintivo</label>
+              <div class="flex items-center gap-2">
+                <input type="color" id="color-picker" value="#38bdf8" oninput="updateColorHex(this.value)" class="w-9 h-9 rounded-xl border-0 cursor-pointer bg-transparent p-0">
+                <div class="relative flex-1">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-nepsMuted text-xs">#</span>
+                  <input type="text" id="color-hex" name="ColorHex" value="38BDF8" maxlength="6" oninput="updateColorPicker(this.value)" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl pl-7 pr-3 py-2 outline-none uppercase font-mono">
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- FILA 2: COMPONENTE SUBIR PORTADA (IFormFile) -->
+          <div class="space-y-1.5">
+            <label class="text-xs font-semibold text-white block">Portada / Image Cover (IFormFile)</label>
+            
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 bg-nepsInput border border-nepsBorder rounded-2xl p-3.5">
+              <!-- PREVIEW IMAGE -->
+              <div class="relative w-20 h-28 rounded-xl bg-nepsCard border border-nepsBorder overflow-hidden flex-shrink-0 group flex items-center justify-center">
+                <img id="cover-preview-img" src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=200&auto=format&fit=crop&q=80" class="w-full h-full object-cover">
+                <div id="cover-preview-placeholder" class="hidden flex-col items-center justify-center text-nepsMuted text-[10px] text-center p-1">
+                  <svg class="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                  Sin portada
+                </div>
+              </div>
+
+              <!-- FILE INPUT & DRAG AREA -->
+              <div class="flex-1 flex flex-col justify-center space-y-2">
+                <div class="relative border-2 border-dashed border-nepsBorder hover:border-nepsPrimary/50 rounded-xl p-4 text-center cursor-pointer transition-colors group" onclick="document.getElementById('CoverImage').click()">
+                  <input type="file" id="CoverImage" name="CoverImage" accept="image/*" onchange="handleFileSelect(event)" class="hidden">
+                  
+                  <div class="flex flex-col items-center justify-center space-y-1">
+                    <svg class="w-6 h-6 text-nepsMuted group-hover:text-nepsPrimary transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 0115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+                    <p class="text-xs font-semibold text-white"><span class="text-nepsPrimary">Hacé clic para subir</span> o arrastrá un archivo</p>
+                    <p class="text-[10px] text-nepsMuted">PNG, JPG, WEBP hasta 5MB</p>
+                  </div>
+                </div>
+
+                <div id="file-info" class="hidden flex items-center justify-between text-[11px] bg-nepsCard px-3 py-1.5 rounded-lg border border-nepsBorder">
+                  <span id="file-name" class="text-slate-200 font-mono truncate">archivo.png</span>
+                  <button type="button" onclick="clearSelectedFile()" class="text-nepsAccent hover:underline text-[10px] font-bold">Quitar</button>
+                </div>
+              </div>
+            </div>
+            <p id="error-list-cover" class="hidden text-[11px] text-nepsAccent mt-1">El archivo seleccionado no es un formato de imagen válido.</p>
+          </div>
+
+          <!-- FILA 3: DESCRIPTION -->
+          <div class="space-y-1.5">
+            <label for="list-description" class="text-xs font-semibold text-white block">Descripción / Sinopsis</label>
+            <textarea id="list-description" name="Description" rows="3" placeholder="Ingresá una reseña o contexto sobre esta lista de obras..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-3.5 py-2.5 outline-none transition-colors resize-none">Selección curada de los mejores títulos shonen publicados durante la última temporada con altos niveles de audiencia y ventas.</textarea>
+          </div>
+
+          <!-- FILA 4: LIST TYPE & VISIBILITY -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-nepsBorder/60">
+            
+            <!-- LIST TYPE -->
+            <div class="space-y-1.5">
+              <label for="list-type" class="text-xs font-semibold text-white block">Tipo de Lista <span class="text-nepsAccent">*</span></label>
+              <select id="list-type" name="ListType" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+                <option value="favoritos">Favoritos</option>
+                <option value="destacados" selected>Recomendados / Curada</option>
+                <option value="lecturas">Lectura Obligatoria</option>
+              </select>
+            </div>
+
+            <!-- VISIBILITY -->
+            <div class="space-y-1.5">
+              <label for="list-visibility" class="text-xs font-semibold text-white block">Visibilidad <span class="text-nepsAccent">*</span></label>
+              <select id="list-visibility" name="Visibility" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+                <option value="publica" selected>Pública (Visible en la app global)</option>
+                <option value="oculta">Oculta (Acceso directo por link)</option>
+                <option value="privada">Privada (Sólo admins)</option>
+              </select>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECCIÓN 2: OBRAS INCLUIDAS -->
+        <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-5 space-y-4 shadow-xl">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-nepsBorder/60 pb-3">
+            <div>
+              <h3 class="text-xs font-bold text-nepsMuted uppercase tracking-wider">2. Obras Incluidas (<span id="works-count">3</span>)</h3>
+              <p class="text-[11px] text-nepsMuted mt-0.5">Catálogo de obras asignadas a esta lista.</p>
+            </div>
+
+            <!-- BOTÓN PARA ABRIR SELECTOR / BUSCADOR -->
+            <button type="button" onclick="openSearchSelector()" class="px-4 py-2 bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold rounded-xl text-xs shadow-lg shadow-nepsPrimary/20 transition-all flex items-center gap-2 self-start sm:self-auto">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+              <span>Agregar Obra</span>
+            </button>
+          </div>
+
+          <!-- PANEL DE BÚSQUEDA Y SELECCIÓN DE OBRAS (DESPLEGABLE) -->
+          <div id="search-selector-panel" class="hidden bg-nepsInput border border-nepsPrimary/40 rounded-2xl p-4 space-y-4 animate-fadeIn">
+            <div class="flex items-center justify-between border-b border-nepsBorder pb-2">
+              <span class="text-xs font-bold text-nepsPrimary flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
+                Buscar Obras en el Catálogo Global
+              </span>
+              <button type="button" onclick="closeSearchSelector()" class="text-nepsMuted hover:text-white text-xs">✕ Cerrar</button>
+            </div>
+
+            <!-- INPUT BÚSQUEDA -->
+            <div class="relative">
+              <input type="text" placeholder="Escribí el título, franquicia o editorial..." class="w-full bg-nepsBg border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-9 pr-4 py-2.5 outline-none">
+              <svg class="w-4 h-4 text-nepsMuted absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/></svg>
+            </div>
+
+            <!-- RESULTADOS DE BÚSQUEDA MOCK -->
+            <div class="space-y-2 max-h-56 overflow-y-auto pr-1">
+              <p class="text-[10px] text-nepsMuted uppercase font-bold tracking-wider">Resultados sugeridos (2)</p>
+
+              <!-- RESULTADO 1 -->
+              <div class="bg-nepsCard hover:bg-nepsBorder/60 border border-nepsBorder rounded-xl p-2.5 flex items-center justify-between transition-colors">
+                <div class="flex items-center gap-3">
+                  <img src="https://images.unsplash.com/photo-1563089145-599997674d42?w=100&auto=format&fit=crop&q=80" class="w-10 h-14 object-cover rounded-md border border-nepsBorder">
+                  <div>
+                    <p class="text-xs font-bold text-white">Jujutsu Kaisen — Vol. 01</p>
+                    <p class="text-[10px] text-nepsMuted">Serie: Jujutsu Kaisen | Franquicia: Mappa / Shueisha</p>
+                    <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">Ivrea Argentina</span>
+                  </div>
+                </div>
+                <button type="button" onclick="addWorkMock('Jujutsu Kaisen — Vol. 01', 'Ivrea Argentina', 'https://images.unsplash.com/photo-1563089145-599997674d42?w=100&auto=format&fit=crop&q=80')" class="px-3 py-1.5 bg-nepsPrimary/10 hover:bg-nepsPrimary text-nepsPrimary hover:text-nepsBg border border-nepsPrimary/30 rounded-lg text-xs font-bold transition-all">
+                  + Incorporar
+                </button>
+              </div>
+
+              <!-- RESULTADO 2 -->
+              <div class="bg-nepsCard hover:bg-nepsBorder/60 border border-nepsBorder rounded-xl p-2.5 flex items-center justify-between transition-colors">
+                <div class="flex items-center gap-3">
+                  <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=100&auto=format&fit=crop&q=80" class="w-10 h-14 object-cover rounded-md border border-nepsBorder">
+                  <div>
+                    <p class="text-xs font-bold text-white">Chainsaw Man — Vol. 12</p>
+                    <p class="text-[10px] text-nepsMuted">Serie: Chainsaw Man | Franquicia: Chainsaw Man</p>
+                    <span class="text-[10px] bg-slate-800 text-slate-300 px-1.5 py-0.5 rounded border border-slate-700">Norma Editorial</span>
+                  </div>
+                </div>
+                <button type="button" onclick="addWorkMock('Chainsaw Man — Vol. 12', 'Norma Editorial', 'https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=100&auto=format&fit=crop&q=80')" class="px-3 py-1.5 bg-nepsPrimary/10 hover:bg-nepsPrimary text-nepsPrimary hover:text-nepsBg border border-nepsPrimary/30 rounded-lg text-xs font-bold transition-all">
+                  + Incorporar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- VISTA: SIN OBRAS AGREGADAS (EMPTY STATE) -->
+          <div id="works-empty-state" class="hidden border-2 border-dashed border-nepsBorder rounded-2xl p-8 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-nepsInput border border-nepsBorder flex items-center justify-center mx-auto text-nepsMuted">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            </div>
+            <h4 class="text-xs font-bold text-white">No hay obras incluidas en esta lista</h4>
+            <p class="text-[11px] text-nepsMuted max-w-sm mx-auto">Usá el botón "Agregar Obra" para buscar e integrar volúmenes o tomos desde el catálogo.</p>
+          </div>
+
+          <!-- LISTA ESTÁTICA DE OBRAS INCLUIDAS -->
+<div id="works-list-container" class="space-y-2.5">
+  
+  <!-- OBRA 1 -->
+  <div class="work-item bg-nepsInput border border-nepsBorder rounded-xl p-3 flex items-center justify-between gap-3 group transition-all duration-150 hover:border-slate-600">
+    <div class="flex items-center gap-2.5 min-w-0">
+      
+      <!-- MANEJADOR DE ARRASTRE (DRAG HANDLE) -->
+      <div class="drag-handle cursor-grab active:cursor-grabbing p-1 -ml-1 text-slate-500 group-hover:text-slate-300 transition-colors flex-shrink-0" title="Arrastrar para reordenar">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+        </svg>
+      </div>
+
+      <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=100&auto=format&fit=crop&q=80" class="w-10 h-14 object-cover rounded-lg border border-nepsBorder flex-shrink-0 shadow-sm">
+
+      <div class="truncate space-y-0.5">
+        <div class="flex items-center gap-2">
+          <p class="text-xs font-bold text-white truncate">Dragon Ball Super — Vol. 20</p>
+          <span class="text-[10px] bg-nepsCard text-nepsMuted border border-nepsBorder px-2 py-0.5 rounded font-mono">Nº 20</span>
+        </div>
+        <p class="text-[11px] text-nepsMuted truncate">Serie: Dragon Ball Super | Franquicia: Dragon Ball</p>
+        <p class="text-[10px] text-slate-400 truncate">Editorial: <strong class="text-slate-200">Ivrea Argentina</strong></p>
+      </div>
+    </div>
+
+    <!-- ACCIÓN QUITAR -->
+    <button type="button" onclick="removeWorkItem(this)" title="Quitar obra de la lista" class="px-2.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent text-nepsAccent hover:text-white border border-nepsAccent/20 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 flex-shrink-0">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      <span class="hidden sm:inline">Quitar</span>
+    </button>
+  </div>
+
+  <!-- OBRA 2 -->
+  <div class="work-item bg-nepsInput border border-nepsBorder rounded-xl p-3 flex items-center justify-between gap-3 group transition-all duration-150 hover:border-slate-600">
+    <div class="flex items-center gap-2.5 min-w-0">
+      
+      <!-- MANEJADOR DE ARRASTRE (DRAG HANDLE) -->
+      <div class="drag-handle cursor-grab active:cursor-grabbing p-1 -ml-1 text-slate-500 group-hover:text-slate-300 transition-colors flex-shrink-0" title="Arrastrar para reordenar">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+        </svg>
+      </div>
+
+      <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&auto=format&fit=crop&q=80" class="w-10 h-14 object-cover rounded-lg border border-nepsBorder flex-shrink-0 shadow-sm">
+
+      <div class="truncate space-y-0.5">
+        <div class="flex items-center gap-2">
+          <p class="text-xs font-bold text-white truncate">One Piece — Tomo 103</p>
+          <span class="text-[10px] bg-nepsCard text-nepsMuted border border-nepsBorder px-2 py-0.5 rounded font-mono">Nº 103</span>
+        </div>
+        <p class="text-[11px] text-nepsMuted truncate">Serie: One Piece | Franquicia: One Piece</p>
+        <p class="text-[10px] text-slate-400 truncate">Editorial: <strong class="text-slate-200">Shueisha</strong></p>
+      </div>
+    </div>
+
+    <button type="button" onclick="removeWorkItem(this)" title="Quitar obra de la lista" class="px-2.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent text-nepsAccent hover:text-white border border-nepsAccent/20 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 flex-shrink-0">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      <span class="hidden sm:inline">Quitar</span>
+    </button>
+  </div>
+
+  <!-- OBRA 3 -->
+  <div class="work-item bg-nepsInput border border-nepsBorder rounded-xl p-3 flex items-center justify-between gap-3 group transition-all duration-150 hover:border-slate-600">
+    <div class="flex items-center gap-2.5 min-w-0">
+      
+      <!-- MANEJADOR DE ARRASTRE (DRAG HANDLE) -->
+      <div class="drag-handle cursor-grab active:cursor-grabbing p-1 -ml-1 text-slate-500 group-hover:text-slate-300 transition-colors flex-shrink-0" title="Arrastrar para reordenar">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
+        </svg>
+      </div>
+
+      <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=100&auto=format&fit=crop&q=80" class="w-10 h-14 object-cover rounded-lg border border-nepsBorder flex-shrink-0 shadow-sm">
+
+      <div class="truncate space-y-0.5">
+        <div class="flex items-center gap-2">
+          <p class="text-xs font-bold text-white truncate">My Hero Academia — Vol. 36</p>
+          <span class="text-[10px] bg-nepsCard text-nepsMuted border border-nepsBorder px-2 py-0.5 rounded font-mono">Nº 36</span>
+        </div>
+        <p class="text-[11px] text-nepsMuted truncate">Serie: Boku no Hero | Franquicia: My Hero Academia</p>
+        <p class="text-[10px] text-slate-400 truncate">Editorial: <strong class="text-slate-200">Panini Manga</strong></p>
+      </div>
+    </div>
+
+    <button type="button" onclick="removeWorkItem(this)" title="Quitar obra de la lista" class="px-2.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent text-nepsAccent hover:text-white border border-nepsAccent/20 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 flex-shrink-0">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      <span class="hidden sm:inline">Quitar</span>
+    </button>
+  </div>
+
+</div>
+        </div>
+
+        <!-- ACCIONES DE GUARDADO Y CANCELACIÓN -->
+        <div class="flex items-center justify-between pt-3 border-t border-nepsBorder/60">
+          <a href="work-lists.html" class="px-5 py-2.5 bg-nepsCard hover:bg-nepsBorder border border-nepsBorder text-white text-xs font-semibold rounded-xl transition-all">
+            Cancelar
+          </a>
+
+          <div class="flex items-center gap-3">
+            <button type="button" onclick="openConfirmSaveModal()" class="px-6 py-2.5 bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold text-xs rounded-xl shadow-lg shadow-nepsPrimary/20 transition-all flex items-center gap-2">
+              <span>Guardar Lista</span>
+            </button>
+          </div>
+        </div>
+
+      </form>
+
+    </main>
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN DE GUARDADO -->
+  <div id="confirm-save-modal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center gap-3 text-nepsPrimary">
+        <div class="w-10 h-10 rounded-xl bg-nepsPrimary/10 border border-nepsPrimary/20 flex items-center justify-center">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"/></svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white">¿Guardar cambios en la lista?</h3>
+          <p class="text-xs text-nepsMuted">Se actualizarán la información y las obras asociadas.</p>
+        </div>
+      </div>
+
+      <p class="text-xs text-slate-300">Las modificaciones estarán visibles de inmediato para los usuarios en la aplicación.</p>
+
+      <div class="flex items-center justify-end gap-3 pt-2 border-t border-nepsBorder">
+        <button onclick="closeConfirmSaveModal()" class="px-4 py-2 bg-nepsInput hover:bg-nepsBorder border border-nepsBorder text-xs text-white font-semibold rounded-xl transition-all">
+          Revisar
+        </button>
+        <button id="btn-execute-save" onclick="executeSave()" class="px-5 py-2 bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold text-xs rounded-xl shadow-md transition-all flex items-center gap-2">
+          <span id="save-btn-text">Confirmar y Guardar</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPTS DE INTERACCIÓN Y MANEJO DE ARCHIVOS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.2/Sortable.min.js"></script>
+  <script>
+    let isListActive = true;
+
+    // INTERRUPTOR DE ESTADOS DE DEMO
+    function setFormState(state) {
+      const formTitle = document.getElementById('form-main-title');
+      const formSubtitle = document.getElementById('form-main-subtitle');
+      const statusContainer = document.getElementById('status-action-container');
+      const formEl = document.getElementById('work-list-form');
+      const skeletonEl = document.getElementById('skeleton-loading-state');
+      const emptyWorksEl = document.getElementById('works-empty-state');
+      const worksListEl = document.getElementById('works-list-container');
+      const globalErrorEl = document.getElementById('global-error-banner');
+      const unsavedBadge = document.getElementById('unsaved-changes-badge');
+
+      // Restablecer estilos de botones demo
+      ['edit', 'create', 'empty', 'loading', 'error'].forEach(s => {
+        const btn = document.getElementById(`btn-state-${s}`);
+        btn.className = 'px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white transition-all';
+      });
+      document.getElementById(`btn-state-${state}`).className = 'px-2.5 py-1 rounded-lg font-bold bg-nepsPrimary text-nepsBg transition-all';
+
+      // Ocultar banderas especiales
+      globalErrorEl.classList.add('hidden');
+      skeletonEl.classList.add('hidden');
+      formEl.classList.remove('hidden');
+      hideValidationErrors();
+
+      if (state === 'edit') {
+        formTitle.textContent = 'Editar Lista: Mejores Shonen del Año';
+        formSubtitle.textContent = 'Configurá la información general y gestioná las obras pertenecientes a esta lista curada.';
+        statusContainer.classList.remove('hidden');
+        emptyWorksEl.classList.add('hidden');
+        worksListEl.classList.remove('hidden');
+        unsavedBadge.classList.remove('hidden');
+        
+        // Cargar valores mock de edición
+        document.getElementById('list-name').value = 'Mejores Shonen del Año';
+        document.getElementById('list-description').value = 'Selección curada de los mejores títulos shonen publicados durante la última temporada.';
+        document.getElementById('list-type').value = 'destacados';
+      } 
+      else if (state === 'create') {
+        formTitle.textContent = 'Nueva Lista de Obras';
+        formSubtitle.textContent = 'Creá una nueva lista oficial administrada por el sistema.';
+        statusContainer.classList.add('hidden');
+        emptyWorksEl.classList.add('hidden');
+        worksListEl.classList.remove('hidden');
+        unsavedBadge.classList.add('hidden');
+
+        // Formulario en blanco para alta
+        document.getElementById('list-name').value = '';
+        document.getElementById('list-description').value = '';
+        clearSelectedFile();
+      }
+      else if (state === 'empty') {
+        formTitle.textContent = 'Editar Lista: Vacía de Ejemplo';
+        statusContainer.classList.remove('hidden');
+        emptyWorksEl.classList.remove('hidden');
+        worksListEl.classList.add('hidden');
+        document.getElementById('works-count').textContent = '0';
+      }
+      else if (state === 'loading') {
+        formEl.classList.add('hidden');
+        skeletonEl.classList.remove('hidden');
+      }
+      else if (state === 'error') {
+        globalErrorEl.classList.remove('hidden');
+        showValidationErrors();
+      }
+    }
+
+    // SELECCIÓN Y PREVIEW DE ARCHIVO (IFormFile)
+    function handleFileSelect(event) {
+      const file = event.target.files[0];
+      if (file) {
+        if (!file.type.startsWith('image/')) {
+          document.getElementById('error-list-cover').classList.remove('hidden');
+          return;
+        }
+        document.getElementById('error-list-cover').classList.add('hidden');
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const previewImg = document.getElementById('cover-preview-img');
+          const placeholder = document.getElementById('cover-preview-placeholder');
+          
+          previewImg.src = e.target.result;
+          previewImg.classList.remove('hidden');
+          placeholder.classList.add('hidden');
+        };
+        reader.readAsDataURL(file);
+
+        document.getElementById('file-name').textContent = file.name;
+        document.getElementById('file-info').classList.remove('hidden');
+      }
+    }
+
+    function clearSelectedFile() {
+      document.getElementById('CoverImage').value = '';
+      document.getElementById('file-info').classList.add('hidden');
+      const previewImg = document.getElementById('cover-preview-img');
+      const placeholder = document.getElementById('cover-preview-placeholder');
+
+      previewImg.classList.add('hidden');
+      placeholder.classList.remove('hidden');
+    }
+
+    // MANEJO DE COLOR
+    function updateColorHex(val) {
+      document.getElementById('color-hex').value = val.replace('#', '').toUpperCase();
+    }
+    function updateColorPicker(val) {
+      if (val.length === 6) {
+        document.getElementById('color-picker').value = '#' + val;
+      }
+    }
+
+    // ACCIONES DE BUSCADOR Y SELECTOR DE OBRAS
+    function openSearchSelector() {
+      document.getElementById('search-selector-panel').classList.remove('hidden');
+    }
+    function closeSearchSelector() {
+      document.getElementById('search-selector-panel').classList.add('hidden');
+    }
+
+    function addWorkMock(title, editorial, img) {
+      const container = document.getElementById('works-list-container');
+      const countEl = document.getElementById('works-count');
+      const emptyState = document.getElementById('works-empty-state');
+      
+      emptyState.classList.add('hidden');
+      container.classList.remove('hidden');
+
+      const currentCount = container.children.length + 1;
+      countEl.textContent = currentCount;
+
+      const newItem = document.createElement('div');
+      newItem.className = 'work-item bg-nepsInput border border-nepsBorder rounded-xl p-3 flex items-center justify-between gap-3';
+      newItem.innerHTML = `
+        <div class="flex items-center gap-3 min-w-0">
+          <img src="${img}" class="w-10 h-14 object-cover rounded-lg border border-nepsBorder flex-shrink-0 shadow-sm">
+          <div class="truncate space-y-0.5">
+            <p class="text-xs font-bold text-white truncate">${title}</p>
+            <p class="text-[11px] text-nepsMuted truncate">Serie: N/D | Franquicia: Destacados</p>
+            <p class="text-[10px] text-slate-400 truncate">Editorial: <strong class="text-slate-200">${editorial}</strong></p>
+          </div>
+        </div>
+        <button type="button" onclick="removeWorkItem(this)" title="Quitar obra" class="px-2.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent text-nepsAccent hover:text-white border border-nepsAccent/20 rounded-lg text-xs font-semibold transition-all flex items-center gap-1.5 flex-shrink-0">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+          <span class="hidden sm:inline">Quitar</span>
+        </button>
+      `;
+
+      container.appendChild(newItem);
+      closeSearchSelector();
+    }
+
+    function removeWorkItem(btn) {
+      const item = btn.closest('.work-item');
+      item.remove();
+
+      const container = document.getElementById('works-list-container');
+      const countEl = document.getElementById('works-count');
+      const emptyState = document.getElementById('works-empty-state');
+      
+      const newCount = container.children.length;
+      countEl.textContent = newCount;
+
+      if (newCount === 0) {
+        emptyState.classList.remove('hidden');
+        container.classList.add('hidden');
+      }
+    }
+
+    // CAMBIO DE ESTADO ACTIVA / INACTIVA
+    function toggleWorkListStatus() {
+      isListActive = !isListActive;
+      const badge = document.getElementById('status-badge');
+      const dot = document.getElementById('status-dot');
+      const text = document.getElementById('status-text');
+      const btn = document.getElementById('btn-toggle-status');
+
+      if (isListActive) {
+        badge.className = 'inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-3 py-1.5 rounded-xl text-emerald-400 font-bold text-xs';
+        dot.className = 'w-2 h-2 rounded-full bg-emerald-400';
+        text.textContent = 'Activa';
+        btn.textContent = 'Desactivar Lista';
+        btn.className = 'px-3.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent text-nepsAccent hover:text-white border border-nepsAccent/20 rounded-xl text-xs font-semibold transition-all';
+      } else {
+        badge.className = 'inline-flex items-center gap-1.5 bg-slate-800 border border-slate-700 px-3 py-1.5 rounded-xl text-slate-400 font-bold text-xs';
+        dot.className = 'w-2 h-2 rounded-full bg-slate-500';
+        text.textContent = 'Inactiva';
+        btn.textContent = 'Reactivar Lista';
+        btn.className = 'px-3.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 text-emerald-400 hover:text-slate-950 border border-emerald-500/20 rounded-xl text-xs font-bold transition-all';
+      }
+    }
+
+    // ERRORES DE VALIDACIÓN
+    function showValidationErrors() {
+      const nameInput = document.getElementById('list-name');
+      nameInput.classList.add('border-nepsAccent');
+      document.getElementById('error-list-name').classList.remove('hidden');
+    }
+
+    function hideValidationErrors() {
+      const nameInput = document.getElementById('list-name');
+      nameInput.classList.remove('border-nepsAccent');
+      document.getElementById('error-list-name').classList.add('hidden');
+    }
+
+    // MODAL Y GUARDADO
+    function openConfirmSaveModal() {
+      document.getElementById('confirm-save-modal').classList.remove('hidden');
+    }
+    function closeConfirmSaveModal() {
+      document.getElementById('confirm-save-modal').classList.add('hidden');
+    }
+
+    function executeSave() {
+      const text = document.getElementById('save-btn-text');
+      text.textContent = 'Guardando cambios...';
+      
+      setTimeout(() => {
+        closeConfirmSaveModal();
+        text.textContent = 'Confirmar y Guardar';
+        alert('¡Work List guardada exitosamente!');
+        window.location.href = 'work-lists.html';
+      }, 1000);
+    }
+	
+	const el = document.getElementById('works-list-container');
+new Sortable(el, {
+  handle: '.drag-handle',
+  animation: 150,
+  ghostClass: 'opacity-40' // Efecto translúcido mientras arrastras
+});
+  </script>
+	<!-- CDN de SortableJS -->
+	
+</body>
+</html>

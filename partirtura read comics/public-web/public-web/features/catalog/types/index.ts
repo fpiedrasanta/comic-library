@@ -1,0 +1,1 @@
+export type { CatalogWorkDetailDto, CatalogWorkContextDto, CatalogWorkNavigationDto, LanguageDto, WorkTypeFilterDto, PersonByRoleDto, TagDto } from './work-detail'

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Formulario Número - NEPS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsAi: '#a855f7',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar for dark UI */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: #0d121d; }
+    ::-webkit-scrollbar-thumb { background: #2d2c33; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #38bdf8; }
+  </style>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden relative">
+
+  <!-- TOAST SYSTEM -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 bg-emerald-950/90 border border-emerald-500/40 text-emerald-200 px-4 py-3 rounded-2xl shadow-2xl flex items-center gap-3 backdrop-blur-md transition-all duration-300 opacity-0 translate-y-5 pointer-events-none">
+    <div class="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center flex-shrink-0 text-emerald-400">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    </div>
+    <div>
+      <h5 id="toast-title" class="text-xs font-bold text-white">Operación exitosa</h5>
+      <p id="toast-desc" class="text-[11px] text-emerald-300/80">Cambios guardados con éxito.</p>
+    </div>
+  </div>
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="listar-series.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Series & Números
+        </a>
+      </nav>
+    </div>
+
+    <!-- PIPELINE STEPPER / VISTA DE PROGRESO -->
+    <div class="p-4 border-t border-nepsBorder bg-nepsInput/30 space-y-3">
+      <p class="text-[10px] font-bold text-nepsMuted uppercase tracking-wider">Flujo de Trabajo</p>
+      <div class="space-y-2 text-xs">
+        <div id="step-1-indicator" class="flex items-center gap-2 text-nepsPrimary font-semibold">
+          <span class="w-5 h-5 rounded-full bg-nepsPrimary/20 text-nepsPrimary border border-nepsPrimary/40 flex items-center justify-center text-[10px] font-bold">1</span>
+          <span>Carga de Archivo</span>
+        </div>
+        <div id="step-2-indicator" class="flex items-center gap-2 text-nepsMuted">
+          <span class="w-5 h-5 rounded-full bg-nepsCard text-nepsMuted border border-nepsBorder flex items-center justify-center text-[10px] font-bold">2</span>
+          <span>Portada e Imágenes IA</span>
+        </div>
+        <div id="step-3-indicator" class="flex items-center gap-2 text-nepsMuted">
+          <span class="w-5 h-5 rounded-full bg-nepsCard text-nepsMuted border border-nepsBorder flex items-center justify-center text-[10px] font-bold">3</span>
+          <span>Metadatos Editoriales</span>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA PRINCIPAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR CONCONTEXTO DE JERARQUÍA -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2 text-xs overflow-hidden">
+        <a href="listar-series.html" class="text-nepsMuted hover:text-white transition-colors">Series</a>
+        <span class="text-nepsMuted/40">/</span>
+        <span class="text-slate-400 font-medium">Shueisha</span>
+        <span class="text-nepsMuted/40">/</span>
+        <span class="text-slate-400 font-medium">Dragon Ball</span>
+        <span class="text-nepsMuted/40">/</span>
+        <a href="listar-numeros.html?serie_id=1" class="text-nepsPrimary hover:underline font-bold">Dragon Ball Super</a>
+        <span class="text-nepsMuted/40">/</span>
+        <span id="breadcrumb-current" class="text-white font-bold truncate">Nuevo Número</span>
+      </div>
+
+      <a href="listar-numeros.html?serie_id=1" class="px-3 py-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-300 hover:text-white font-semibold text-xs rounded-xl border border-nepsBorder transition-all flex items-center gap-1.5">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <span>Cancelar</span>
+      </a>
+    </header>
+
+    <!-- FORM CONTENEDOR -->
+    <main class="p-4 sm:p-8 space-y-8 max-w-5xl w-full mx-auto pb-24">
+
+      <!-- ENCABEZADO Y CAMPO INICIAL DE REFERENCIA -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-4 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-nepsBorder/60 pb-4">
+          <div>
+            <h1 id="page-title" class="text-xl font-extrabold text-white">Nuevo Número</h1>
+            <p class="text-xs text-nepsMuted">Subí el archivo digital para extracción automática o cargá directamente la ficha editorial.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-[10px] bg-slate-800 text-slate-300 px-2.5 py-1 rounded-full border border-slate-700 font-semibold">ContentStatus: <strong id="lbl-content-status" class="text-slate-400">Missing</strong></span>
+            <span class="text-[10px] bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full border border-emerald-500/20 font-bold">IsActive: Activo</span>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-200">Nombre / Referencia Inicial <span class="text-nepsAccent">*</span></label>
+          <input type="text" id="input-ref-name" placeholder="Ej. Dragon Ball Super #01 - El Guerrero del Futuro" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl px-4 py-3 outline-none transition-all">
+          <p class="text-[11px] text-nepsMuted">Nombre de referencia preliminar para identificar el registro antes de procesar los metadatos finales.</p>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: CARGA DE ARCHIVO DIGITAL (CBR/CBZ) -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-nepsPrimary/10 text-nepsPrimary flex items-center justify-center font-bold text-xs border border-nepsPrimary/20">1</div>
+            <h2 class="text-sm font-bold text-white">Carga de Archivo Digital (CBR / CBZ)</h2>
+          </div>
+          <span class="text-[11px] text-nepsMuted">Formatos aceptados: <strong class="text-slate-300">.cbr, .cbz</strong></span>
+        </div>
+
+        <!-- DRAG & DROP ZONE -->
+        <div id="drop-zone" onclick="triggerFileInput()" class="border-2 border-dashed border-nepsBorder hover:border-nepsPrimary bg-nepsInput/50 hover:bg-nepsInput rounded-2xl p-8 text-center cursor-pointer transition-all space-y-3 relative group">
+          <input type="file" id="file-input" accept=".cbr,.cbz" class="hidden" onchange="handleFileSelect(event)">
+          
+          <div class="w-12 h-12 rounded-2xl bg-nepsCard border border-nepsBorder flex items-center justify-center mx-auto text-nepsMuted group-hover:text-nepsPrimary group-hover:scale-110 transition-all">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/></svg>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-white">Arrastrá tu archivo CBR/CBZ aquí o <span class="text-nepsPrimary underline">explorá tu equipo</span></p>
+            <p class="text-[11px] text-nepsMuted mt-1">Tamaño máximo recomendado: 250MB</p>
+          </div>
+        </div>
+
+        <!-- INDICADOR DE CARGA Y PROCESAMIENTO DIGITAL -->
+        <div id="processing-box" class="hidden bg-nepsInput border border-nepsBorder rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between text-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-sky-500/10 text-nepsPrimary flex items-center justify-center">
+                <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              </div>
+              <div>
+                <p id="file-name-lbl" class="font-bold text-white">dragonball_super_v01.cbz</p>
+                <p id="processing-status-lbl" class="text-[11px] text-nepsPrimary font-medium">Procesando y descomprimiendo páginas...</p>
+              </div>
+            </div>
+            <span id="processing-percent" class="font-mono font-bold text-nepsPrimary">45%</span>
+          </div>
+
+          <div class="w-full bg-nepsCard h-2 rounded-full overflow-hidden border border-nepsBorder">
+            <div id="processing-bar" class="bg-nepsPrimary h-full w-[45%] transition-all duration-300"></div>
+          </div>
+        </div>
+
+        <!-- ERROR STATE DE PROCESAMIENTO -->
+        <div id="processing-error-box" class="hidden bg-rose-950/20 border border-rose-500/40 rounded-xl p-4 flex items-center justify-between gap-4">
+          <div class="flex items-center gap-3 text-xs">
+            <div class="w-8 h-8 rounded-lg bg-rose-500/20 text-rose-400 flex items-center justify-center">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            </div>
+            <div>
+              <p class="font-bold text-white">Error al procesar el archivo digital</p>
+              <p class="text-[11px] text-rose-300/80">El archivo está dañado o no es un cómic comprimido válido.</p>
+            </div>
+          </div>
+          <button onclick="simulateUploadProcess()" class="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 border border-rose-500/40 text-rose-200 text-xs font-semibold rounded-xl transition-all">Reintentar</button>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: SELECCIÓN DE PORTADA E IMÁGENES PARA IA -->
+      <div id="section-pages-gallery" class="hidden bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-6 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-nepsBorder pb-4">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 rounded-lg bg-nepsPrimary/10 text-nepsPrimary flex items-center justify-center font-bold text-xs border border-nepsPrimary/20">2</div>
+            <div>
+              <h2 class="text-sm font-bold text-white">Páginas Extraídas</h2>
+              <p class="text-xs text-nepsMuted">Seleccioná la portada oficial y las imágenes para el análisis asistido con IA.</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-300 font-medium">
+              IA Selected: <strong id="lbl-ai-count" class="text-nepsAi font-mono font-bold">0</strong> págs.
+            </span>
+            <button id="btn-process-ai" onclick="runAIAnalysis()" class="px-4 py-2 bg-nepsAi hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-lg shadow-purple-950/50 transition-all flex items-center gap-2 disabled:opacity-50" disabled>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+
+              <span id="btn-ai-text">Procesar con IA</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- GRID DE PÁGINAS EXTRAÍDAS -->
+        <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="pages-grid">
+          <!-- Generado Dinámicamente -->
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: RESULTADO EDITABLE SUGERIDO POR IA -->
+      <div id="section-ai-results" class="hidden bg-gradient-to-b from-purple-950/20 to-nepsCard border border-nepsAi/40 rounded-2xl p-6 space-y-4 shadow-2xl relative overflow-hidden">
+        <div class="flex items-center justify-between border-b border-nepsAi/30 pb-3">
+          <div class="flex items-center gap-2 text-nepsAi font-bold text-xs uppercase tracking-wider">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+
+            <span>Datos sugeridos por IA (Sugerencias Editables)</span>
+          </div>
+          <button onclick="applyAISuggestions()" class="px-3 py-1 bg-nepsAi/20 hover:bg-nepsAi/30 text-purple-200 border border-nepsAi/40 text-[11px] font-bold rounded-lg transition-all">
+            Aplicar sugerencias al formulario
+          </button>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+          <div class="bg-nepsInput/60 p-3 rounded-xl border border-nepsBorder space-y-1">
+            <span class="text-[10px] text-nepsMuted font-bold uppercase">Número Detectado</span>
+            <p id="ai-res-num" class="font-bold text-white">#1</p>
+          </div>
+          <div class="bg-nepsInput/60 p-3 rounded-xl border border-nepsBorder space-y-1">
+            <span class="text-[10px] text-nepsMuted font-bold uppercase">Título Detectado</span>
+            <p id="ai-res-title" class="font-bold text-white">El Guerrero del Futuro</p>
+          </div>
+          <div class="bg-nepsInput/60 p-3 rounded-xl border border-nepsBorder space-y-1 sm:col-span-1">
+            <span class="text-[10px] text-nepsMuted font-bold uppercase">Personajes Clave</span>
+            <p id="ai-res-chars" class="font-medium text-slate-300">Goku, Vegeta, Beerus, Whis</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 5: DATOS Y METADATOS EDITORIALES DEL NÚMERO -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-6 shadow-xl">
+        <div class="flex items-center gap-2 border-b border-nepsBorder pb-4">
+          <div class="w-7 h-7 rounded-lg bg-nepsPrimary/10 text-nepsPrimary flex items-center justify-center font-bold text-xs border border-nepsPrimary/20">3</div>
+          <h2 class="text-sm font-bold text-white">Datos del Número (Edición Editorial)</h2>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 text-xs">
+          
+          <!-- NÚMERO Y TÍTULO -->
+          <div class="sm:col-span-3 space-y-1.5">
+            <label class="block font-bold text-slate-200">Número <span class="text-nepsAccent">*</span></label>
+            <input type="text" id="input-number" placeholder="Ej. 1, 10A, Annual 1" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-white rounded-xl px-3.5 py-2.5 outline-none font-mono font-bold">
+          </div>
+
+          <div class="sm:col-span-9 space-y-1.5">
+            <label class="block font-bold text-slate-200">Título del Ejemplar <span class="text-nepsAccent">*</span></label>
+            <input type="text" id="input-title" placeholder="Ej. El Sueño del Dios de la Destrucción" class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-white rounded-xl px-3.5 py-2.5 outline-none">
+          </div>
+
+          <!-- DESCRIPCIÓN -->
+          <div class="sm:col-span-12 space-y-1.5">
+            <label class="block font-bold text-slate-200">Sinopsis / Descripción Editorial</label>
+            <textarea id="input-desc" rows="3" placeholder="Sipnosis del número..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-white rounded-xl p-3.5 outline-none transition-colors"></textarea>
+          </div>
+
+          <!-- IDIOMA, NÚMERO ANTERIOR Y SIGUIENTE (SELECTORES SEARCHABLE) -->
+          <div class="sm:col-span-4 space-y-1.5">
+            <label class="block font-bold text-slate-200">Idioma</label>
+            <select id="select-lang" class="w-full bg-nepsInput border border-nepsBorder text-white rounded-xl px-3 py-2.5 outline-none focus:border-nepsPrimary">
+              <option value="es">Español (ES)</option>
+              <option value="en">Inglés (EN)</option>
+              <option value="ja">Japonés (JA)</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-4 space-y-1.5">
+            <label class="block font-bold text-slate-200">Número Anterior (Secuencia)</label>
+            <select id="select-prev" class="w-full bg-nepsInput border border-nepsBorder text-white rounded-xl px-3 py-2.5 outline-none focus:border-nepsPrimary">
+              <option value="">Ninguno (Primer Número)</option>
+              <option value="0">Número #0 (Especial Preludio)</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-4 space-y-1.5">
+            <label class="block font-bold text-slate-200">Número Siguiente (Secuencia)</label>
+            <select id="select-next" class="w-full bg-nepsInput border border-nepsBorder text-white rounded-xl px-3 py-2.5 outline-none focus:border-nepsPrimary">
+              <option value="">Sin definir</option>
+              <option value="2">Número #2</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SECCIÓN 6: PERSONAS Y ROLES (RELACIÓN MÚLTIPLE) -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-4 shadow-xl">
+        <div class="flex items-center justify-between border-b border-nepsBorder pb-4">
+          <div>
+            <h2 class="text-sm font-bold text-white">Personas y Roles</h2>
+            <p class="text-xs text-nepsMuted">Asociá artistas, guionistas y equipo editorial al número.</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button onclick="openQuickModal('person')" class="text-[11px] bg-nepsInput hover:bg-nepsBorder text-slate-300 px-2.5 py-1 rounded-lg border border-nepsBorder transition-all flex items-center gap-1">+ Persona</button>
+            <button onclick="openQuickModal('role')" class="text-[11px] bg-nepsInput hover:bg-nepsBorder text-slate-300 px-2.5 py-1 rounded-lg border border-nepsBorder transition-all flex items-center gap-1">+ Rol</button>
+          </div>
+        </div>
+
+        <!-- FORMULARIO INLINE DE AGREGADO DE PERSONA + ROL -->
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end bg-nepsInput/40 p-3.5 rounded-xl border border-nepsBorder">
+          <div class="sm:col-span-5 space-y-1 text-xs">
+            <label class="font-bold text-slate-300">Persona</label>
+            <select id="add-person-select" class="w-full bg-nepsInput border border-nepsBorder text-white rounded-xl px-3 py-2 outline-none focus:border-nepsPrimary">
+              <option value="Akira Toriyama">Akira Toriyama</option>
+              <option value="Toyotarou">Toyotarou</option>
+              <option value="John Doe">John Doe</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-5 space-y-1 text-xs">
+            <label class="font-bold text-slate-300">Rol</label>
+            <select id="add-role-select" class="w-full bg-nepsInput border border-nepsBorder text-white rounded-xl px-3 py-2 outline-none focus:border-nepsPrimary">
+              <option value="Guionista">Guionista</option>
+              <option value="Dibujante">Dibujante</option>
+              <option value="Entintador">Entintador</option>
+              <option value="Colorista">Colorista</option>
+            </select>
+          </div>
+
+          <div class="sm:col-span-2">
+            <button onclick="addPersonRole()" class="w-full py-2 bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-bold text-xs rounded-xl transition-all">
+              Agregar
+            </button>
+          </div>
+        </div>
+
+        <!-- LISTA DE RELACIONES ASOCIADAS (CHIPS / FILAS) -->
+        <div id="person-role-list" class="flex flex-wrap gap-2 pt-2">
+          <!-- Renderizado Dinámico -->
+        </div>
+      </div>
+
+      <!-- SECCIÓN 7: TAGS Y RECOMENDACIONES DE IA -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 space-y-6 shadow-xl">
+        <div class="border-b border-nepsBorder pb-4">
+          <h2 class="text-sm font-bold text-white">Tags del Número</h2>
+          <p class="text-xs text-nepsMuted">Etiquetas asociadas para categorización y búsqueda dentro del catálogo.</p>
+        </div>
+
+        <!-- TAGS ACTIVOS -->
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-slate-200">Tags Guardados</label>
+          <div id="tags-active-container" class="flex flex-wrap items-center gap-2 bg-nepsInput border border-nepsBorder p-3 rounded-xl min-h-[48px]">
+            <!-- Renderizado dinámico de tags -->
+          </div>
+          <div class="flex gap-2 text-xs pt-1">
+            <input type="text" id="input-new-tag" placeholder="Escribí un nuevo tag y presioná Enter..." class="bg-nepsInput border border-nepsBorder text-white rounded-xl px-3 py-1.5 outline-none focus:border-nepsPrimary flex-1" onkeypress="if(event.key==='Enter'){ event.preventDefault(); addCustomTag(); }">
+            <button onclick="addCustomTag()" class="px-3 py-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-200 font-bold rounded-xl border border-nepsBorder">Agregar</button>
+          </div>
+        </div>
+
+        <!-- RECOMENDACIONES DE IA (RECOMENDADOS SEPARADOS VISUALMENTE) -->
+        <div id="section-ai-tags-rec" class="hidden bg-purple-950/10 border border-purple-500/20 rounded-xl p-4 space-y-3">
+          <div class="flex items-center gap-2 text-purple-300 font-bold text-xs">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+
+            <span>Tags Recomendados por IA (Haz clic para incorporar)</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <p class="text-[10px] text-nepsMuted uppercase font-bold">Generales</p>
+            <div id="ai-rec-general" class="flex flex-wrap gap-2"></div>
+
+            <p class="text-[10px] text-nepsMuted uppercase font-bold pt-2">Personajes Detectados</p>
+            <div id="ai-rec-chars" class="flex flex-wrap gap-2"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- BARRA INFERIOR DE ACCIÓN Y GUARDADO -->
+    <div class="fixed bottom-0 right-0 left-0 md:left-64 bg-nepsCard/95 backdrop-blur-md border-t border-nepsBorder p-4 z-40 flex items-center justify-between gap-4">
+      <div class="text-xs text-nepsMuted hidden sm:block">
+        Contexto: <span class="text-white font-medium">Shueisha / Dragon Ball / Dragon Ball Super</span>
+      </div>
+
+      <div class="flex items-center gap-3 ml-auto">
+        <a href="listar-numeros.html?serie_id=1" class="px-4 py-2 bg-nepsInput hover:bg-nepsBorder text-slate-300 text-xs font-semibold rounded-xl border border-nepsBorder transition-all">Cancelar</a>
+        <button id="btn-save" onclick="saveNumber()" class="px-6 py-2 bg-nepsPrimary hover:bg-sky-400 text-nepsBg font-extrabold text-xs rounded-xl shadow-lg shadow-nepsPrimary/20 transition-all flex items-center gap-2">
+          <span id="btn-save-text">Guardar Número</span>
+          <svg id="btn-save-spinner" class="w-4 h-4 animate-spin hidden" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL RÁPIDO PARA CREAR PERSONA / ROL -->
+  <div id="quick-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl max-w-sm w-full p-6 space-y-4 shadow-2xl">
+      <h3 id="quick-modal-title" class="text-sm font-bold text-white">Crear Nueva Entidad</h3>
+      
+      <div class="space-y-1.5 text-xs">
+        <label class="block font-bold text-slate-300">Nombre</label>
+        <input type="text" id="quick-modal-input" placeholder="Nombre..." class="w-full bg-nepsInput border border-nepsBorder text-white rounded-xl px-3 py-2 outline-none focus:border-nepsPrimary">
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-nepsBorder">
+        <button onclick="closeQuickModal()" class="px-3 py-1.5 bg-nepsInput text-slate-300 text-xs rounded-xl border border-nepsBorder">Cancelar</button>
+        <button onclick="saveQuickEntity()" class="px-4 py-1.5 bg-nepsPrimary text-nepsBg font-bold text-xs rounded-xl">Crear</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LÓGICA INTERACTIVA COMPLETA -->
+  <script>
+    // ESTADO DE LA PÁGINA
+    let selectedCoverIndex = 0;
+    let selectedAiPages = new Set();
+    let personRoles = [
+      { person: 'Akira Toriyama', role: 'Guionista' },
+      { person: 'Toyotarou', role: 'Dibujante' }
+    ];
+    let activeTags = ['manga', 'shonen', 'accion'];
+    let aiRecGeneral = ['misterio', 'super-heroe'];
+    let aiRecChars = ['goku', 'beerus', 'whis'];
+    let quickEntityType = '';
+
+    // INICIALIZACIÓN
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPersonRoles();
+      renderTags();
+    });
+
+    // SIMULACIÓN DE SUBIDA DE ARCHIVO (CBR/CBZ)
+    function triggerFileInput() {
+      document.getElementById('file-input').click();
+    }
+
+    function handleFileSelect(event) {
+      if (event.target.files.length > 0) {
+        document.getElementById('file-name-lbl').textContent = event.target.files[0].name;
+        simulateUploadProcess();
+      }
+    }
+
+    function simulateUploadProcess() {
+      document.getElementById('drop-zone').classList.add('hidden');
+      document.getElementById('processing-error-box').classList.add('hidden');
+      document.getElementById('processing-box').classList.remove('hidden');
+
+      let percent = 0;
+      const interval = setInterval(() => {
+        percent += 15;
+        document.getElementById('processing-percent').textContent = percent + '%';
+        document.getElementById('processing-bar').style.width = percent + '%';
+
+        if (percent >= 100) {
+          clearInterval(interval);
+          document.getElementById('processing-box').classList.add('hidden');
+          document.getElementById('lbl-content-status').textContent = 'Completed';
+          document.getElementById('lbl-content-status').className = 'text-emerald-400';
+          renderPagesGallery();
+          document.getElementById('section-pages-gallery').classList.remove('hidden');
+          showToast('Contenido procesado', 'Se han extraído 6 páginas correctamente.');
+        }
+      }, 300);
+    }
+
+    // RENDERIZADO Y SELECCIÓN EN GALERÍA DE PÁGINAS (PORTADA VS IA)
+    function renderPagesGallery() {
+      const grid = document.getElementById('pages-grid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < 6; i++) {
+        const isCover = (selectedCoverIndex === i);
+        const isAi = selectedAiPages.has(i);
+
+        const card = document.createElement('div');
+        card.className = `relative rounded-xl border overflow-hidden group bg-nepsInput p-1 flex flex-col justify-between transition-all ${isCover ? 'border-amber-400 ring-2 ring-amber-400/30' : 'border-nepsBorder'}`;
+
+        card.innerHTML = `
+          <div class="relative aspect-[3/4] rounded-lg overflow-hidden bg-slate-900">
+            <img src="https://picsum.photos/200/300?random=${i + 10}" class="w-full h-full object-cover">
+            
+            <!-- BADGE DE PORTADA -->
+            ${isCover ? `
+              <span class="absolute top-1 left-1 bg-amber-500 text-slate-950 font-extrabold text-[9px] px-1.5 py-0.5 rounded shadow">
+                PORTADA
+              </span>
+            ` : ''}
+
+            <!-- CHECKBOX SELECCIÓN IA -->
+            <label class="absolute top-1 right-1 bg-black/60 backdrop-blur-md p-1 rounded-md cursor-pointer">
+              <input type="checkbox" ${isAi ? 'checked' : ''} onchange="toggleAiPage(${i})" class="w-3.5 h-3.5 accent-purple-500 rounded">
+            </label>
+          </div>
+
+          <div class="pt-2 flex flex-col gap-1 text-[10px]">
+            <span class="text-nepsMuted font-mono">Pág. #${i + 1}</span>
+            <button onclick="setCover(${i})" class="w-full py-1 rounded font-bold transition-all ${isCover ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40' : 'bg-nepsCard hover:bg-nepsBorder text-slate-300 border border-nepsBorder'}">
+              ${isCover ? 'Portada Seleccionada' : 'Marcar Portada'}
+            </button>
+          </div>
+        `;
+
+        grid.appendChild(card);
+      }
+    }
+
+    function setCover(index) {
+      selectedCoverIndex = index;
+      renderPagesGallery();
+      showToast('Portada actualizada', `Se definió la página #${index + 1} como portada del número.`);
+    }
+
+    function toggleAiPage(index) {
+      if (selectedAiPages.has(index)) {
+        selectedAiPages.delete(index);
+      } else {
+        selectedAiPages.add(index);
+      }
+      
+      const count = selectedAiPages.size;
+      document.getElementById('lbl-ai-count').textContent = count;
+      document.getElementById('btn-process-ai').disabled = (count === 0);
+      renderPagesGallery();
+    }
+
+    // PROCESAMIENTO CON IA
+    function runAIAnalysis() {
+      const btn = document.getElementById('btn-process-ai');
+      const btnText = document.getElementById('btn-ai-text');
+      btn.disabled = true;
+      btnText.textContent = 'Analizando...';
+
+      setTimeout(() => {
+        btnText.textContent = 'Procesar con IA';
+        btn.disabled = false;
+
+        document.getElementById('section-ai-results').classList.remove('hidden');
+        document.getElementById('section-ai-tags-rec').classList.remove('hidden');
+        renderAiTagRecommendations();
+        showToast('Análisis IA Completado', 'Se han generado sugerencias para el número.');
+      }, 1200);
+    }
+
+    function applyAISuggestions() {
+      document.getElementById('input-number').value = '1';
+      document.getElementById('input-title').value = 'El Guerrero del Futuro';
+      document.getElementById('input-desc').value = 'El Dios de la Destrucción Beerus despierta tras un largo sueño buscando al Super Saiyajin Dios...';
+      showToast('Sugerencias Aplicadas', 'Los campos del formulario se actualizaron con la sugerencia.');
+    }
+
+    // GESTIÓN DE PERSONAS Y ROLES
+    function addPersonRole() {
+      const person = document.getElementById('add-person-select').value;
+      const role = document.getElementById('add-role-select').value;
+
+      personRoles.push({ person, role });
+      renderPersonRoles();
+    }
+
+    function removePersonRole(index) {
+      personRoles.splice(index, 1);
+      renderPersonRoles();
+    }
+
+    function renderPersonRoles() {
+      const container = document.getElementById('person-role-list');
+      container.innerHTML = '';
+
+      personRoles.forEach((item, idx) => {
+        const chip = document.createElement('div');
+        chip.className = 'inline-flex items-center gap-2 px-3 py-1.5 rounded-xl bg-nepsInput border border-nepsBorder text-xs text-white shadow-sm';
+        chip.innerHTML = `
+          <span class="font-bold text-slate-200">${item.person}</span>
+          <span class="text-nepsMuted">—</span>
+          <span class="text-nepsPrimary font-medium">${item.role}</span>
+          <button onclick="removePersonRole(${idx})" class="text-nepsMuted hover:text-nepsAccent transition-colors ml-1">×</button>
+        `;
+        container.appendChild(chip);
+      });
+    }
+
+    // GESTIÓN DE TAGS Y RECOMENDACIONES
+    function renderTags() {
+      const container = document.getElementById('tags-active-container');
+      container.innerHTML = '';
+
+      activeTags.forEach((tag, idx) => {
+        const chip = document.createElement('span');
+        chip.className = 'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-nepsPrimary/10 border border-nepsPrimary/30 text-nepsPrimary text-xs font-semibold';
+        chip.innerHTML = `
+          <span>${tag}</span>
+          <button onclick="removeTag(${idx})" class="hover:text-white transition-colors">×</button>
+        `;
+        container.appendChild(chip);
+      });
+    }
+
+    function addCustomTag() {
+      const input = document.getElementById('input-new-tag');
+      const val = input.value.trim().toLowerCase();
+      if (val && !activeTags.includes(val)) {
+        activeTags.push(val);
+        input.value = '';
+        renderTags();
+      }
+    }
+
+    function removeTag(idx) {
+      activeTags.splice(idx, 1);
+      renderTags();
+    }
+
+    function renderAiTagRecommendations() {
+      const genBox = document.getElementById('ai-rec-general');
+      const charBox = document.getElementById('ai-rec-chars');
+
+      genBox.innerHTML = '';
+      charBox.innerHTML = '';
+
+      aiRecGeneral.forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'px-2.5 py-1 rounded-lg bg-purple-900/30 hover:bg-purple-800/40 text-purple-200 border border-purple-500/30 text-xs font-medium transition-all';
+        btn.textContent = '+ ' + tag;
+        btn.onclick = () => acceptAiTag(tag, 'gen');
+        genBox.appendChild(btn);
+      });
+
+      aiRecChars.forEach(tag => {
+        const btn = document.createElement('button');
+        btn.className = 'px-2.5 py-1 rounded-lg bg-purple-900/30 hover:bg-purple-800/40 text-purple-200 border border-purple-500/30 text-xs font-medium transition-all';
+        btn.textContent = '+ ' + tag;
+        btn.onclick = () => acceptAiTag(tag, 'char');
+        charBox.appendChild(btn);
+      });
+    }
+
+    function acceptAiTag(tag, type) {
+      if (!activeTags.includes(tag)) {
+        activeTags.push(tag);
+        renderTags();
+      }
+      if (type === 'gen') {
+        aiRecGeneral = aiRecGeneral.filter(t => t !== tag);
+      } else {
+        aiRecChars = aiRecChars.filter(t => t !== tag);
+      }
+      renderAiTagRecommendations();
+    }
+
+    // MODAL RÁPIDO PARA PERSONA / ROL
+    function openQuickModal(type) {
+      quickEntityType = type;
+      document.getElementById('quick-modal-title').textContent = (type === 'person') ? 'Crear Nueva Persona' : 'Crear Nuevo Rol';
+      document.getElementById('quick-modal-input').value = '';
+      document.getElementById('quick-modal').classList.remove('hidden');
+    }
+
+    function closeQuickModal() {
+      document.getElementById('quick-modal').classList.add('hidden');
+    }
+
+    function saveQuickEntity() {
+      const val = document.getElementById('quick-modal-input').value.trim();
+      if (val) {
+        if (quickEntityType === 'person') {
+          const sel = document.getElementById('add-person-select');
+          const opt = new Option(val, val, true, true);
+          sel.add(opt);
+        } else {
+          const sel = document.getElementById('add-role-select');
+          const opt = new Option(val, val, true, true);
+          sel.add(opt);
+        }
+        closeQuickModal();
+        showToast('Entidad creada', `${val} ahora está disponible para asociar.`);
+      }
+    }
+
+    // GUARDADO DEL FORMULARIO COMPLETO
+    function saveNumber() {
+      const btn = document.getElementById('btn-save');
+      const btnText = document.getElementById('btn-save-text');
+      const spinner = document.getElementById('btn-save-spinner');
+
+      btn.disabled = true;
+      btnText.textContent = 'Guardando...';
+      spinner.classList.remove('hidden');
+
+      setTimeout(() => {
+        btn.disabled = false;
+        btnText.textContent = 'Guardar Número';
+        spinner.classList.add('hidden');
+
+        showToast('Guardado exitoso', 'Los datos del número fueron registrados correctamente.');
+        setTimeout(() => {
+          window.location.href = 'listar-numeros.html?serie_id=1';
+        }, 1200);
+      }, 1000);
+    }
+
+    function showToast(title, desc) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-title').textContent = title;
+      document.getElementById('toast-desc').textContent = desc;
+
+      toast.classList.remove('opacity-0', 'translate-y-5', 'pointer-events-none');
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-5', 'pointer-events-none');
+      }, 3000);
+    }
+  </script>
+
+</body>
+</html>

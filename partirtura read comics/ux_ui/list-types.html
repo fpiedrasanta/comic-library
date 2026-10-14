@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administración de Tipos de Lista - Dashboard</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/&gt;</span></div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="admin-personas.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Personas
+        </a>
+        <a href="admin-roles.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+          Roles
+        </a>
+        <a href="admin-etiquetas.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+          Etiquetas
+        </a>
+        <a href="list-types.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+          Tipos de Lista
+        </a>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- CONTENIDO PRINCIPAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <h1 class="text-sm font-bold text-white tracking-tight">Administración de Tipos de Lista</h1>
+
+      <button onclick="openModal('modalCreate')" class="flex items-center gap-2 px-3.5 py-2 bg-nepsPrimary text-slate-950 hover:bg-sky-300 font-bold rounded-xl text-xs transition-all shadow-md">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+        <span>Nuevo Tipo de Lista</span>
+      </button>
+    </header>
+
+    <main class="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+
+      <!-- BANNER DE NOTIFICACIÓN DE ÉXITO (US-0022) -->
+      <div id="stateSuccessBanner" class="hidden bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-2xl flex items-center justify-between gap-4 text-xs">
+        <div class="flex items-center gap-3 text-emerald-400">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span class="font-medium">La operación se completó exitosamente.</span>
+        </div>
+        <button onclick="document.getElementById('stateSuccessBanner').classList.add('hidden')" class="text-emerald-400 hover:text-white">✕</button>
+      </div>
+
+      <!-- BANNER DE ERROR GLOBAL -->
+      <div id="stateErrorBanner" class="hidden bg-nepsAccent/10 border border-nepsAccent/30 p-4 rounded-2xl flex items-center justify-between gap-4 text-xs">
+        <div class="flex items-center gap-3 text-nepsAccent">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span class="font-medium">Ocurrió un error al cargar los tipos de lista. Inténtalo de nuevo.</span>
+        </div>
+        <button class="px-3 py-1.5 bg-nepsAccent text-white font-bold rounded-xl text-xs">Reintentar</button>
+      </div>
+
+      <!-- TOOLBAR: BUSCADOR, FILTRO DE ESTADO Y ORDENAMIENTO -->
+      <div class="bg-nepsCard border border-nepsBorder p-4 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="relative w-full md:w-80">
+          <input type="text" placeholder="Buscar por nombre..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-9 pr-4 py-2.5 outline-none transition-colors">
+          <svg class="w-4 h-4 text-nepsMuted absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end text-xs">
+          <div class="flex items-center gap-2">
+            <label class="text-nepsMuted text-[11px] font-medium">Estado:</label>
+            <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="todos">Todos</option>
+              <option value="activo" selected>Activos</option>
+              <option value="inactivo">Inactivos</option>
+            </select>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <label class="text-nepsMuted text-[11px] font-medium">Ordenar por:</label>
+            <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="nombre_asc">Nombre (A-Z)</option>
+              <option value="nombre_desc">Nombre (Z-A)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- TABLA DE LISTADO PRINCIPAL -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs">
+            <thead class="bg-nepsInput/50 border-b border-nepsBorder text-nepsMuted uppercase font-bold text-[10px] tracking-wider">
+              <tr>
+                <th class="py-3.5 px-6">Nombre</th>
+                <th class="py-3.5 px-6">Estado</th>
+                <th class="py-3.5 px-6 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-nepsBorder/60 text-slate-200">
+              
+              <!-- REGISTRO 1: ACTIVO -->
+              <tr class="hover:bg-nepsInput/30 transition-colors">
+                <td class="py-4 px-6 font-semibold text-white">Favoritos</td>
+                <td class="py-4 px-6">
+                  <span class="inline-flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full text-emerald-400 font-bold text-[10px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Activo
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button onclick="openModal('modalEdit')" class="px-2.5 py-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-200 rounded-lg border border-nepsBorder transition-colors">Editar</button>
+                    <button onclick="openModal('modalDeactivate')" class="px-2.5 py-1.5 bg-nepsAccent/10 hover:bg-nepsAccent hover:text-white text-nepsAccent rounded-lg border border-nepsAccent/20 transition-all">Desactivar</button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- REGISTRO 2: INACTIVO -->
+              <tr class="hover:bg-nepsInput/30 transition-colors opacity-60">
+                <td class="py-4 px-6 font-semibold text-slate-400">Lecturas Archivas</td>
+                <td class="py-4 px-6">
+                  <span class="inline-flex items-center gap-1.5 bg-slate-800 border border-slate-700 px-2.5 py-0.5 rounded-full text-slate-400 font-bold text-[10px]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span> Inactivo
+                  </span>
+                </td>
+                <td class="py-4 px-6 text-right">
+                  <div class="flex items-center justify-end gap-2">
+                    <button onclick="openModal('modalEdit')" class="px-2.5 py-1.5 bg-nepsInput hover:bg-nepsBorder text-slate-300 rounded-lg border border-nepsBorder transition-colors">Editar</button>
+                    <button onclick="openModal('modalActivate')" class="px-2.5 py-1.5 bg-emerald-500/10 hover:bg-emerald-500 hover:text-slate-950 text-emerald-400 font-bold rounded-lg border border-emerald-500/20 transition-all">Reactivar</button>
+                  </div>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ESTADO DE CARGA -->
+        <div id="stateLoading" class="hidden p-12 text-center space-y-3">
+          <div class="w-6 h-6 border-2 border-nepsPrimary border-t-transparent rounded-full animate-spin mx-auto"></div>
+          <p class="text-xs text-nepsMuted">Cargando tipos de lista...</p>
+        </div>
+
+        <!-- ESTADO VACÍO / SIN RESULTADOS -->
+        <div id="stateEmpty" class="hidden p-12 text-center space-y-2">
+          <p class="text-sm font-bold text-white">No se encontraron tipos de lista</p>
+          <p class="text-xs text-nepsMuted">Prueba ajustando los filtros de búsqueda o agrega un nuevo tipo de lista.</p>
+        </div>
+
+        <!-- ESTADO DE ERROR DE TABLA -->
+        <div id="stateTableError" class="hidden p-12 text-center space-y-3">
+          <div class="w-8 h-8 rounded-full bg-nepsAccent/10 border border-nepsAccent/20 flex items-center justify-center mx-auto text-nepsAccent">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+          </div>
+          <p class="text-sm font-bold text-white">Error al cargar la información</p>
+          <p class="text-xs text-nepsMuted">No pudimos obtener el listado de tipos de lista.</p>
+        </div>
+
+      </div>
+
+      <!-- PAGINACIÓN -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <span class="text-xs text-nepsMuted">Mostrando <strong class="text-white">2</strong> de <strong class="text-white">2</strong> tipos de lista</span>
+        <div class="flex items-center gap-2">
+          <button class="px-3 py-1.5 bg-nepsInput border border-nepsBorder text-xs text-nepsMuted rounded-xl disabled:opacity-40" disabled>Anterior</button>
+          <span class="text-xs text-nepsPrimary font-bold bg-nepsInput border border-nepsBorder px-3 py-1 rounded-xl">1</span>
+          <button class="px-3 py-1.5 bg-nepsInput border border-nepsBorder text-xs text-nepsMuted rounded-xl disabled:opacity-40" disabled>Siguiente</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- MODAL: ALTA DE TIPO DE LISTA -->
+  <div id="modalCreate" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 max-w-md w-full space-y-5">
+      <div class="flex items-center justify-between border-b border-nepsBorder/60 pb-3">
+        <h3 class="text-base font-bold text-white">Nuevo Tipo de Lista</h3>
+        <button onclick="closeModal('modalCreate')" class="text-nepsMuted hover:text-white">✕</button>
+      </div>
+
+      <form class="space-y-4" onsubmit="event.preventDefault();">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">Nombre <span class="text-nepsAccent">*</span></label>
+          <input type="text" placeholder="Ej. Favoritos" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+          <!-- Ejemplo de Validación Visual y Mensaje de Error -->
+          <p class="hidden text-[11px] text-nepsAccent font-medium pt-1">El nombre es obligatorio y no puede superar los 50 caracteres.</p>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-nepsBorder/60">
+          <button type="button" onclick="closeModal('modalCreate')" class="px-4 py-2 bg-nepsInput text-nepsMuted hover:text-white border border-nepsBorder rounded-xl text-xs">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-nepsPrimary text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2">
+            <!-- Spinner opcional para estado de envío -->
+            <span class="hidden w-3 h-3 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+            <span>Guardar</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: EDICIÓN DE TIPO DE LISTA -->
+  <div id="modalEdit" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-6 max-w-md w-full space-y-5">
+      <div class="flex items-center justify-between border-b border-nepsBorder/60 pb-3">
+        <h3 class="text-base font-bold text-white">Editar Tipo de Lista</h3>
+        <button onclick="closeModal('modalEdit')" class="text-nepsMuted hover:text-white">✕</button>
+      </div>
+
+      <form class="space-y-4" onsubmit="event.preventDefault();">
+        <div class="space-y-1.5">
+          <label class="text-xs font-bold text-white">Nombre <span class="text-nepsAccent">*</span></label>
+          <input type="text" value="Favoritos" required class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white rounded-xl px-3.5 py-2.5 outline-none transition-colors">
+          <p class="hidden text-[11px] text-nepsAccent font-medium pt-1">Ingrese un nombre válido.</p>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-3 border-t border-nepsBorder/60">
+          <button type="button" onclick="closeModal('modalEdit')" class="px-4 py-2 bg-nepsInput text-nepsMuted hover:text-white border border-nepsBorder rounded-xl text-xs">Cancelar</button>
+          <button type="submit" class="px-5 py-2 bg-nepsPrimary text-slate-950 font-bold rounded-xl text-xs flex items-center gap-2">
+            <span class="hidden w-3 h-3 border-2 border-slate-950 border-t-transparent rounded-full animate-spin"></span>
+            <span>Guardar Cambios</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMACIÓN DESACTIVACIÓN -->
+  <div id="modalDeactivate" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-nepsAccent/40 rounded-2xl p-6 max-w-sm w-full space-y-4">
+      <h3 class="text-base font-bold text-white">Desactivar Tipo de Lista</h3>
+      <p class="text-xs text-nepsMuted">¿Deseas desactivar el tipo de lista <strong class="text-white">Favoritos</strong>?</p>
+      <p class="text-[11px] text-nepsAccent bg-nepsAccent/10 p-2.5 rounded-xl border border-nepsAccent/20">
+        <strong>Operación:</strong> El registro cambiará a estado inactivo y no estará disponible para nuevas asignaciones.
+      </p>
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal('modalDeactivate')" class="px-4 py-2 bg-nepsInput text-nepsMuted border border-nepsBorder rounded-xl text-xs">Cancelar</button>
+        <button onclick="closeModal('modalDeactivate')" class="px-4 py-2 bg-nepsAccent text-white font-bold rounded-xl text-xs">Desactivar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CONFIRMACIÓN REACTIVACIÓN -->
+  <div id="modalActivate" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-nepsCard border border-emerald-500/40 rounded-2xl p-6 max-w-sm w-full space-y-4">
+      <h3 class="text-base font-bold text-white">Reactivar Tipo de Lista</h3>
+      <p class="text-xs text-nepsMuted">¿Deseas reactivar el tipo de lista <strong class="text-white">Lecturas Archivas</strong>?</p>
+      <p class="text-[11px] text-emerald-400 bg-emerald-500/10 p-2.5 rounded-xl border border-emerald-500/20">
+        <strong>Operación:</strong> El registro volverá a estar en estado activo e integrará las búsquedas principales.
+      </p>
+      <div class="flex justify-end gap-3 pt-2">
+        <button onclick="closeModal('modalActivate')" class="px-4 py-2 bg-nepsInput text-nepsMuted border border-nepsBorder rounded-xl text-xs">Cancelar</button>
+        <button onclick="closeModal('modalActivate')" class="px-4 py-2 bg-emerald-500 text-slate-950 font-bold rounded-xl text-xs">Reactivar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+  </script>
+
+</body>
+</html>

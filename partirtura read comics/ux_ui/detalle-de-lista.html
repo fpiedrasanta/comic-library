@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detalle de Lista - Comic Library | NEPS</title>
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="min-h-full text-nepsText antialiased bg-nepsBg font-sans relative overflow-x-hidden flex flex-col justify-between">
+
+  <!-- GLOWS AMBIENTALES DE FONDO -->
+  <div id="ambient-glow" class="fixed top-0 right-0 w-[600px] h-[600px] bg-[radial-gradient(circle_at_80%_20%,rgba(245,27,0,0.12)_0%,transparent_70%)] pointer-events-none transition-all duration-500"></div>
+
+  <!-- NAVBAR HEADER -->
+  <header class="border-b border-nepsBorder bg-nepsBg/85 backdrop-blur-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="/lists" class="text-2xl font-bold tracking-tight text-white">
+          &lt;neps&lt;span class="text-nepsAccent"&gt;/&lt;/span&gt;&gt;
+        </a>
+        <nav class="hidden md:flex items-center gap-2 text-xs font-semibold text-nepsMuted border-l border-nepsBorder pl-3">
+          <a href="/lists" class="hover:text-white transition-colors">Listas</a>
+          <span>/</span>
+          <span class="text-white">Detalle</span>
+        </nav>
+      </div>
+
+      <!-- DEMO STATE CONTROLS -->
+      <div class="flex items-center gap-1.5 bg-nepsInput border border-nepsBorder p-1 rounded-xl text-[11px]">
+        <span class="text-nepsMuted font-mono px-2 hidden lg:inline">ESTADOS DEMO:</span>
+        <button onclick="showDemo('default')" class="px-2.5 py-1 rounded-lg font-semibold bg-nepsPrimary text-nepsBg">Muchas obras</button>
+        <button onclick="showDemo('few')" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white">Pocas obras</button>
+        <button onclick="showDemo('empty')" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white">Sin obras</button>
+        <button onclick="showDemo('noimage')" class="px-2.5 py-1 rounded-lg font-semibold text-nepsMuted hover:text-white">Sin imagen</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- CONTENIDO PRINCIPAL (/lists/{id}) -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 flex-grow w-full space-y-10">
+
+    <!-- BREADCRUMB MOBILE -->
+    <div class="md:hidden">
+      <a href="/lists" class="inline-flex items-center gap-1 text-xs text-nepsMuted hover:text-white font-medium">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Volver a Exploración de Listas
+      </a>
+    </div>
+
+    <!-- HEADER DE LIST (/lists/{id}) -->
+    <section id="list-header" class="relative bg-nepsCard/80 border border-nepsBorder rounded-3xl p-6 sm:p-8 overflow-hidden backdrop-blur-md shadow-2xl transition-all duration-300"
+             style="border-color: rgba(245, 27, 0, 0.3); background: linear-gradient(135deg, rgba(245, 27, 0, 0.08) 0%, rgba(19, 26, 38, 0.95) 60%);">
+      
+      <!-- Detalle visual superior basado en color distintivo -->
+      <div id="header-accent-bar" class="absolute top-0 left-0 right-0 h-1.5" style="background-color: #f51b00;"></div>
+
+      <div class="flex flex-col md:flex-row items-center md:items-start gap-6 sm:gap-8 relative z-10">
+        
+        <!-- COVER VERTICAL DE LA LIST (Sin padding, object-cover) -->
+        <div class="w-44 sm:w-52 md:w-60 flex-shrink-0">
+          <div id="cover-container" class="w-full aspect-[2/3] bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border border-white/10 relative group">
+            <img id="list-cover-img" 
+                 src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80" 
+                 alt="Portada de la lista" 
+                 class="w-full h-full object-cover" />
+            
+            <!-- FALLBACK SIN IMAGEN (Oculto por defecto) -->
+            <div id="list-cover-fallback" class="hidden w-full h-full bg-slate-950 flex flex-col items-center justify-center p-4 text-center">
+              <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 mb-3">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                </svg>
+              </div>
+              <span class="text-xs font-mono text-nepsMuted">Sin portada</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- INFORMACIÓN DE LA LIST -->
+        <div class="flex-1 space-y-4 text-center md:text-left">
+          
+          <!-- TYPE PILL -->
+          <div class="flex flex-wrap items-center justify-center md:justify-start gap-2">
+            <span id="list-badge" class="inline-block text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg border shadow-sm"
+                  style="background-color: rgba(245, 27, 0, 0.15); border-color: rgba(245, 27, 0, 0.4); color: #ff523b;">
+              Evento / Crossover
+            </span>
+          </div>
+
+          <!-- NOMBRE Y DESCRIPCIÓN EXTENSA -->
+          <div class="space-y-2">
+            <h1 id="list-title" class="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight">
+              Guerras Secretas: Orden de Lectura Cronológico y Cronograma de Crossovers Marvel
+            </h1>
+            <p id="list-description" class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-3xl">
+              La guía definitiva para experimentar el evento multiversal que cambió el Universo Marvel para siempre. Esta lista abarca desde los preludios de Hickman en Los Vengadores y Nuevos Vengadores, pasando por el colapso del Multiverso en la Incursión Final, hasta las consecuencias inmediatas y la reestructuración del cosmos. Cada obra está ordenada de manera secuencial para una lectura sin spoilers.
+            </p>
+          </div>
+
+          <!-- METADATOS: CANTIDAD DE OBRAS (SÓLO OBRAS) -->
+          <div class="pt-4 border-t border-nepsBorder/60 flex items-center justify-center md:justify-start gap-6 text-xs text-nepsMuted">
+            <div class="flex items-center gap-2">
+              <div class="w-8 h-8 rounded-xl bg-nepsInput border border-nepsBorder flex items-center justify-center text-slate-300">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+                </svg>
+              </div>
+              <div>
+                <span class="block text-[10px] uppercase font-mono tracking-wider text-nepsMuted">Contenido</span>
+                <span id="list-works-count" class="text-sm font-bold text-white">12 obras</span>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- SECCIÓN DE OBRAS DE LA LIST -->
+    <section class="space-y-6">
+      
+      <!-- ENCABEZADO DE SECCIÓN (Sín controles de búsqueda/sorting) -->
+      <div class="flex items-center justify-between border-b border-nepsBorder/80 pb-4">
+        <div>
+          <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
+            <span>Obras de la Lista</span>
+            <span class="text-xs font-mono font-normal text-nepsMuted px-2 py-0.5 rounded bg-nepsInput border border-nepsBorder">
+              Orden Secuencial
+            </span>
+          </h2>
+          <p class="text-xs text-nepsMuted mt-0.5">El orden de las obras está predefinido por el autor de la colección.</p>
+        </div>
+      </div>
+
+      <!-- GRILLA DE OBRAS (REUTILIZANDO WorkCard EXISTENTE DEL PUBLIC WEB) -->
+      <div id="works-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-5">
+        
+        <!-- WORKCARD 1 (Standard WorkCard con indicador de orden secuencial #1) -->
+        <article class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-500 transition-all duration-300 relative">
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80" alt="Avengers #1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <!-- Indicador Secuencial de la Lista -->
+            <div class="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md border border-white/20 text-white font-mono font-extrabold text-[11px] px-2 py-0.5 rounded-lg shadow-md">
+              #1
+            </div>
+          </div>
+          <div class="p-3 space-y-1 flex-1 flex flex-col justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-sky-400 block truncate">Marvel Comics</span>
+              <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors" title="Avengers: El fin del tiempo #1">
+                Avengers: El fin del tiempo #1
+              </h3>
+            </div>
+            <p class="text-[10px] text-nepsMuted pt-2 border-t border-nepsBorder/40">2015 • Cómic</p>
+          </div>
+        </article>
+
+        <!-- WORKCARD 2 -->
+        <article class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-500 transition-all duration-300 relative">
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1578632767115-351597cf2477?w=400&auto=format&fit=crop&q=80" alt="New Avengers #1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md border border-white/20 text-white font-mono font-extrabold text-[11px] px-2 py-0.5 rounded-lg shadow-md">
+              #2
+            </div>
+          </div>
+          <div class="p-3 space-y-1 flex-1 flex flex-col justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-sky-400 block truncate">Marvel Comics</span>
+              <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors" title="New Avengers: Incursiones #1">
+                New Avengers: Incursiones #1
+              </h3>
+            </div>
+            <p class="text-[10px] text-nepsMuted pt-2 border-t border-nepsBorder/40">2015 • Cómic</p>
+          </div>
+        </article>
+
+        <!-- WORKCARD 3 -->
+        <article class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-500 transition-all duration-300 relative">
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80" alt="Secret Wars #1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md border border-white/20 text-white font-mono font-extrabold text-[11px] px-2 py-0.5 rounded-lg shadow-md">
+              #3
+            </div>
+          </div>
+          <div class="p-3 space-y-1 flex-1 flex flex-col justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-sky-400 block truncate">Marvel Comics</span>
+              <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors" title="Secret Wars: Mundo de Batalla #1">
+                Secret Wars: Mundo de Batalla #1
+              </h3>
+            </div>
+            <p class="text-[10px] text-nepsMuted pt-2 border-t border-nepsBorder/40">2015 • Evento</p>
+          </div>
+        </article>
+
+        <!-- WORKCARD 4 -->
+        <article class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-500 transition-all duration-300 relative">
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1563089145-599997674d42?w=400&auto=format&fit=crop&q=80" alt="Secret Wars #2" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md border border-white/20 text-white font-mono font-extrabold text-[11px] px-2 py-0.5 rounded-lg shadow-md">
+              #4
+            </div>
+          </div>
+          <div class="p-3 space-y-1 flex-1 flex flex-col justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-sky-400 block truncate">Marvel Comics</span>
+              <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors" title="Secret Wars: Mundo de Batalla #2">
+                Secret Wars: Mundo de Batalla #2
+              </h3>
+            </div>
+            <p class="text-[10px] text-nepsMuted pt-2 border-t border-nepsBorder/40">2015 • Evento</p>
+          </div>
+        </article>
+
+        <!-- WORKCARD 5 -->
+        <article class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-500 transition-all duration-300 relative">
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=400&auto=format&fit=crop&q=80" alt="Siege #1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md border border-white/20 text-white font-mono font-extrabold text-[11px] px-2 py-0.5 rounded-lg shadow-md">
+              #5
+            </div>
+          </div>
+          <div class="p-3 space-y-1 flex-1 flex flex-col justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-sky-400 block truncate">Marvel Comics</span>
+              <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors" title="Siege: El Muro de los Escudos #1">
+                Siege: El Muro de los Escudos #1
+              </h3>
+            </div>
+            <p class="text-[10px] text-nepsMuted pt-2 border-t border-nepsBorder/40">2015 • Spin-off</p>
+          </div>
+        </article>
+
+        <!-- WORKCARD 6 -->
+        <article class="group bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden flex flex-col justify-between hover:border-slate-500 transition-all duration-300 relative">
+          <div class="w-full aspect-[2/3] bg-slate-950 overflow-hidden relative">
+            <img src="https://images.unsplash.com/photo-1534447677768-be436bb09401?w=400&auto=format&fit=crop&q=80" alt="Thors #1" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+            <div class="absolute top-2 left-2 bg-slate-950/90 backdrop-blur-md border border-white/20 text-white font-mono font-extrabold text-[11px] px-2 py-0.5 rounded-lg shadow-md">
+              #6
+            </div>
+          </div>
+          <div class="p-3 space-y-1 flex-1 flex flex-col justify-between">
+            <div class="space-y-1">
+              <span class="text-[10px] font-semibold text-sky-400 block truncate">Marvel Comics</span>
+              <h3 class="text-xs font-bold text-white line-clamp-2 leading-snug group-hover:text-sky-300 transition-colors" title="Thors: La Policía de Battleworld #1">
+                Thors: La Policía de Battleworld #1
+              </h3>
+            </div>
+            <p class="text-[10px] text-nepsMuted pt-2 border-t border-nepsBorder/40">2015 • Serie</p>
+          </div>
+        </article>
+
+      </div>
+
+      <!-- ESTADO VACÍO: LIST SIN OBRAS -->
+      <div id="empty-works" class="hidden py-16 text-center bg-nepsCard/40 border border-nepsBorder rounded-2xl space-y-3">
+        <div class="w-12 h-12 bg-nepsInput border border-nepsBorder rounded-2xl flex items-center justify-center mx-auto text-nepsMuted">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+        </div>
+        <h3 class="text-sm font-bold text-white">Esta lista aún no contiene obras</h3>
+        <p class="text-xs text-nepsMuted max-w-sm mx-auto">La colección fue creada pero no se han asignado cómics u obras hasta el momento.</p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="border-t border-nepsBorder bg-nepsBg py-6 relative z-10">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-xs text-nepsMuted">
+      &copy; 2026 Comic Library — Referencia visual <span class="text-white font-mono">TASK-UXUI-0028</span>
+    </div>
+  </footer>
+
+  <!-- SCRIPT DE INTERACTIVIDAD DEMO PARA PROBAR VARIANTES -->
+  <script>
+    function showDemo(mode) {
+      const header = document.getElementById('list-header');
+      const accentBar = document.getElementById('header-accent-bar');
+      const badge = document.getElementById('list-badge');
+      const title = document.getElementById('list-title');
+      const desc = document.getElementById('list-description');
+      const count = document.getElementById('list-works-count');
+      const worksGrid = document.getElementById('works-grid');
+      const emptyWorks = document.getElementById('empty-works');
+      const coverImg = document.getElementById('list-cover-img');
+      const coverFallback = document.getElementById('list-cover-fallback');
+      const ambientGlow = document.getElementById('ambient-glow');
+
+      // Reset visividades de la portada
+      coverImg.classList.remove('hidden');
+      coverFallback.classList.add('hidden');
+      emptyWorks.classList.add('hidden');
+      worksGrid.classList.remove('hidden');
+
+      if (mode === 'default') {
+        // Muchas obras (Color Red)
+        header.style.borderColor = 'rgba(245, 27, 0, 0.3)';
+        header.style.background = 'linear-gradient(135deg, rgba(245, 27, 0, 0.08) 0%, rgba(19, 26, 38, 0.95) 60%)';
+        accentBar.style.backgroundColor = '#f51b00';
+        badge.style.backgroundColor = 'rgba(245, 27, 0, 0.15)';
+        badge.style.borderColor = 'rgba(245, 27, 0, 0.4)';
+        badge.style.color = '#ff523b';
+        badge.innerText = 'Evento / Crossover';
+        title.innerText = 'Guerras Secretas: Orden de Lectura Cronológico y Cronograma de Crossovers Marvel';
+        desc.innerText = 'La guía definitiva para experimentar el evento multiversal que cambió el Universo Marvel para siempre. Esta lista abarca desde los preludios de Hickman en Los Vengadores y Nuevos Vengadores, pasando por el colapso del Multiverso en la Incursión Final, hasta las consecuencias inmediatas y la reestructuración del cosmos. Cada obra está ordenada de manera secuencial para una lectura sin spoilers.';
+        count.innerText = '12 obras';
+        ambientGlow.style.background = 'radial-gradient(circle at 80% 20%, rgba(245,27,0,0.12) 0%, transparent 70%)';
+        coverImg.src = 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80';
+      } 
+      else if (mode === 'few') {
+        // Pocas obras (Color Emerald)
+        header.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+        header.style.background = 'linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(19, 26, 38, 0.95) 60%)';
+        accentBar.style.backgroundColor = '#10b981';
+        badge.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
+        badge.style.borderColor = 'rgba(16, 185, 129, 0.4)';
+        badge.style.color = '#34d399';
+        badge.innerText = 'Guía de Inicio';
+        title.innerText = 'Batman: Arcos Fundamentales para Principiantes';
+        desc.innerText = 'Una selección rápida de 2 obras indispensables para adentrarse en la mitología del Caballero Oscuro sin necesidad de leer décadas de continuidad previa.';
+        count.innerText = '2 obras';
+        ambientGlow.style.background = 'radial-gradient(circle at 80% 20%, rgba(16,185,129,0.12) 0%, transparent 70%)';
+        coverImg.src = 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80';
+      } 
+      else if (mode === 'empty') {
+        // Sin obras (Color Purple)
+        header.style.borderColor = 'rgba(168, 85, 247, 0.3)';
+        header.style.background = 'linear-gradient(135deg, rgba(168, 85, 247, 0.08) 0%, rgba(19, 26, 38, 0.95) 60%)';
+        accentBar.style.backgroundColor = '#a855f7';
+        badge.style.backgroundColor = 'rgba(168, 85, 247, 0.15)';
+        badge.style.borderColor = 'rgba(168, 85, 247, 0.4)';
+        badge.style.color = '#c084fc';
+        badge.innerText = 'Borrador / Colección';
+        title.innerText = 'Nuevas Fronteras del Cómic Independiente (2026)';
+        desc.innerText = 'Lista en proceso de curaduría para catalogar lanzamientos relevantes del circuito indie.';
+        count.innerText = '0 obras';
+        worksGrid.classList.add('hidden');
+        emptyWorks.classList.remove('hidden');
+        ambientGlow.style.background = 'radial-gradient(circle at 80% 20%, rgba(168,85,247,0.12) 0%, transparent 70%)';
+      } 
+      else if (mode === 'noimage') {
+        // Sin imagen (Color Cyan)
+        header.style.borderColor = 'rgba(6, 182, 212, 0.3)';
+        header.style.background = 'linear-gradient(135deg, rgba(6, 182, 212, 0.08) 0%, rgba(19, 26, 38, 0.95) 60%)';
+        accentBar.style.backgroundColor = '#06b6d4';
+        badge.style.backgroundColor = 'rgba(6, 182, 212, 0.15)';
+        badge.style.borderColor = 'rgba(6, 182, 212, 0.4)';
+        badge.style.color = '#22d3ee';
+        badge.innerText = 'Orden Cronológico';
+        title.innerText = 'Saga de la Oscuridad Inminente';
+        desc.innerText = 'Recopilación cronológica sin arte de portada principal cargado aún.';
+        count.innerText = '6 obras';
+        coverImg.classList.add('hidden');
+        coverFallback.classList.remove('hidden');
+        ambientGlow.style.background = 'radial-gradient(circle at 80% 20%, rgba(6,182,212,0.12) 0%, transparent 70%)';
+      }
+    }
+  </script>
+</body>
+</html>

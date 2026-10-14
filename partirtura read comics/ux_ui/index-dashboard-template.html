@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard Admin - Comic Library | NEPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <!-- Brand Header -->
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <!-- Links de Gestión -->
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsPrimary/10 text-nepsPrimary font-semibold text-xs border border-nepsPrimary/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Catálogo Cómics
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Usuarios
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Ajustes
+        </a>
+      </nav>
+    </div>
+
+    <!-- User Logged Foot -->
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">
+          FP
+        </div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Super Admin</p>
+        </div>
+      </div>
+      <a href="login.html" title="Cerrar sesión" class="text-nepsMuted hover:text-nepsAccent p-1.5 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <!-- Toggle Button for Mobile -->
+        <button onclick="document.getElementById('sidebar').classList.toggle('hidden')" class="md:hidden text-nepsMuted hover:text-white p-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <h1 class="text-sm font-bold text-white tracking-tight">Consola de Administración</h1>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button class="bg-nepsPrimary text-nepsBg hover:bg-sky-300 font-bold text-xs px-3.5 py-2 rounded-lg transition-all flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Nuevo Comic
+        </button>
+      </div>
+    </header>
+
+    <!-- BODY CONTENT -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+      
+      <!-- CARDS MÉTRICAS (KPIs) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <div class="bg-nepsCard border border-nepsBorder p-4 rounded-xl space-y-2">
+          <p class="text-xs text-nepsMuted font-medium">Total de Cómics</p>
+          <div class="flex items-baseline justify-between">
+            <span class="text-2xl font-extrabold text-white">1,248</span>
+            <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">+12%</span>
+          </div>
+        </div>
+
+        <div class="bg-nepsCard border border-nepsBorder p-4 rounded-xl space-y-2">
+          <p class="text-xs text-nepsMuted font-medium">Usuarios Activos</p>
+          <div class="flex items-baseline justify-between">
+            <span class="text-2xl font-extrabold text-white">4,890</span>
+            <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">+8%</span>
+          </div>
+        </div>
+
+        <div class="bg-nepsCard border border-nepsBorder p-4 rounded-xl space-y-2">
+          <p class="text-xs text-nepsMuted font-medium">Lecturas del Mes</p>
+          <div class="flex items-baseline justify-between">
+            <span class="text-2xl font-extrabold text-white">34.2k</span>
+            <span class="text-[11px] font-semibold text-emerald-400 bg-emerald-400/10 px-2 py-0.5 rounded-full">+24%</span>
+          </div>
+        </div>
+
+        <div class="bg-nepsCard border border-nepsBorder p-4 rounded-xl space-y-2">
+          <p class="text-xs text-nepsMuted font-medium">Reportes Pendientes</p>
+          <div class="flex items-baseline justify-between">
+            <span class="text-2xl font-extrabold text-white">3</span>
+            <span class="text-[11px] font-semibold text-nepsAccent bg-nepsAccent/10 px-2 py-0.5 rounded-full">-2</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TABLA DE GESTIÓN DE CATÁLOGO -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden shadow-xl">
+        
+        <!-- Controles de la Tabla -->
+        <div class="p-4 border-b border-nepsBorder flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="w-full sm:w-72 relative">
+            <input type="text" placeholder="Filtrar por título, editorial..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-600 rounded-lg pl-8 pr-3 py-2 outline-none">
+            <svg class="w-4 h-4 text-nepsMuted absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+
+          <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+            <select class="bg-nepsInput border border-nepsBorder text-xs text-nepsText rounded-lg px-3 py-2 outline-none">
+              <option>Todas las editoriales</option>
+              <option>Marvel</option>
+              <option>DC Comics</option>
+              <option>Manga</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tabla Responsive -->
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-nepsBorder bg-nepsInput/50 text-[11px] uppercase tracking-wider text-nepsMuted font-semibold">
+                <th class="p-4">Cómic</th>
+                <th class="p-4">Editorial</th>
+                <th class="p-4">Año</th>
+                <th class="p-4">Estado</th>
+                <th class="p-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-nepsBorder text-xs">
+              
+              <!-- Fila 1 -->
+              <tr class="hover:bg-nepsInput/30 transition-colors">
+                <td class="p-4 flex items-center gap-3">
+                  <img src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=100&q=80" class="w-8 h-12 object-cover rounded border border-nepsBorder">
+                  <div>
+                    <p class="font-bold text-white">Spider-Man: Into the Verse #12</p>
+                    <p class="text-[10px] text-nepsMuted">ID: COM-9042</p>
+                  </div>
+                </td>
+                <td class="p-4 text-nepsText">Marvel Comics</td>
+                <td class="p-4 text-nepsMuted">2024</td>
+                <td class="p-4">
+                  <span class="bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 px-2 py-0.5 rounded-full text-[10px] font-semibold">Publicado</span>
+                </td>
+                <td class="p-4 text-right space-x-2">
+                  <button class="text-nepsMuted hover:text-nepsPrimary font-medium">Editar</button>
+                  <button class="text-nepsMuted hover:text-nepsAccent font-medium">Eliminar</button>
+                </td>
+              </tr>
+
+              <!-- Fila 2 -->
+              <tr class="hover:bg-nepsInput/30 transition-colors">
+                <td class="p-4 flex items-center gap-3">
+                  <img src="https://images.unsplash.com/photo-1612036782180-6f0b6cd846fe?auto=format&fit=crop&w=100&q=80" class="w-8 h-12 object-cover rounded border border-nepsBorder">
+                  <div>
+                    <p class="font-bold text-white">Batman: The Dark Knight #01</p>
+                    <p class="text-[10px] text-nepsMuted">ID: COM-8821</p>
+                  </div>
+                </td>
+                <td class="p-4 text-nepsText">DC Comics</td>
+                <td class="p-4 text-nepsMuted">2023</td>
+                <td class="p-4">
+                  <span class="bg-amber-400/10 text-amber-400 border border-amber-400/20 px-2 py-0.5 rounded-full text-[10px] font-semibold">Borrador</span>
+                </td>
+                <td class="p-4 text-right space-x-2">
+                  <button class="text-nepsMuted hover:text-nepsPrimary font-medium">Editar</button>
+                  <button class="text-nepsMuted hover:text-nepsAccent font-medium">Eliminar</button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Paginador Footer -->
+        <div class="p-4 border-t border-nepsBorder flex items-center justify-between text-xs text-nepsMuted">
+          <span>Mostrando 1 a 2 de 1,248 registros</span>
+          <div class="flex gap-1">
+            <button class="px-3 py-1 bg-nepsInput border border-nepsBorder rounded hover:text-white transition-colors">Anterior</button>
+            <button class="px-3 py-1 bg-nepsInput border border-nepsBorder rounded hover:text-white transition-colors">Siguiente</button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+</html>

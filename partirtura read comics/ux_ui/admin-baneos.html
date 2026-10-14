@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Administración de Baneos - Comic Library | NEPS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar acorde a NEPS */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0b0f19; }
+    ::-webkit-scrollbar-thumb { background: #2d2c33; border-radius: 9999px; border: 2px solid #0b0f19; }
+    ::-webkit-scrollbar-thumb:hover { background: #64748b; }
+    * { scrollbar-width: thin; scrollbar-color: #2d2c33 #0b0f19; }
+  </style>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <!-- Brand Header -->
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <!-- Links de Gestión -->
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          Catálogo Cómics
+        </a>
+        <a href="admin-usuarios.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Usuarios
+        </a>
+        <!-- Módulo Activo: Baneos -->
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsAccent/10 text-nepsAccent font-semibold text-xs border border-nepsAccent/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          Baneos / Bloqueos
+        </a>
+        <a href="#" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+          Ajustes
+        </a>
+      </nav>
+    </div>
+
+    <!-- User Logged Foot -->
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">
+          FP
+        </div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Administrator</p>
+        </div>
+      </div>
+      <a href="login.html" title="Cerrar sesión" class="text-nepsMuted hover:text-nepsAccent p-1.5 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+      </a>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <button onclick="document.getElementById('sidebar').classList.toggle('hidden')" class="md:hidden text-nepsMuted hover:text-white p-2">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <!-- Título de la Sección -->
+        <h1 class="text-sm font-bold text-white tracking-tight flex items-center gap-2">
+          <span>Administración de Baneos</span>
+          <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded-full font-semibold border border-nepsAccent/20">US-0011</span>
+        </h1>
+      </div>
+
+      <!-- Botón Principal: Crear Baneo -->
+      <a href="admin-baneos-seleccion-usuario.html" class="bg-nepsAccent text-white hover:bg-rose-600 font-bold text-xs px-3.5 py-2 rounded-xl transition-all shadow-lg shadow-nepsAccent/20 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        <span>Crear Baneo</span>
+      </a>
+    </header>
+
+    <!-- BODY CONTENT -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+
+      <!-- PANEL DE BÚSQUEDA Y FILTROS -->
+      <div class="bg-nepsCard border border-nepsBorder p-4 sm:p-5 rounded-2xl space-y-4 shadow-xl">
+        
+        <!-- Buscador General (Criterio Único con OR implícito) -->
+        <div class="relative w-full">
+          <input type="text" id="searchInput" placeholder="Buscar por nombre, apellido o correo..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-9 pr-4 py-2.5 outline-none transition-colors">
+          <svg class="w-4 h-4 text-nepsMuted absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+
+        <!-- Filtros, Ordenamiento y Fechas Rango -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-xs pt-1 border-t border-nepsBorder/50">
+          
+          <!-- Fecha Desde (Opcional) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-nepsMuted text-[11px] font-medium">Fecha desde:</label>
+            <input type="datetime-local" class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary color-scheme-dark">
+          </div>
+
+          <!-- Fecha Hasta (Opcional) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-nepsMuted text-[11px] font-medium">Fecha hasta:</label>
+            <input type="datetime-local" class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+          </div>
+
+          <!-- Baneos Activos -->
+          <div class="flex flex-col gap-1">
+            <label class="text-nepsMuted text-[11px] font-medium">Baneos activos:</label>
+            <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="">Todos</option>
+              <option value="si">Sí</option>
+              <option value="no">No</option>
+            </select>
+          </div>
+
+          <!-- Ordenar por (Default: Fecha de creación) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-nepsMuted text-[11px] font-medium">Ordenar por:</label>
+            <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="created_at" selected>Fecha</option>
+              <option value="nombre">Nombre</option>
+              <option value="correo">Correo</option>
+              <option value="fecha_desde">Fecha desde</option>
+              <option value="fecha_hasta">Fecha hasta</option>
+            </select>
+          </div>
+
+          <!-- Dirección (Default: Desc) -->
+          <div class="flex flex-col gap-1">
+            <label class="text-nepsMuted text-[11px] font-medium">Dirección:</label>
+            <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+              <option value="asc">Asc</option>
+              <option value="desc" selected>Desc</option>
+            </select>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- BANNER DE FEEDBACK / ERROR O ÉXITO (Opcional - Simulado) -->
+      <div id="toastSuccess" class="hidden bg-emerald-500/10 border border-emerald-500/20 p-3.5 rounded-xl flex items-center justify-between text-xs text-emerald-400">
+        <div class="flex items-center gap-2">
+          <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+          <span>El baneo de <strong>Carlos Rodríguez</strong> ha sido desactivado correctamente.</span>
+        </div>
+        <button onclick="this.parentElement.classList.add('hidden')" class="hover:text-white">&times;</button>
+      </div>
+
+      <!-- GRILLA / TABLA DE BANEOS -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl overflow-hidden shadow-xl">
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-nepsBorder bg-nepsInput/50 text-[11px] uppercase tracking-wider text-nepsMuted font-semibold">
+                <th class="p-4">Usuario</th>
+                <th class="p-4">Fecha Creación</th>
+                <th class="p-4">Vigencia (Desde - Hasta)</th>
+                <th class="p-4">Estado</th>
+                <th class="p-4 text-right">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-nepsBorder text-xs" id="banTableBody">
+              
+              <!-- Fila 1: Baneo Activo Temporal -->
+              <tr class="hover:bg-nepsInput/30 transition-colors">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0">
+                    <div class="min-w-0">
+                      <p class="font-bold text-white truncate">Rodríguez, Carlos</p>
+                      <p class="text-[11px] text-nepsMuted truncate">carlos.rod@hotmail.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4 text-slate-300 font-medium whitespace-nowrap">
+                  25/08/2026 10:15
+                </td>
+                <td class="p-4 text-slate-300 whitespace-nowrap">
+                  <div class="flex flex-col text-[11px]">
+                    <span><strong class="text-nepsMuted">Desde:</strong> 25/08/2026 10:00</span>
+                    <span><strong class="text-nepsMuted">Hasta:</strong> 25/09/2026 10:00</span>
+                  </div>
+                </td>
+                <td class="p-4 whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5 bg-nepsAccent/10 border border-nepsAccent/20 px-2.5 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-nepsAccent animate-pulse"></span>
+                    <span class="text-[10px] font-bold text-nepsAccent uppercase tracking-wide">Activo</span>
+                  </div>
+                </td>
+                <td class="p-4 text-right space-x-1 whitespace-nowrap">
+                  <button class="p-1.5 text-nepsMuted hover:text-nepsPrimary hover:bg-nepsInput rounded-lg transition-colors" title="Ver detalle">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  </button>
+                  <button class="p-1.5 text-nepsMuted hover:text-white hover:bg-nepsInput rounded-lg transition-colors" title="Editar baneo">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </button>
+                  <!-- Botón Desactivar / Eliminar (Gatilla Confirmación) -->
+                  <button onclick="openDeactivateModal('Carlos Rodríguez')" class="p-1.5 text-nepsMuted hover:text-nepsAccent hover:bg-nepsAccent/10 rounded-lg transition-colors" title="Desactivar baneo">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Fila 2: Baneo Permanente Activo -->
+              <tr class="hover:bg-nepsInput/30 transition-colors">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0">
+                    <div class="min-w-0">
+                      <p class="font-bold text-white truncate">Fernández, Lucas</p>
+                      <p class="text-[11px] text-nepsMuted truncate">lfernandez@yahoo.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4 text-slate-300 font-medium whitespace-nowrap">
+                  10/01/2026 14:00
+                </td>
+                <td class="p-4 text-slate-300 whitespace-nowrap">
+                  <div class="flex flex-col text-[11px]">
+                    <span><strong class="text-nepsMuted">Desde:</strong> 10/01/2026 14:00</span>
+                    <span class="text-nepsAccent font-semibold">Permanente (Sin límite)</span>
+                  </div>
+                </td>
+                <td class="p-4 whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5 bg-nepsAccent/10 border border-nepsAccent/20 px-2.5 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-nepsAccent"></span>
+                    <span class="text-[10px] font-bold text-nepsAccent uppercase tracking-wide">Activo (Perm)</span>
+                  </div>
+                </td>
+                <td class="p-4 text-right space-x-1 whitespace-nowrap">
+                  <button class="p-1.5 text-nepsMuted hover:text-nepsPrimary hover:bg-nepsInput rounded-lg transition-colors" title="Ver detalle">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  </button>
+                  <button class="p-1.5 text-nepsMuted hover:text-white hover:bg-nepsInput rounded-lg transition-colors" title="Editar baneo">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </button>
+                  <button onclick="openDeactivateModal('Lucas Fernández')" class="p-1.5 text-nepsMuted hover:text-nepsAccent hover:bg-nepsAccent/10 rounded-lg transition-colors" title="Desactivar baneo">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                  </button>
+                </td>
+              </tr>
+
+              <!-- Fila 3: Baneo Finalizado / Desactivado Lógicamente -->
+              <tr class="hover:bg-nepsInput/30 transition-colors opacity-75">
+                <td class="p-4">
+                  <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" class="w-10 h-10 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0 grayscale">
+                    <div class="min-w-0">
+                      <p class="font-bold text-white truncate">Gómez, Mariana</p>
+                      <p class="text-[11px] text-nepsMuted truncate">marian.gomez@gmail.com</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-4 text-slate-300 font-medium whitespace-nowrap">
+                  01/05/2026 08:30
+                </td>
+                <td class="p-4 text-slate-300 whitespace-nowrap">
+                  <div class="flex flex-col text-[11px]">
+                    <span><strong class="text-nepsMuted">Desde:</strong> 01/05/2026 08:30</span>
+                    <span><strong class="text-nepsMuted">Hasta:</strong> 01/06/2026 08:30</span>
+                  </div>
+                </td>
+                <td class="p-4 whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5 bg-slate-500/10 border border-slate-500/20 px-2.5 py-1 rounded-full">
+                    <span class="w-2 h-2 rounded-full bg-slate-400"></span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Finalizado</span>
+                  </div>
+                </td>
+                <td class="p-4 text-right space-x-1 whitespace-nowrap">
+                  <button class="p-1.5 text-nepsMuted hover:text-nepsPrimary hover:bg-nepsInput rounded-lg transition-colors" title="Ver detalle">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                  </button>
+                  <button class="p-1.5 text-nepsMuted hover:text-white hover:bg-nepsInput rounded-lg transition-colors opacity-50 cursor-not-allowed" title="Editar desactivado" disabled>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  </button>
+                  <button class="p-1.5 text-nepsMuted opacity-30 cursor-not-allowed" disabled title="Ya finalizado">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+                  </button>
+                </td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ESTADO VACÍO / SIN RESULTADOS (Hidden por defecto, alternable mediante JS) -->
+        <div id="emptyState" class="hidden p-12 text-center space-y-3">
+          <div class="w-12 h-12 rounded-full bg-nepsInput border border-nepsBorder flex items-center justify-center mx-auto text-nepsMuted">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+          </div>
+          <h4 class="text-sm font-bold text-white">No se encontraron registros de baneo</h4>
+          <p class="text-xs text-nepsMuted max-w-sm mx-auto">No hay baneos que coincidan con la búsqueda o los filtros aplicados. Intentá ajustar los criterios.</p>
+        </div>
+
+      </div>
+
+      <!-- PAGINADOR UNIFICADO (Default: PageSize 48, Page 1) -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+        
+        <!-- Info de registros -->
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-nepsAccent/60"></span>
+          <span class="text-xs text-nepsMuted font-medium">
+            Mostrando <strong class="text-white">1 - 48</strong> de <strong class="text-white">142</strong> baneos registrados
+          </span>
+        </div>
+
+        <!-- Botonera Unificada -->
+        <div class="flex items-center gap-2">
+          <!-- Navegación Izquierda -->
+          <div class="flex items-center bg-nepsInput border border-nepsBorder rounded-xl p-1 shadow-inner">
+            <!-- Primera Página -->
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled title="Primera página">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+            </button>
+            <!-- Página Anterior -->
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent" disabled title="Página anterior">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+          </div>
+
+          <!-- Selector de Página Editable -->
+          <div class="flex items-center gap-2 bg-nepsInput border border-nepsBorder px-3 py-1 rounded-xl">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-nepsMuted">Pág.</span>
+            <input type="number" min="1" max="3" value="1" class="w-10 text-center bg-nepsBg border border-nepsBorder focus:border-nepsPrimary text-xs font-bold text-nepsPrimary py-1 rounded-md outline-none transition-all shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+            <span class="text-xs text-nepsMuted font-medium">/ 3</span>
+          </div>
+
+          <!-- Navegación Derecha -->
+          <div class="flex items-center bg-nepsInput border border-nepsBorder rounded-xl p-1 shadow-inner">
+            <!-- Página Siguiente -->
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all" title="Página siguiente">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <!-- Última Página -->
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all" title="Última página">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M6 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL DE CONFIRMACIÓN DE DESACTIVACIÓN LÓGICA (ELIMINAR) -->
+  <div id="deactivateModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-200">
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl max-w-md w-full overflow-hidden shadow-2xl transform scale-95 transition-transform duration-200 p-6 space-y-5">
+      
+      <div class="flex items-start gap-4">
+        <div class="w-10 h-10 rounded-xl bg-nepsAccent/10 text-nepsAccent flex items-center justify-center flex-shrink-0 border border-nepsAccent/20">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div>
+          <h3 class="text-sm font-bold text-white">Desactivar Baneo de Usuario</h3>
+          <p class="text-xs text-nepsMuted mt-1">
+            ¿Confirmás la desactivación del baneo activo para <strong id="modalUserName" class="text-white">---</strong>?
+          </p>
+        </div>
+      </div>
+
+      <div class="bg-nepsInput/60 border border-nepsBorder/80 p-3 rounded-xl text-[11px] text-nepsMuted space-y-1">
+        <p class="font-semibold text-slate-300">Aviso sobre esta operación:</p>
+        <p>• Esta acción realiza una <strong>desactivación lógica</strong>. El registro histórico del baneo no se eliminará de la base de datos.</p>
+        <p>• El usuario recuperará el acceso a las funciones restringidas del sistema de inmediato.</p>
+      </div>
+
+      <div class="flex items-center justify-end gap-3 pt-2">
+        <button onclick="closeDeactivateModal()" class="px-4 py-2 bg-nepsInput border border-nepsBorder hover:bg-nepsBorder/50 text-xs font-semibold text-slate-300 rounded-xl transition-colors">
+          Cancelar
+        </button>
+        <button onclick="confirmDeactivate()" class="px-4 py-2 bg-nepsAccent hover:bg-rose-600 text-xs font-bold text-white rounded-xl shadow-lg shadow-nepsAccent/20 transition-all flex items-center gap-1.5">
+          <span>Confirmar Desactivación</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- LÓGICA JAVASCRIPT SIMPLIFICADA DE INTERACCIÓN -->
+  <script>
+    const modal = document.getElementById('deactivateModal');
+    let targetUser = '';
+
+    function openDeactivateModal(userName) {
+      targetUser = userName;
+      document.getElementById('modalUserName').textContent = userName;
+      modal.classList.remove('opacity-0', 'pointer-events-none');
+    }
+
+    function closeDeactivateModal() {
+      modal.classList.add('opacity-0', 'pointer-events-none');
+    }
+
+    function confirmDeactivate() {
+      closeDeactivateModal();
+      const toast = document.getElementById('toastSuccess');
+      toast.classList.remove('hidden');
+      setTimeout(() => toast.classList.add('hidden'), 5000);
+    }
+  </script>
+
+</body>
+</html>

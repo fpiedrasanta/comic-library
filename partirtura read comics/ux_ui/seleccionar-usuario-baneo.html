@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-[#0b0f19]">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seleccionar Usuario para Baneo - NEPS Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            nepsBg: '#0b0f19',
+            nepsCard: '#131a26',
+            nepsInput: '#0d121d',
+            nepsPrimary: '#38bdf8',
+            nepsAccent: '#f43f5e',
+            nepsBorder: '#2d2c33',
+            nepsMuted: '#64748b',
+            nepsText: '#f8fafc'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="h-full text-nepsText antialiased bg-nepsBg font-sans flex flex-col md:flex-row overflow-hidden">
+
+  <!-- SIDEBAR NAVIGATION -->
+  <aside id="sidebar" class="w-full md:w-64 bg-nepsCard border-r border-nepsBorder flex-shrink-0 flex flex-col justify-between hidden md:flex z-30">
+    <div>
+      <div class="h-16 flex items-center px-6 border-b border-nepsBorder gap-2">
+        <div class="text-xl font-bold text-white tracking-tight">&lt;neps<span class="text-nepsAccent">/</span>&gt;</div>
+        <span class="text-[10px] bg-nepsAccent/10 text-nepsAccent px-2 py-0.5 rounded font-bold uppercase tracking-wider border border-nepsAccent/20">Admin</span>
+      </div>
+
+      <nav class="p-4 space-y-1">
+        <p class="px-3 text-[10px] font-bold text-nepsMuted uppercase tracking-wider mb-2">Módulos</p>
+        <a href="admin-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+          General
+        </a>
+        <a href="admin-bans.html" class="flex items-center gap-3 px-3 py-2 rounded-lg bg-nepsAccent/10 text-nepsAccent font-semibold text-xs border border-nepsAccent/20">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+          Baneos & Sanciones
+        </a>
+        <a href="admin-users-dashboard.html" class="flex items-center gap-3 px-3 py-2 rounded-lg text-nepsMuted hover:text-white hover:bg-nepsInput transition-colors text-xs">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+          Usuarios
+        </a>
+      </nav>
+    </div>
+
+    <div class="p-4 border-t border-nepsBorder flex items-center justify-between">
+      <div class="flex items-center gap-2.5 overflow-hidden">
+        <div class="w-8 h-8 rounded-lg bg-nepsPrimary/20 text-nepsPrimary font-bold text-xs flex items-center justify-center flex-shrink-0">FP</div>
+        <div class="truncate">
+          <p class="text-xs font-bold text-white truncate">Federico P.</p>
+          <p class="text-[10px] text-nepsMuted truncate">Super Admin</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ÁREA DE CONTENIDO CENTRAL -->
+  <div class="flex-1 flex flex-col h-full overflow-y-auto">
+    
+    <!-- TOPBAR CON ACCIÓN DE RETORNO Y PASO DE FLUJO -->
+    <header class="h-16 border-b border-nepsBorder bg-nepsBg/90 backdrop-blur-md sticky top-0 z-20 px-4 sm:px-8 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <a href="admin-bans.html" class="flex items-center gap-1.5 text-xs font-semibold text-nepsMuted hover:text-white bg-nepsCard border border-nepsBorder hover:border-nepsMuted px-3 py-1.5 rounded-lg transition-all">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+          <span>Volver a Baneos</span>
+        </a>
+        <div class="h-4 w-px bg-nepsBorder hidden sm:block"></div>
+        <h1 class="text-sm font-bold text-white tracking-tight hidden sm:block">Crear Nuevo Baneo</h1>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] text-nepsPrimary bg-nepsPrimary/10 px-2.5 py-1 rounded-md border border-nepsPrimary/20 font-semibold">
+          Paso 1 de 2: Seleccionar Usuario
+        </span>
+      </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="p-4 sm:p-8 space-y-6 max-w-7xl w-full mx-auto">
+
+      <!-- ENCABEZADO EXPLICATIVO -->
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-nepsBorder/60 pb-4">
+        <div>
+          <h2 class="text-lg font-bold text-white tracking-tight">Selección de Usuario Activo</h2>
+          <p class="text-xs text-nepsMuted mt-0.5">Busca y elige al usuario al que aplicarás el baneo. Los usuarios con sanciones activas se encuentran bloqueados.</p>
+        </div>
+      </div>
+
+      <!-- FILTROS Y BÚSQUEDA -->
+      <div class="bg-nepsCard border border-nepsBorder p-4 rounded-2xl space-y-3">
+        <!-- Buscador Único (Nombre, Apellido, Email) -->
+        <div class="relative w-full">
+          <input type="text" placeholder="Buscar por nombre, apellido o correo..." class="w-full bg-nepsInput border border-nepsBorder focus:border-nepsPrimary text-xs text-white placeholder-slate-500 rounded-xl pl-9 pr-4 py-2.5 outline-none transition-colors">
+          <svg class="w-4 h-4 text-nepsMuted absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        </div>
+
+        <!-- Selector de Ordenamiento -->
+        <div class="flex flex-wrap items-center justify-end gap-3 text-xs">
+          <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+            <div class="flex items-center gap-2">
+              <label class="text-nepsMuted text-[11px] font-medium">Ordenar por:</label>
+              <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+                <option value="fecha_registro" selected>Fecha de registro</option>
+                <option value="nombre">Nombre</option>
+                <option value="apellido">Apellido</option>
+                <option value="email">Correo</option>
+              </select>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <label class="text-nepsMuted text-[11px] font-medium">Dirección:</label>
+              <select class="bg-nepsInput border border-nepsBorder text-xs text-white rounded-lg px-2.5 py-1.5 outline-none focus:border-nepsPrimary">
+                <option value="desc" selected>Desc</option>
+                <option value="asc">Asc</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- GRILLA DE CARDS DE USUARIOS -->
+      <div class="grid grid-cols-1 sm:grid-cols-[repeat(auto-fit,minmax(380px,1fr))] gap-4">
+
+        <!-- CARD 1: USUARIO SELECCIONABLE (Sin Baneo Activo) -->
+        <div data-user-id="1" class="user-card group bg-nepsCard border border-nepsBorder hover:border-nepsPrimary/60 rounded-xl p-4 flex flex-col justify-between space-y-4 transition-all min-w-full sm:min-w-[380px] hover:shadow-lg hover:shadow-nepsPrimary/5">
+          <div class="flex items-center gap-3.5">
+            <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80" class="w-20 h-20 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0 group-hover:border-nepsPrimary/40 transition-colors">
+            <div class="space-y-0.5 min-w-0 flex-1">
+              <p class="text-xs text-nepsMuted font-medium truncate">Nombre completo: <span class="text-white font-bold">Mariana Gómez</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">email: <span class="text-slate-300">marian.gomez@gmail.com</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">Nacionalidad: <span class="text-slate-300">Argentina</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">Fecha de registro: <span class="text-slate-300">14/08/2026 18:32</span></p>
+            </div>
+          </div>
+
+          <div class="border-t border-nepsBorder/60 pt-3 space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-nepsMuted text-[11px]">Cantidad baneos: <strong class="text-white">0</strong></span>
+              
+              <!-- Estado Seleccionable / Sin ban -->
+              <div class="flex items-center gap-1.5 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full" title="Usuario Sin Baneo Vigente">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-[10px] font-bold text-emerald-400 uppercase tracking-wide">Seleccionable</span>
+              </div>
+            </div>
+
+            <!-- Botón Acción Directa -->
+            <a href="admin-bans-create.html?user_id=1" class="w-full flex items-center justify-center gap-2 py-2 px-3 bg-nepsPrimary/10 text-nepsPrimary hover:bg-nepsPrimary hover:text-slate-950 border border-nepsPrimary/30 font-semibold rounded-lg text-xs transition-all">
+              <span>Seleccionar Usuario</span>
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- CARD 2: USUARIO NO SELECCIONABLE (Con Baneo Temporal Activo) -->
+        <div class="user-card opacity-70 bg-nepsCard/60 border border-amber-500/30 rounded-xl p-4 flex flex-col justify-between space-y-4 min-w-full sm:min-w-[380px] relative overflow-hidden">
+          <div class="flex items-center gap-3.5">
+            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=160&q=80" class="w-20 h-20 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0 grayscale-[30%]">
+            <div class="space-y-0.5 min-w-0 flex-1">
+              <p class="text-xs text-nepsMuted font-medium truncate">Nombre completo: <span class="text-slate-200 font-bold">Carlos Rodríguez</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">email: <span class="text-slate-400">carlos.rod@hotmail.com</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">Nacionalidad: <span class="text-slate-400">Chile</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">Fecha de registro: <span class="text-slate-400">02/06/2026 09:15</span></p>
+            </div>
+          </div>
+
+          <div class="border-t border-nepsBorder/60 pt-3 space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-nepsMuted text-[11px]">Cantidad baneos: <strong class="text-amber-400 font-bold">2</strong></span>
+              
+              <!-- Badge Baneo Vigente -->
+              <div class="flex items-center gap-1.5 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-full" title="Usuario posee baneo vigente">
+                <span class="w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="text-[10px] font-bold text-amber-400 uppercase tracking-wide">Temp Ban Activo</span>
+              </div>
+            </div>
+
+            <!-- Botón Deshabilitado con Alerta -->
+            <button disabled title="El usuario ya se encuentra baneado actualmente" class="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-800/80 text-nepsMuted border border-nepsBorder font-medium rounded-lg text-xs cursor-not-allowed">
+              <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span>Baneo Vigente (No seleccionable)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- CARD 3: USUARIO NO SELECCIONABLE (Con Baneo Permanente Activo) -->
+        <div class="user-card opacity-70 bg-nepsCard/60 border border-nepsAccent/30 rounded-xl p-4 flex flex-col justify-between space-y-4 min-w-full sm:min-w-[380px] relative overflow-hidden">
+          <div class="flex items-center gap-3.5">
+            <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=160&q=80" class="w-20 h-20 rounded-xl object-contain bg-nepsInput border border-nepsBorder flex-shrink-0 grayscale-[50%]">
+            <div class="space-y-0.5 min-w-0 flex-1">
+              <p class="text-xs text-nepsMuted font-medium truncate">Nombre completo: <span class="text-slate-200 font-bold">Lucas Fernández</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">email: <span class="text-slate-400">lfernandez@yahoo.com</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">Nacionalidad: <span class="text-slate-400">Uruguay</span></p>
+              <p class="text-xs text-nepsMuted font-medium truncate">Fecha de registro: <span class="text-slate-300">11/01/2025 21:40</span></p>
+            </div>
+          </div>
+
+          <div class="border-t border-nepsBorder/60 pt-3 space-y-3">
+            <div class="flex items-center justify-between text-xs">
+              <span class="text-nepsMuted text-[11px]">Cantidad baneos: <strong class="text-nepsAccent font-bold">5</strong></span>
+              
+              <!-- Badge Perm Ban -->
+              <div class="flex items-center gap-1.5 bg-nepsAccent/10 border border-nepsAccent/20 px-2 py-0.5 rounded-full" title="Baneo Permanente Activo">
+                <span class="w-2 h-2 rounded-full bg-nepsAccent"></span>
+                <span class="text-[10px] font-bold text-nepsAccent uppercase tracking-wide">Perm Ban Activo</span>
+              </div>
+            </div>
+
+            <!-- Botón Deshabilitado con Alerta -->
+            <button disabled class="w-full flex items-center justify-center gap-1.5 py-2 px-3 bg-slate-800/80 text-nepsMuted border border-nepsBorder font-medium rounded-lg text-xs cursor-not-allowed">
+              <svg class="w-3.5 h-3.5 text-nepsAccent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/></svg>
+              <span>Baneo Vigente (No seleccionable)</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- PAGINACIÓN -->
+      <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-4 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-nepsPrimary/60"></span>
+          <span class="text-xs text-nepsMuted font-medium">
+            Mostrando <strong class="text-white">12</strong> de <strong class="text-white">4.120</strong> usuarios activos
+          </span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <div class="flex items-center bg-nepsInput border border-nepsBorder rounded-xl p-1 shadow-inner">
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all disabled:opacity-30" title="Primera página">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/></svg>
+            </button>
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all disabled:opacity-30" title="Página anterior">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+            </button>
+          </div>
+
+          <div class="flex items-center gap-2 bg-nepsInput border border-nepsBorder px-3 py-1 rounded-xl">
+            <span class="text-[11px] font-semibold uppercase tracking-wider text-nepsMuted">Pág.</span>
+            <input type="number" min="1" max="343" value="1" class="w-10 text-center bg-nepsBg border border-nepsBorder focus:border-nepsPrimary text-xs font-bold text-nepsPrimary py-1 rounded-md outline-none transition-all shadow-inner [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+            <span class="text-xs text-nepsMuted font-medium">/ 343</span>
+          </div>
+
+          <div class="flex items-center bg-nepsInput border border-nepsBorder rounded-xl p-1 shadow-inner">
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all" title="Página siguiente">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </button>
+            <button class="p-2 text-nepsMuted hover:text-white hover:bg-nepsCard rounded-lg transition-all" title="Última página">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M6 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- COMPONENTES DE ESTADOS ADICIONALES (Opcional para renderizado condicional en FE) -->
+  <!-- 
+    1. ESTADO DE BUSQUEDA SIN RESULTADOS / LISTADO VACÍO:
+    <div class="bg-nepsCard border border-nepsBorder rounded-2xl p-12 text-center max-w-lg mx-auto space-y-3">
+      <div class="w-12 h-12 rounded-full bg-nepsInput border border-nepsBorder flex items-center justify-center mx-auto text-nepsMuted">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+      </div>
+      <h3 class="text-sm font-bold text-white">No se encontraron usuarios</h3>
+      <p class="text-xs text-nepsMuted">No existen usuarios activos que coincidan con los criterios de búsqueda ingresados.</p>
+    </div>
+
+    2. ESTADO DE ERROR:
+    <div class="bg-nepsAccent/10 border border-nepsAccent/20 rounded-2xl p-6 text-center max-w-md mx-auto space-y-2">
+      <p class="text-xs font-bold text-nepsAccent">Error al cargar la lista de usuarios</p>
+      <p class="text-[11px] text-nepsMuted">Ocurrió un inconveniente al consultar el servidor. Por favor, reintenta la búsqueda.</p>
+    </div>
+  -->
+
+</body>
+</html>
