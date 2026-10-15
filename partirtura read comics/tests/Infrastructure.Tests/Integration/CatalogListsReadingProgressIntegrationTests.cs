@@ -12,6 +12,7 @@ namespace Infrastructure.Tests.Integration;
 [Collection("IntegrationTests")]
 public class CatalogListsReadingProgressIntegrationTests
 {
+    private const long UnknownListId = 9_999_999_999;
     private readonly IntegrationTestFixture _fixture;
 
     public CatalogListsReadingProgressIntegrationTests(IntegrationTestFixture fixture)
@@ -186,6 +187,129 @@ public class CatalogListsReadingProgressIntegrationTests
         }
     }
 
+    [Fact]
+    public async Task Detail_NonexistentList_ThrowsBusinessNotFound()
+    {
+        using var scope = _fixture.ScopeFactory.CreateScope();
+        var service = scope.ServiceProvider.GetRequiredService<IWorkListService>();
+
+        await Assert.ThrowsAsync<Domain.Exceptions.BusinessNotFoundException>(
+            () => service.GetCatalogByIdAsync(UnknownListId, null, default));
+    }
+
+    [Fact]
+    public async Task ListProgress_IsIsolatedBetweenTwoAuthenticatedUsers()
+    {
+        var context = await CreateListWithWorksAsync();
+        try
+        {
+            var secondUser = (await WorkRatingTestSupport.PickActiveUsersAsync(_fixture, 2))[1];
+            await SetProgressAsync(secondUser.Id, context.WorkId1, ReadingState.Completed, 100);
+            await CreateListReadingProgressAsync(context.UserId, context.WorkListId);
+
+            using var scope = _fixture.ScopeFactory.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IWorkListService>();
+
+            var readerDetail = await service.GetCatalogByIdAsync(context.WorkListId, context.UserId, default);
+            var secondDetail = await service.GetCatalogByIdAsync(context.WorkListId, secondUser.Id, default);
+
+            Assert.Null(readerDetail.ReadingProgressPercentage);
+            Assert.Equal(50, secondDetail.ReadingProgressPercentage);
+
+            Assert.Null(WorkById(readerDetail, context.WorkId1).ReadingProgressPercentage);
+            Assert.Null(WorkById(readerDetail, context.WorkId2).ReadingProgressPercentage);
+            Assert.Equal(100, WorkById(secondDetail, context.WorkId1).ReadingProgressPercentage);
+            Assert.Null(WorkById(secondDetail, context.WorkId2).ReadingProgressPercentage);
+        }
+        finally
+        {
+            await CleanupAsync(context);
+        }
+    }
+
+    [Fact]
+    public async Task ListProgress_IgnoresListTrackingRecord_WithoutWorkProgress()
+    {
+        var context = await CreateListWithWorksAsync();
+        try
+        {
+            await CreateListReadingProgressAsync(context.UserId, context.WorkListId);
+
+            using var scope = _fixture.ScopeFactory.CreateScope();
+            var service = scope.ServiceProvider.GetRequiredService<IWorkListService>();
+
+            var detail = await service.GetCatalogByIdAsync(context.WorkListId, context.UserId, default);
+            Assert.Null(detail.ReadingProgressPercentage);
+            Assert.All(detail.Works, work => Assert.Null(work.Work.ReadingProgressPercentage));
+        }
+        finally
+        {
+            await CleanupAsync(context);
+        }
+    }
+
+    [Fact]
+    public async Task ListProgress_RecomputesAfterCompositionChanges()
+    {
+        var context = await CreateListWithWorksAsync();
+        try
+        {
+            await SetProgressAsync(context.UserId, context.WorkId1, ReadingState.Completed, 100);
+            await SetProgressAsync(context.UserId, context.WorkId2, ReadingState.Reading, 40);
+
+            using (var scope = _fixture.ScopeFactory.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IWorkListService>();
+                var before = await service.GetCatalogByIdAsync(context.WorkListId, context.UserId, default);
+                Assert.Equal(50, before.ReadingProgressPercentage);
+            }
+
+            await RemoveWorkFromListAsync(context.WorkListId, context.WorkId2);
+
+            using (var scope = _fixture.ScopeFactory.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IWorkListService>();
+                var after = await service.GetCatalogByIdAsync(context.WorkListId, context.UserId, default);
+                Assert.Equal(1, after.WorkCount);
+                Assert.Equal(100, after.ReadingProgressPercentage);
+            }
+        }
+        finally
+        {
+            await CleanupAsync(context);
+        }
+    }
+
+    private async Task CreateListReadingProgressAsync(long userId, long workListId)
+    {
+        using var scope = _fixture.ScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var user = await dbContext.Users.FirstAsync(existing => existing.Id == userId);
+        var workList = await dbContext.WorkLists.FirstAsync(existing => existing.Id == workListId);
+
+        dbContext.ListReadingProgresses.Add(new Domain.Entities.ListReadingProgress
+        {
+            User = user,
+            WorkList = workList,
+            CurrentWork = null,
+            LastReadAt = DateTimeOffset.UtcNow
+        });
+        await dbContext.SaveChangesAsync();
+    }
+
+    private async Task RemoveWorkFromListAsync(long workListId, long workId)
+    {
+        using var scope = _fixture.ScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var item = await dbContext.WorkListItems.FirstAsync(
+            existing => existing.WorkList != null && existing.WorkList.Id == workListId &&
+                        existing.Work != null && existing.Work.Id == workId);
+        dbContext.WorkListItems.Remove(item);
+        await dbContext.SaveChangesAsync();
+    }
+
     private static CatalogListWorkDto WorkById(CatalogListDetailDto detail, long workId)
     {
         return detail.Works.Single(work => work.Work.Id == workId).Work;
@@ -299,11 +423,15 @@ public class CatalogListsReadingProgressIntegrationTests
         using var scope = _fixture.ScopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
+        var listProgressRows = await dbContext.ListReadingProgresses
+            .Where(progress => progress.WorkList != null && progress.WorkList.Id == context.WorkListId)
+            .ToListAsync();
+        dbContext.ListReadingProgresses.RemoveRange(listProgressRows);
+
         if (context.WorkIds.Count > 0)
         {
             var progressRows = await dbContext.WorkReadingProgresses
-                .Where(progress => progress.User != null && progress.User.Id == context.UserId &&
-                                   progress.Work != null && context.WorkIds.Contains(progress.Work.Id))
+                .Where(progress => progress.Work != null && context.WorkIds.Contains(progress.Work.Id))
                 .ToListAsync();
             dbContext.WorkReadingProgresses.RemoveRange(progressRows);
         }
