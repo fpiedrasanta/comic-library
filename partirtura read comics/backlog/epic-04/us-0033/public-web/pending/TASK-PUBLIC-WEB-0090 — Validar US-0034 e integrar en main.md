@@ -126,3 +126,81 @@ No eliminar la rama de trabajo mientras la integración no se haya verificado co
 - Si se integra, `main` queda validada y publicada en el remoto.
 - La rama de trabajo se elimina únicamente después de verificar una integración exitosa.
 - Los commits, las validaciones y el resultado final quedan documentados en esta task.
+
+---
+
+## Resultado de ejecución
+
+### Estado
+
+**finished.** Integración realizada en `main`.
+
+### Documentación revisada
+
+- `frontend-coding-rules.md`, `frontend-public-web-stack-technology.md`, `public-web-architecture.md`: leídas y aplicadas (nada de la implementación las contradice).
+- `components.md`, `pages.md`, `endpoints.md` → `endpoints/endpoints-catalog.md`: revisados. `components.md` y
+  `pages.md` fueron actualizadas en las tasks 0088 y 0089.
+- `TASK-API-0304` y el resultado de las tasks de API 0301-0306: revisados; el trabajo de API quedó
+  integrado en `main` con anterioridad.
+- `communication.md`: estados y movimientos respetados.
+
+### Validación de implementación
+
+| Comprobación | Resultado |
+|---|---|
+| El listado muestra el avance de la API | OK — `readingProgressPercentage` consumido en `ListCard` |
+| `null` no se presenta como `0 %` | OK — `hasVisibleProgress`; Grep sin resultados de `|| 0` sobre el campo |
+| Promedio y votos sólo con promedio entre 1 y 5 | OK — `hasVisibleRating` (constantes `MIN_RATING`/`MAX_RATING`) |
+| El detalle muestra avance general e individual | OK — `ListHeader` (`ListProgressBlock`) y `ListWorkRow` |
+| Las filas conservan el orden del backend | OK — se itera `list.works` tal cual llega (`WorkListItem.Position`); sin sort local |
+| Drag & drop deshabilitado para listas de sistema | OK — sin `draggable`, `dragstart`, `onDrop`, ni tirador renderizado |
+| El botón de lectura muestra Leer/Continuar según el avance | OK — `resolveAction` sobre el porcentaje |
+| Sin funcionalidad de listas personales | OK — sólo se tocó el listado y el detalle de listas de sistema |
+| Sin endpoints inventados ni lógica duplicada | OK — se reutiliza `useCatalogLists`/`useCatalogListDetail`, `ProtectedImage`, `StarRatingDisplay` y el helper compartido |
+| Responsive | OK — rejilla 2/3/4/5 columnas en el listado; filas con `truncate`, texto oculto en móvil y badge que apila |
+
+Hallazgo: la task decía "cada fila ofrece acceso al lector existente", pero su sección "Acceso al lector"
+dice "Todavía no hacer nada, sólo mostrar el botón" y "las obras no acceden al lector tampoco, no son
+navegables". Se siguió la regla explícita: los botones se muestran y **no navegan**, documentado en el
+código. No es un workaround ni un bloqueo: es la funcionalidad pendiente, cuyo contrato falta
+(`currentIdWork`), y conectarla es trivial cuando exista.
+
+### Pruebas
+
+No hay pruebas E2E ni unitarias configuradas para el Public Web (el único script del `package.json` es
+`typecheck`). Las validaciones ejecutadas y sus resultados reales:
+
+```
+npm run typecheck   → sin errores
+npm run build       → built in 8.66s (warnings preexistentes de chunking)
+```
+
+Verificaciones estáticas adicionales sobre el árbol integrado:
+
+- `types/lists.ts`: los tres campos nuevos presentes en `CatalogListCardDto`, `CatalogListWorkDto` y
+  `CatalogListDetailDto`.
+- `list-detail-page.tsx` / `list-work-row.tsx`: sin `draggable`, `dragstart`, `onDrop`, `useNavigate` ni
+  `navigate(`.
+- `list-detail-page.tsx`: sin `WorkCard` ni `ResultsGrid`.
+- `list-detail-page.tsx:60`: `key={item.work.id}` (clave estable, no índice).
+
+No se ejecutó validación contra el backend real: la API está integrada y verificada por sus propias
+tasks, pero la comprobación visual con datos del usuario autenticado quedó pendiente en 0088 y 0089.
+
+### Integración en main
+
+Commits integrados desde `feature/us-0034-app-list-reading-and-ratings`:
+
+```
+3ace8bb US-0034: show reading progress and rating on system list cards (TASK-PUBLIC-WEB-0088)
+c517bf0 US-0034: system list detail as rows with reading progress and rating (TASK-PUBLIC-WEB-0089)
+a26eba6 US-0034: move public-web tasks 0088-0089 to finished with execution results
+36b3a89 US-0034: integrate app list reading progress and ratings (public-web)  ← merge --no-ff
+```
+
+Secuencia ejecutada: rama creada desde `main` (`git pull` ya estaba al día) → implementación en dos
+commits con su verificación entre ambos → `git push -u` de la rama → `git switch main` →
+`git pull --ff-only` → `git merge --no-ff` (sin conflictos, estrategia `ort`) → verificación de
+`typecheck` y `build` sobre `main` fusionado.
+
+Una vez publicados `main` y borrada la rama, este registro queda como constancia del resultado.
