@@ -60,18 +60,21 @@ only in which parent pills a card carries, and that travels in the data.
 | `useRecommendedWorks` | `features/catalog/hooks/use-recommended-works.ts` | `useQuery` over `GET /api/works/recommended` with the selected criterion in the query key. `staleTime: 0` because the set changes as soon as the user starts reading a work. |
 | `getRecommendedWorks` | `features/catalog/api/recommended-works-repository.ts` | `GET /api/works/recommended` (`sortBy`). |
 
-## Public Web lists components (TASK-PUBLIC-WEB-0070)
+## Public Web lists components (TASK-PUBLIC-WEB-0070, updated TASK-PUBLIC-WEB-0088, TASK-PUBLIC-WEB-0089)
 
 `/lists` and `/lists/:id` reuse the catalog pieces that apply
-(autocomplete, search, WorkCard, states) and add the list-specific
-ones.
+(autocomplete, search, states) and add the list-specific ones. The
+`WorkCard` grid of the detail was replaced by rows: a list row is a
+reading position, not a catalog card.
 
 | Component | Location | Role |
 |-----------|----------|------|
 | `ListsPage` | `features/catalog/pages/lists-page.tsx` | The `/lists` exploration: heading, search, the four filters, count, card grid, infinite scroll and the loading/empty/error states. |
-| `ListDetailPage` / `ListRoutePage` | `features/catalog/pages/{list-detail,list-route}-page.tsx` | The `/lists/:id` detail: `ListHeader` plus the works of the list with the existing `WorkCard`, in list order. The route page resolves the `:id`. |
-| `ListCard` | `features/catalog/components/list-card.tsx` | One list: vertical cover (`aspect-[2/3]`, `object-cover`, no padding) with the list color as top accent, type pill, name and work count. The whole card links to the detail. |
-| `ListHeader` | `features/catalog/components/list-header.tsx` | The detail header: vertical cover, type pill, name, description, work count, accent bar and glow in the list color. Loading, not-found and error shells. |
+| `ListDetailPage` / `ListRoutePage` | `features/catalog/pages/{list-detail,list-route}-page.tsx` | The `/lists/:id` detail: `ListHeader` plus the works of the list as rows, in the order the backend delivers (`WorkListItem.Position`). No work filter, search, sorting or reordering. The route page resolves the `:id`. |
+| `ListWorkRow` | `features/catalog/components/list-work-row.tsx` | One work of a list as a row: order number, cover thumbnail, title, publisher and number, its reading progress (bar and percentage, only when the API returns one) and the reading action of that work. The row does not navigate and cannot be reordered. |
+| `ListCard` | `features/catalog/components/list-card.tsx` | One list: vertical cover (`aspect-[2/3]`, `object-cover`, no padding) with the list color as top accent, type pill, name and work count. It also shows the rating (only when the average is a valid score, 1-5) and the reading progress of the authenticated user (never shown as `0%` when there is no progress). The whole card links to the detail. |
+| `ListHeader` | `features/catalog/components/list-header.tsx` | The detail header: vertical cover, type pill, name, description, work count, accent bar and glow in the list color. It adds the list progress block with its reading action (only when the API returns a percentage) and the rating (only when the average is a valid score). Loading, not-found and error shells. |
+| `listMetrics` | `features/catalog/utils/list-metrics.ts` | `hasVisibleRating` (average inside the valid star range) and `hasVisibleProgress` (`null` progress is not `0`), so the list card, the header and the rows all tell the two cases apart the same way. |
 | `ListCardSkeleton` / `ListCardSkeletonGrid` | `features/catalog/components/list-card-skeleton.tsx` | First-paint placeholders mirroring the real card structure. |
 | `useCatalogLists` | `features/catalog/hooks/use-catalog-lists.ts` | `useInfiniteQuery` for `GET /api/catalog/lists`; every filter is part of the query key, so a filter change restarts at page 1. |
 | `useCatalogListDetail` | `features/catalog/hooks/use-list-detail.ts` | `useEntityDetail` for `GET /api/catalog/lists/{id}`; a 404 is reported apart from a real error. |

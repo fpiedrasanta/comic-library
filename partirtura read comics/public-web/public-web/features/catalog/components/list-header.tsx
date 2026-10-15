@@ -4,12 +4,30 @@ import {
   readableBackgroundColor,
   readablePillTextColor,
 } from '../utils/entity-color'
+import { StarRatingDisplay } from './star-rating-display'
+import { hasVisibleProgress, hasVisibleRating } from '../utils/list-metrics'
 import type { CatalogListDetailDto } from '../types/lists'
 
 const CARD_SURFACE = '#131a26'
 const PILL_BACKGROUND_ALPHA = 0.85
 const PILL_BORDER_ALPHA = 0.3
 const GLOW_ALPHA = 0.15
+const FULL_PERCENTAGE = 100
+
+/** Reading action of the whole list, driven by the list progress the API returns. */
+type ListReadingAction = 'read' | 'continue' | 'restart'
+
+const ACTION_LABELS: Record<ListReadingAction, string> = {
+  read: 'Leer',
+  continue: 'Continuar leyendo',
+  restart: 'Recomenzar',
+}
+
+function resolveAction(percentage: number | null): ListReadingAction {
+  if (percentage === null) return 'read'
+  if (percentage >= FULL_PERCENTAGE) return 'restart'
+  return 'continue'
+}
 
 interface ListHeaderProps {
   list: CatalogListDetailDto | null
@@ -33,6 +51,11 @@ function Shell({ children }: { children: React.ReactNode }) {
  * padding, rounded — and the list color accents the bar, the glow
  * and the type pill. The description only exists here: the card of
  * the listing deliberately leaves it out.
+ *
+ * It also carries the reading state of the list: the progress block
+ * with its reading action (only when the API returns a percentage)
+ * and the rating, which is shown only when the average is a valid
+ * score.
  */
 export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps) {
   if (isLoading) {
@@ -139,7 +162,15 @@ export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps
             </p>
           )}
 
-          <div className="pt-4 border-t border-neps-border/60 flex items-center justify-center md:justify-start gap-6 text-xs text-neps-muted">
+          {hasVisibleProgress(list.readingProgressPercentage) ? (
+            <ListProgressBlock percentage={list.readingProgressPercentage} />
+          ) : (
+            <div className="flex justify-center md:justify-start">
+              <ListReadingButton action={resolveAction(list.readingProgressPercentage)} />
+            </div>
+          )}
+
+          <div className="pt-4 border-t border-neps-border/60 flex flex-wrap items-center justify-center md:justify-start gap-6 text-xs text-neps-muted">
             <div className="flex items-center gap-2">
               <div className="w-8 h-8 rounded-xl bg-neps-input border border-neps-border flex items-center justify-center text-slate-300">
                 <svg
@@ -165,8 +196,76 @@ export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps
                 </span>
               </div>
             </div>
+
+            {hasVisibleRating(list.averageRating) && (
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-xl bg-neps-input border border-neps-border flex items-center justify-center text-amber-400">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                  </svg>
+                </div>
+                <div>
+                  <span className="block text-[10px] uppercase font-mono tracking-wider text-neps-muted">
+                    Valoración
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <StarRatingDisplay averageRating={list.averageRating} size={13} showValue />
+                    <span className="text-sm font-bold text-white">
+                      · {list.ratingCount} {list.ratingCount === 1 ? 'voto' : 'votos'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+function ListReadingButton({ action }: { action: ListReadingAction }) {
+  return (
+    <button
+      type="button"
+      // The reading action of a list has no destination yet: resuming needs to
+      // know which work of the list to open (`currentIdWork`), which the API does
+      // not expose. Until then the button only states the action, as decided in
+      // TASK-PUBLIC-WEB-0089.
+      className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition-colors shadow-lg shadow-emerald-500/10"
+    >
+      <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden>
+        <path d="M8 5v14l11-7z" />
+      </svg>
+      {ACTION_LABELS[action]}
+    </button>
+  )
+}
+
+/**
+ * Progress of the list, with the action that resumes it. The percentage comes
+ * from the API: it is never recalculated, and a `null` never reaches this block
+ * because there is nothing to report about the progress in that case.
+ */
+function ListProgressBlock({ percentage }: { percentage: number }) {
+  const action = resolveAction(percentage)
+
+  return (
+    <div className="bg-neps-input/60 border border-neps-border/80 rounded-xl p-3.5 space-y-3">
+      <div className="flex items-center justify-between text-xs">
+        <span className="text-neps-muted font-medium">Avance de la lista</span>
+        <span className="text-emerald-400 font-bold font-mono">{percentage}%</span>
+      </div>
+
+      <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+        <div
+          className="h-full bg-emerald-500 rounded-full transition-all duration-300"
+          style={{ width: `${percentage}%` }}
+        />
+      </div>
+
+      <div className="flex items-center justify-center md:justify-end pt-1">
+        <ListReadingButton action={action} />
       </div>
     </div>
   )

@@ -53,6 +53,12 @@ export interface CatalogListWorkDto {
   numberValue: string | null
   /** When the work was uploaded. */
   createdAt: string
+  /**
+   * Reading progress of the authenticated user for this work, or `null` when the
+   * user never opened it. Only the stored percentage travels: the reader keeps its
+   * own position, so there is no current page or total here.
+   */
+  readingProgressPercentage: number | null
 }
 
 export interface CatalogListWorkItemDto {
@@ -69,6 +75,15 @@ export interface CatalogListDetailDto {
   color: string | null
   urlCover: string | null
   workCount: number
+  /**
+   * Percentage of the works of the list the authenticated user has completed.
+   * `0` for an empty list and `null` when the user has no progress on any of its
+   * works, so the two cases must be told apart and never turned into a value.
+   */
+  readingProgressPercentage: number | null
+  /** List average rating, `null` when `ratingCount` is 0. */
+  averageRating: number | null
+  ratingCount: number
   /** Ordered by `WorkListItem.Position`, as defined by the list. */
   works: CatalogListWorkItemDto[]
 }
