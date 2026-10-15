@@ -142,7 +142,7 @@ export function EntityListingPage<T extends { id: number }>({
             Mostrando <span className="font-bold text-white">{totalCount}</span> elementos registrados
           </p>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4 sm:gap-5">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5">
             {cards.map((card) => (
               <EntityCard key={card.id} card={card} />
             ))}
