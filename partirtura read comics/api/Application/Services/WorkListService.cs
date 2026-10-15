@@ -174,6 +174,7 @@ public class WorkListService : IWorkListService
 
     public async Task<ListResponse<CatalogListCardDto>> GetCatalogPagedAsync(
         GetCatalogListsRequest request,
+        long? userId = null,
         CancellationToken cancellationToken = default)
     {
         var currentPage = request.currentPage;
@@ -182,6 +183,7 @@ public class WorkListService : IWorkListService
         ValidateOrdering(request.orderBy, request.orderDir);
 
         var (workLists, totalCount) = await _unitOfWork.WorkListRepository.GetCatalogPagedAsync(
+            userId,
             currentPage,
             pageSize,
             request.search,
@@ -197,7 +199,7 @@ public class WorkListService : IWorkListService
         return PaginationGuard.Build(currentPage, pageSize, totalCount, items);
     }
 
-    public async Task<CatalogListDetailDto> GetCatalogByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<CatalogListDetailDto> GetCatalogByIdAsync(long id, long? userId = null, CancellationToken cancellationToken = default)
     {
         var workList = await _unitOfWork.WorkListRepository.GetCatalogByIdAsync(id, cancellationToken);
         if (workList is null)
@@ -205,7 +207,25 @@ public class WorkListService : IWorkListService
             throw new BusinessNotFoundException(WorkListNotFound);
         }
 
-        return ToCatalogDetailDto(workList);
+        var progressByWorkId = await GetReadingProgressByWorkIdAsync(workList, userId, cancellationToken);
+        return ToCatalogDetailDto(workList, progressByWorkId);
+    }
+
+    private async Task<Dictionary<long, WorkReadingProgress>> GetReadingProgressByWorkIdAsync(
+        WorkList workList,
+        long? userId,
+        CancellationToken cancellationToken)
+    {
+        if (userId is null || userId.Value <= 0)
+        {
+            return new Dictionary<long, WorkReadingProgress>();
+        }
+
+        var workIds = workList.WorkListItems.Select(workItem => workItem.Work.Id).ToList();
+        var progressRecords = await _unitOfWork.WorkReadingProgressRepository
+            .GetByWorkIdsAndUserIdAsync(workIds, userId.Value, cancellationToken);
+
+        return progressRecords.ToDictionary(progress => progress.Work!.Id);
     }
 
     private async Task<ListType> GetActiveListTypeAsync(long listTypeId, CancellationToken cancellationToken)
@@ -565,8 +585,10 @@ public class WorkListService : IWorkListService
             work.IsActive);
     }
 
-    private static CatalogListCardDto ToCatalogCardDto(WorkList workList)
+    private static CatalogListCardDto ToCatalogCardDto(WorkListCardData workListData)
     {
+        var workList = workListData.WorkList;
+
         return new CatalogListCardDto(
             workList.Id,
             workList.Name,
@@ -574,14 +596,22 @@ public class WorkListService : IWorkListService
             workList.ListType.Name,
             workList.Color,
             ImageUrlBuilder.ToUrl(workList.Cover),
-            workList.WorkListItems.Count);
+            workListData.WorkCount,
+            workListData.ReadingProgressPercentage,
+            workListData.AverageRating,
+            workList.RatingCount);
     }
 
-    private static CatalogListDetailDto ToCatalogDetailDto(WorkList workList)
+    private static CatalogListDetailDto ToCatalogDetailDto(
+        WorkList workList,
+        Dictionary<long, WorkReadingProgress> progressByWorkId)
     {
-        var works = workList.WorkListItems
+        var orderedItems = workList.WorkListItems
             .OrderBy(workItem => workItem.Position)
-            .Select(ToCatalogWorkItemDto)
+            .ToList();
+
+        var works = orderedItems
+            .Select(workItem => ToCatalogWorkItemDto(workItem, progressByWorkId))
             .ToList();
 
         return new CatalogListDetailDto(
@@ -593,12 +623,41 @@ public class WorkListService : IWorkListService
             workList.Color,
             ImageUrlBuilder.ToUrl(workList.Cover),
             works.Count,
+            CalculateListReadingProgress(orderedItems, progressByWorkId),
+            workList.RatingCount == 0 ? null : workList.AverageRating,
+            workList.RatingCount,
             works);
     }
 
-    private static CatalogListWorkItemDto ToCatalogWorkItemDto(WorkListItem workItem)
+    private static int? CalculateListReadingProgress(
+        IReadOnlyList<WorkListItem> orderedItems,
+        Dictionary<long, WorkReadingProgress> progressByWorkId)
+    {
+        var totalWorks = orderedItems.Count;
+        if (totalWorks == 0)
+        {
+            return 0;
+        }
+
+        var hasAnyProgress = orderedItems.Any(workItem => progressByWorkId.ContainsKey(workItem.Work.Id));
+        if (!hasAnyProgress)
+        {
+            return null;
+        }
+
+        var completedWorks = orderedItems.Count(workItem =>
+            progressByWorkId.TryGetValue(workItem.Work.Id, out var progress) &&
+            progress.State == ReadingState.Completed);
+
+        return completedWorks * 100 / totalWorks;
+    }
+
+    private static CatalogListWorkItemDto ToCatalogWorkItemDto(
+        WorkListItem workItem,
+        Dictionary<long, WorkReadingProgress> progressByWorkId)
     {
         var work = workItem.Work;
+        progressByWorkId.TryGetValue(work.Id, out var progress);
         return new CatalogListWorkItemDto(
             workItem.Position,
             new CatalogListWorkDto(
@@ -619,7 +678,8 @@ public class WorkListService : IWorkListService
                 work.WorkType?.Id,
                 work.WorkType?.Name,
                 work.NumberValue,
-                work.CreatedAt));
+                work.CreatedAt,
+                progress?.PercentageReading));
     }
 
     private static WorkCatalogNodeDto? MapPublisherNode(Work work)

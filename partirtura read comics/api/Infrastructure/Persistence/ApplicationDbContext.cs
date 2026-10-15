@@ -30,6 +30,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Domain.Entities.WorkListItem> WorkListItems => Set<Domain.Entities.WorkListItem>();
     public DbSet<Domain.Entities.WorkReadingProgress> WorkReadingProgresses => Set<Domain.Entities.WorkReadingProgress>();
     public DbSet<Domain.Entities.WorkRating> WorkRatings => Set<Domain.Entities.WorkRating>();
+    public DbSet<Domain.Entities.ListRating> ListRatings => Set<Domain.Entities.ListRating>();
+    public DbSet<Domain.Entities.ListReadingProgress> ListReadingProgresses => Set<Domain.Entities.ListReadingProgress>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,5 +74,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfiguration(new WorkListItemConfiguration());
         modelBuilder.ApplyConfiguration(new WorkReadingProgressConfiguration());
         modelBuilder.ApplyConfiguration(new WorkRatingConfiguration());
+        modelBuilder.ApplyConfiguration(new ListRatingConfiguration());
+        modelBuilder.ApplyConfiguration(new ListReadingProgressConfiguration());
     }
 }

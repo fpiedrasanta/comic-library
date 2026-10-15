@@ -94,11 +94,17 @@ Task<(IReadOnlyList<TEntity>, int)> GetCatalogPagedAsync(int currentPage, int pa
 - **Location**: `Infrastructure/Repositories/WorkListRepository.cs`
 - **Operations**: 
   - `GetPagedAsync` (official `System` lists only; search by list name, work title, and work number; filters by franchise, publisher, list type, active state, and UTC creation range; ordering by name or creation date; pagination)
-  - `GetCatalogPagedAsync` (public catalog query: active `System` lists only, partial `LIKE` search across Name and Description, hierarchical publisher/franchise/series filters, optional listTypeId filter, ordering by name or creation date with Id tie-breaker, pagination)
-  - `GetCatalogByIdAsync` (fully loaded detail with WorkListItems ordered by Position, including Work, WorkType, Series.Franchise.Publisher, Franchise.Publisher, Publisher, and Work.Cover; `AsSplitQuery` + `AsNoTracking`)
+  - `GetCatalogPagedAsync` (public catalog query: active `System` lists only, partial `LIKE` search across Name and Description, hierarchical publisher/franchise/series filters, optional listTypeId filter, ordering by name or creation date with Id tie-breaker, pagination. Added 2026-10 for US-0034: accepts the optional `long? userId` of the authenticated reader as the first parameter and projects, in the same SQL statement, `WorkCount` (`WorkListItems.Count`), `ReadingProgressPercentage`, and `AverageRating`. See "WorkList catalog reading progress" below.)
+  - `GetCatalogByIdAsync` (fully loaded detail with WorkListItems ordered by Position, including Work, WorkType, Series.Franchise.Publisher, Franchise.Publisher, Publisher, and Work.Cover; `AsSplitQuery` + `AsNoTracking`. For US-0034 the per-Work reading progress is resolved by the Service through the batched `IWorkReadingProgressRepository.GetByWorkIdsAndUserIdAsync`, so this query is unchanged.)
   - `GetByIdAsync` (fully loaded edit detail ordered by `Position`)
   - `GetByNameAsync`, `AddAsync`, `UpdateAsync`
 - **Notes**: `AsNoTracking` for all reads. The paged query includes `ListType` and `Cover` to avoid N+1 access and returns the cover metadata needed by the application. The detail query includes `Work`, `Franchise`, `Publisher`, `Series`, and work cover relationships with `AsSplitQuery`. WorkListItems are managed through the aggregate navigation by Application; no physical deletion is performed. **Indexes**: `Name`, `ListTypeId`, `CoverId`, `OwnerId`, `Visibility`, `IsActive`, `(WorkListId, WorkId)` unique, `(WorkListId, Position)` unique, plus the owner check constraint.
+
+### WorkList catalog reading progress (US-0034)
+
+- **Where**: inside the `GetCatalogPagedAsync` projection, so the whole page is resolved in a single SQL statement plus the pagination `COUNT`. No N+1.
+- **`ReadingProgressPercentage`**: computed with a nested conditional that EF Core translates to `CASE WHEN` over correlated subqueries against `WorkReadingProgresses`. Rules: an empty list returns `0`; if the reader has no `WorkReadingProgress` for any Work of the list it returns `null`; otherwise it is `completedWorks * 100 / totalWorks`, where `completedWorks` counts the list items whose Work has a `WorkReadingProgress` in `ReadingState.Completed` for that user. When `userId` is `null` the equality never matches, so the result is `null` for anonymous readers.
+- **`AverageRating` / `RatingCount`**: read from the persisted `WorkList` accumulators. When `RatingCount == 0` the exposed average is `null`. `ListRating` rows are never queried to recompute them.
 
 ## WorkRepository
 

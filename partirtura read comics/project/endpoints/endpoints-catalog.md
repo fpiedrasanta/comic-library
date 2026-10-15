@@ -292,10 +292,13 @@ Response:
                   "id": 5,
                   "name": "Orden de lectura X-Men",
                   "listTypeId": 2,
-                  "listTypeName": "Cronológica",
+                  "listTypeName": "CronolÃ³gica",
                   "color": "#1B3A6B",
                   "urlCover": "/images/123",
-                  "workCount": 15
+                  "workCount": 15,
+                  "readingProgressPercentage": 20,
+                  "averageRating": 4.5,
+                  "ratingCount": 8
               }
           ]
       }
@@ -306,7 +309,7 @@ Response Type:
 `ApiResponse<ListResponse<CatalogListCardDto>>`
 
 DTO:
-`Application/DTOs/CatalogListDtos.cs` — `CatalogListCardDto` (Id, Name, ListTypeId, ListTypeName, Color, UrlCover, WorkCount).
+`Application/DTOs/CatalogListDtos.cs` â€” `CatalogListCardDto` (Id, Name, ListTypeId, ListTypeName, Color, UrlCover, WorkCount, ReadingProgressPercentage, AverageRating, RatingCount).
 
 Notes:
 - `urlCover` is `null` when the list has no cover image. It is a relative path built with `ImageUrlBuilder.ToUrl`.
@@ -318,6 +321,8 @@ Notes:
 - Pagination uses `PaginationGuard.CatalogCardDefaultPageSize` (24) and `CatalogCardMaxPageSize` (36).
 - Administrative data is never exposed: no `isActive`, `ownerType`, `ownerUserId`, `visibility`, `createdAt`, or storage information.
 - Read-only. No side effects.
+- `readingProgressPercentage` (US-0034, authenticated reader): the percentage of works of the list the current user has completed, computed in SQL as `completedWorks * 100 / totalWorks` using `ReadingState.Completed`. An empty list returns `0`; when the user has no reading progress for any work of the list it is `null`. `null` is also returned when the `sub` claim is missing or cannot be parsed.
+- `averageRating` / `ratingCount` (US-0034): the accumulators persisted on `WorkList`. When `ratingCount` is `0`, `averageRating` is `null`. Individual ratings are never queried to recompute them.
 
 ## GET /api/catalog/lists/{id}
 
@@ -352,6 +357,9 @@ Response:
           "color": "#1B3A6B",
           "urlCover": "/images/123",
           "workCount": 15,
+          "readingProgressPercentage": 20,
+          "averageRating": 4.5,
+          "ratingCount": 8,
           "works": [
               {
                   "position": 1,
@@ -373,7 +381,8 @@ Response:
                       "workTypeId": 1,
                       "workTypeName": "Número",
                       "numberValue": "1",
-                      "createdAt": "2024-01-15T10:30:00Z"
+                      "createdAt": "2024-01-15T10:30:00Z",
+                      "readingProgressPercentage": 40
                   }
               }
           ]
@@ -386,16 +395,19 @@ Response Type:
 `ApiResponse<CatalogListDetailDto>`
 
 DTO:
-`Application/DTOs/CatalogListDtos.cs` — `CatalogListDetailDto` (Id, Name, ListTypeId, ListTypeName, Description, Color, UrlCover, WorkCount, Works) with `Works` as `IReadOnlyList<CatalogListWorkItemDto>` (Position, Work). `CatalogListWorkDto` exposes all fields needed to render the existing WorkCard: Id, Title, Description, Publisher (Id, Name, Color), Franchise (Id, Name, Color), Series (Id, Name, Color), PublicationDate, UrlCover, WorkType (Id, Name), NumberValue, CreatedAt.
+`Application/DTOs/CatalogListDtos.cs` â€” `CatalogListDetailDto` (Id, Name, ListTypeId, ListTypeName, Description, Color, UrlCover, WorkCount, ReadingProgressPercentage, AverageRating, RatingCount, Works) with `Works` as `IReadOnlyList<CatalogListWorkItemDto>` (Position, Work). `CatalogListWorkDto` exposes all fields needed to render the existing WorkCard: Id, Title, Description, Publisher (Id, Name, Color), Franchise (Id, Name, Color), Series (Id, Name, Color), PublicationDate, UrlCover, WorkType (Id, Name), NumberValue, CreatedAt, ReadingProgressPercentage.
 
 Notes:
 - Works are returned ordered by `WorkListItem.Position` (the order defined by the list). No client-side sorting or filtering is applied.
 - The endpoint loads the full work graph needed for WorkCard in a single query with `AsSplitQuery`: Work, WorkType, Series.Franchise.Publisher, Franchise.Publisher, Publisher, and Work.Cover.
 - No N+1 queries: all relationships required for WorkCard are eager-loaded.
-- Colors are populated from the entity color, resolving the parent chain when the work does not have the level directly: PublisherColor comes from Work.Publisher → Work.Franchise?.Publisher → Work.Series?.Franchise?.Publisher; FranchiseColor from Work.Franchise → Work.Series?.Franchise; SeriesColor from Work.Series.
+- Colors are populated from the entity color, resolving the parent chain when the work does not have the level directly: PublisherColor comes from Work.Publisher â†’ Work.Franchise?.Publisher â†’ Work.Series?.Franchise?.Publisher; FranchiseColor from Work.Franchise â†’ Work.Series?.Franchise; SeriesColor from Work.Series.
 - If the list exists but is inactive or not owned by System, returns 404 (same message as non-existent, so existence of a deactivated list is not disclosed).
 - Administrative data is never exposed: no `ownerType`, `ownerUserId`, `visibility`, `isActive`, `createdAt`.
 - Read-only. No side effects.
+- List-level `readingProgressPercentage` (US-0034, authenticated reader): `completedWorks * 100 / totalWorks` using `ReadingState.Completed`. An empty list returns `0`; when the user has no reading progress for any work of the list it is `null`.
+- List-level `averageRating` / `ratingCount` (US-0034): accumulators persisted on `WorkList`. When `ratingCount` is `0`, `averageRating` is `null`.
+- Per-work `readingProgressPercentage` (US-0034, authenticated reader): the stored `WorkReadingProgress.PercentageReading` of the current user for that work, or `null` when the user has no progress record for it. The list and per-work progress are read through a single batched query (`IWorkReadingProgressRepository.GetByWorkIdsAndUserIdAsync`), never one query per work.
 
 ---
 

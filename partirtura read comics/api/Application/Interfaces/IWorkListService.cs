@@ -11,6 +11,6 @@ public interface IWorkListService
     Task<WorkListDetailDto> UpdateAsync(long id, UpdateWorkListRequest request, CancellationToken cancellationToken = default);
     Task DeactivateAsync(long id, CancellationToken cancellationToken = default);
     Task ActivateAsync(long id, CancellationToken cancellationToken = default);
-    Task<ListResponse<CatalogListCardDto>> GetCatalogPagedAsync(GetCatalogListsRequest request, CancellationToken cancellationToken = default);
-    Task<CatalogListDetailDto> GetCatalogByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<ListResponse<CatalogListCardDto>> GetCatalogPagedAsync(GetCatalogListsRequest request, long? userId = null, CancellationToken cancellationToken = default);
+    Task<CatalogListDetailDto> GetCatalogByIdAsync(long id, long? userId = null, CancellationToken cancellationToken = default);
 }

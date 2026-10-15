@@ -1,4 +1,4 @@
-# Domain entities — Index
+﻿# Domain entities â€” Index
 
 Domain entities are simple C# classes in `Domain/Entities/`. There is **no common base class**. Each entity declares its own `Id`, `CreatedAt`, and optionally `IsActive` properties directly.
 
@@ -9,7 +9,7 @@ Domain entities are simple C# classes in `Domain/Entities/`. There is **no commo
 | `domain/domain-overview.md` | Model structure, common patterns, inheritance, key conventions |
 | `domain/domain-users.md` | User, Ban, RefreshToken, PasswordResetToken, PasswordResetAuthorization, AccountDeletionToken |
 | `domain/domain-catalog.md` | Country, Publisher, Image, File, Franchise, Series, Language, Person, Role, PersonByRole, Tag, TagByWork, WorkList, WorkListItem |
-| `domain/domain-content.md` | Work, Number, GraphicNovel, Page, Work hierarchy, WorkReadingProgress, WorkRating |
+| `domain/domain-content.md` | Work, Page, Work hierarchy, WorkReadingProgress, WorkRating, ListRating, ListReadingProgress |
 
 ## Entity relationship summary
 
@@ -42,6 +42,8 @@ graph LR
     WorkType["WorkType"]
     WorkRating["WorkRating"]
     WorkReadingProgress["WorkReadingProgress"]
+    ListRating["ListRating"]
+    ListReadingProgress["ListReadingProgress"]
     
     User --> Ban
     User --> RefreshToken
@@ -52,6 +54,8 @@ graph LR
     User --> WorkList
     User --> WorkRating
     User --> WorkReadingProgress
+    User --> ListRating
+    User --> ListReadingProgress
     
     Country --> Publisher
     Publisher --> Franchise
@@ -83,6 +87,11 @@ graph LR
     Page --> Image
     Work --> WorkRating
     Work --> WorkReadingProgress
+    Work --> ListRating
+    Work --> ListReadingProgress
+    WorkList --> ListRating
+    WorkList --> ListReadingProgress
+    ListReadingProgress -->|"CurrentWork"| Work
     
     File <|-- Image
 ```
@@ -113,19 +122,24 @@ graph LR
 | `Work` | `WorkRating` | One-to-many (one rating per User) |
 | `User` | `WorkReadingProgress` | One-to-many (one progress per Work) |
 | `Work` | `WorkReadingProgress` | One-to-many (one progress per User) |
+| `User` | `ListRating` | One-to-many (one rating per WorkList) |
+| `WorkList` | `ListRating` | One-to-many (one rating per User) |
+| `User` | `ListReadingProgress` | One-to-many (one progress per WorkList) |
+| `WorkList` | `ListReadingProgress` | One-to-many (one progress per User) |
+| `ListReadingProgress` | `Work` (CurrentWork) | Many-to-one, optional; must belong to the list |
 | `File` (abstract) | `Image` | TPH inheritance (discriminator `FileType`) |
 
 ## Audit note (2026-09)
 
 The previous version of this document listed fields that the model does not have:
 
-- `Number.Number` — wrong. The field is `NumberValue` (free-form string).
-- `Person.IsFeatured` — does not exist.
-- `Role.Type` — does not exist. Roles are a free-form taxonomy.
-- `Image.OwnerEntityType` / `OwnerEntityId` — does not exist. The model uses a single `Files` table with a discriminator (`File` / `Image`) and a `Type` enum.
-- `Country.IsFeatured` — does not exist.
-- `BaseEntity` / `BaseEntityActivation` — do not exist. There is no common base class. Each entity declares its own `Id`, `CreatedAt`, and optionally `IsActive` directly.
-- `BaseEntity.DeletedAt` — does not exist. Deactivation uses `IsActive` where applicable.
+- `Number.Number` â€” wrong. The field is `NumberValue` (free-form string).
+- `Person.IsFeatured` â€” does not exist.
+- `Role.Type` â€” does not exist. Roles are a free-form taxonomy.
+- `Image.OwnerEntityType` / `OwnerEntityId` â€” does not exist. The model uses a single `Files` table with a discriminator (`File` / `Image`) and a `Type` enum.
+- `Country.IsFeatured` â€” does not exist.
+- `BaseEntity` / `BaseEntityActivation` â€” do not exist. There is no common base class. Each entity declares its own `Id`, `CreatedAt`, and optionally `IsActive` directly.
+- `BaseEntity.DeletedAt` â€” does not exist. Deactivation uses `IsActive` where applicable.
 
 These corrections were validated by re-reading the entity files during the 2026-09 audit.
 
@@ -133,8 +147,8 @@ These corrections were validated by re-reading the entity files during the 2026-
 
 The relationship summary and diagram were updated after re-reading the entities:
 
-- `Number` and `GraphicNovel` — **no longer exist**. `Work` is a single non-abstract entity with `NumberValue` (free-form string) and `WorkType` (classification only). The `Work <|-- Number` / `Work <|-- GraphicNovel` TPH inheritance and their relationships were removed.
-- `WorkReadingProgress` was missing from the diagram and from the key relationships (`User` ↔ `WorkReadingProgress`, `Work` ↔ `WorkReadingProgress`).
+- `Number` and `GraphicNovel` â€” **no longer exist**. `Work` is a single non-abstract entity with `NumberValue` (free-form string) and `WorkType` (classification only). The `Work <|-- Number` / `Work <|-- GraphicNovel` TPH inheritance and their relationships were removed.
+- `WorkReadingProgress` was missing from the diagram and from the key relationships (`User` â†” `WorkReadingProgress`, `Work` â†” `WorkReadingProgress`).
 - `ListType`, `WorkList` and `WorkListItem` nodes were missing from the diagram (their edges were already present).
-- `WorkType` and the `Work` → `Series` / `Franchise` / `Publisher` editorial context relationships were added.
-- The only TPH inheritance in the model is `File` → `Image` (discriminator `FileType`).
+- `WorkType` and the `Work` â†’ `Series` / `Franchise` / `Publisher` editorial context relationships were added.
+- The only TPH inheritance in the model is `File` â†’ `Image` (discriminator `FileType`).
