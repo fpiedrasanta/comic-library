@@ -203,4 +203,14 @@ commits con su verificación entre ambos → `git push -u` de la rama → `git s
 `git pull --ff-only` → `git merge --no-ff` (sin conflictos, estrategia `ort`) → verificación de
 `typecheck` y `build` sobre `main` fusionado.
 
-Una vez publicados `main` y borrada la rama, este registro queda como constancia del resultado.
+### Estado final de la integración
+
+- `main` == `origin/main` (`0 0`), working tree limpio.
+- Commits posteriores al merge en `main`: `ccf9911` (registro de esta task) y `cd2ed61` (movimiento de
+  esta task a `finished/`).
+- Rama `feature/us-0034-app-list-reading-and-ratings` borrada **local y remotamente**, después de
+  comprobar que estaba fusionada en `main` (`git branch --merged main`).
+- Sólo queda `main`, con seguimiento de `origin/main`.
+
+Las tres tasks de Public Web de esta US (`0088`, `0089`, `0090`) quedaron en
+`backlog/epic-04/us-0033/public-web/finished/`.
