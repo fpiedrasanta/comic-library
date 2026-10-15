@@ -5,6 +5,7 @@ import {
   readableBackgroundColor,
   readablePillTextColor,
 } from '../utils/entity-color'
+import { hasVisibleProgress, hasVisibleRating } from '../utils/list-metrics'
 import type { CatalogListCardDto } from '../types/lists'
 
 const CARD_SURFACE = '#131a26'
@@ -21,6 +22,11 @@ const ACCENT_ALPHA = 0.7
  * accent. The whole card is a link to the list detail; there are
  * no nested links, so the link wraps the card instead of being
  * stretched over it.
+ *
+ * Below the title it carries the list metrics the API already
+ * returns: the rating (only when the average is a valid score) and
+ * the reading progress of the authenticated user (never shown as
+ * `0%` when there is no progress at all).
  */
 export function ListCard({ list }: { list: CatalogListCardDto }) {
   const vars = list.color
@@ -113,6 +119,31 @@ export function ListCard({ list }: { list: CatalogListCardDto }) {
           </svg>
           {list.workCount} {list.workCount === 1 ? 'obra' : 'obras'}
         </p>
+
+        {hasVisibleRating(list.averageRating) && (
+          <p className="text-[11px] font-medium text-amber-400 flex items-center gap-1.5">
+            <span aria-hidden>★</span>
+            {list.averageRating.toFixed(1)}
+            <span className="text-neps-muted">
+              · {list.ratingCount} {list.ratingCount === 1 ? 'voto' : 'votos'}
+            </span>
+          </p>
+        )}
+
+        {hasVisibleProgress(list.readingProgressPercentage) && (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-[10px] text-neps-muted">
+              <span>Tu avance</span>
+              <span className="font-mono font-bold text-emerald-400">{list.readingProgressPercentage}%</span>
+            </div>
+            <div className="w-full h-1.5 bg-neps-input border border-neps-border rounded-full overflow-hidden">
+              <div
+                className="h-full bg-emerald-500 rounded-full"
+                style={{ width: `${list.readingProgressPercentage}%` }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </Link>
   )
