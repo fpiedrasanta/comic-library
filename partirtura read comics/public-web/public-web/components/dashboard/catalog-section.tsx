@@ -68,7 +68,7 @@ export default function CatalogSection({
     <section className="space-y-4" id="catalog">
       <SectionHeading sortBy={sortBy} onSortChange={onSortChange} />
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-5">
         {works.map((work) => (
           <RecommendedWorkCard key={work.id} work={work} averageRating={work.averageRating} />
         ))}
