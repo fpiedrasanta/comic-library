@@ -17,6 +17,15 @@ export interface CatalogListCardDto {
   /** Null when the list has no cover image. */
   urlCover: string | null
   workCount: number
+  /**
+   * Percentage of the works of the list the authenticated user has completed.
+   * `0` for an empty list and `null` when the user has no progress on any of its
+   * works, so the two cases must be told apart and never turned into a value.
+   */
+  readingProgressPercentage: number | null
+  /** List average rating, `null` when `ratingCount` is 0. */
+  averageRating: number | null
+  ratingCount: number
 }
 
 /**
