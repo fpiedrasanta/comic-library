@@ -91,3 +91,48 @@ La API y los contratos existentes son la fuente funcional. No inventar endpoints
 - `components.md` y `pages.md` se revisaron y se actualizaron si correspondía.
 - Las validaciones disponibles se ejecutaron y sus resultados quedaron documentados.
 - Los cambios están committeados y publicados en la rama de trabajo.
+
+---
+
+## Resultado de ejecución
+
+### Estado
+
+**finished.** Rama de trabajo `feature/us-0034-app-list-reading-and-ratings`, commit `3ace8bb`.
+
+### Implementado
+
+- `features/catalog/types/lists.ts`: `CatalogListCardDto` gana `readingProgressPercentage`,
+  `averageRating` y `ratingCount`. El backend ya los devuelve (TASK-API-0304), así que no hubo cambios
+  de repositorio ni de consulta.
+- `features/catalog/components/list-card.tsx`: debajo del conteo de obras se agregan las dos métricas.
+  - **Avance**: barra + `{porcentaje}%`, sólo cuando la API devuelve un valor.
+  - **Valoración**: `★ {promedio} · {n} votos`, sólo cuando el promedio está entre 1 y 5.
+- `features/catalog/utils/list-metrics.ts` (nuevo): `hasVisibleRating` (rango válido 1-5) y
+  `hasVisibleProgress` (`null` no es `0`), compartidos con el detalle y las filas.
+
+### Decisiones
+
+- **Nada recalculado**: los valores se muestran tal cual vienen de la API. `null` de progreso oculta la
+  barra; `0` la muestra al 0%. Un promedio de 0, `null` o fuera de rango oculta la valoración.
+- **Ubicación de cada métrica**: el avance en el pié de la tarjeta (junto a la cantidad de obras) y la
+  valoración como línea con estrella. Las `WorkCard` no muestran valoración, así que no había criterio
+  visual previo que reutilizar; se usó el mismo lenguaje de badge `★ X.X` que `RecommendedWorkCard`,
+  con el texto de votos al lado.
+- El color de la barra es el de la maqueta nueva de esta US (esmeralda), no la rama ámbar→naranja que
+  usa la barra de avance de `WorkCard`. Queda anotado para uniformarlo si se decide.
+
+### Archivos modificados
+
+- `public-web/public-web/features/catalog/types/lists.ts`
+- `public-web/public-web/features/catalog/components/list-card.tsx`
+- `public-web/public-web/features/catalog/utils/list-metrics.ts` (nuevo)
+- `project/components.md` (sección de listas)
+- `project/pages.md` (fila `Lists`)
+
+### Verificación
+
+- `npm run typecheck`: sin errores.
+- `npm run build`: sin errores (warnings preexistentes de chunking).
+- No hay script de lint configurado.
+- Pendiente validación visual contra el endpoint real.

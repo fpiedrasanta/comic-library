@@ -130,3 +130,64 @@ La vista debe adaptarse a Mobile, Tablet y Desktop sin perder:
 - `components.md` y `pages.md` se revisaron y se actualizaron si correspondía.
 - Las validaciones disponibles se ejecutaron y sus resultados quedaron documentados.
 - Los cambios están committeados y publicados en la rama de trabajo.
+
+---
+
+## Resultado de ejecución
+
+### Estado
+
+**finished.** Rama de trabajo `feature/us-0034-app-list-reading-and-ratings`, commit `c517bf0`.
+
+### Implementado
+
+1. **Tipos** (`features/catalog/types/lists.ts`): `CatalogListWorkDto` gana `readingProgressPercentage`
+   y `CatalogListDetailDto` gana `readingProgressPercentage`, `averageRating` y `ratingCount`.
+2. **Encabezado** (`features/catalog/components/list-header.tsx`): bloque "Avance de la lista" con el
+   porcentaje, la barra y la acción de lectura (**Leer / Continuar leyendo / Recomenzar**, derivada del
+   porcentaje de la lista), más la valoración de la lista (`StarRatingDisplay` + `n votos`) junto a la
+   cantidad de obras. La valoración sólo se muestra si el promedio está entre 1 y 5; el bloque de avance
+   sólo si la API devuelve un porcentaje.
+3. **Filas** (`features/catalog/components/list-work-row.tsx`, nuevo reutilizable): número de orden,
+   miniatura de portada (`ProtectedImage`), título, editorial y número, barra + porcentaje del avance
+   individual y la acción de lectura de esa obra (**Leer / Continuar / Recomenzar**).
+4. **Página** (`features/catalog/pages/list-detail-page.tsx`): las obras pasan de la grilla de
+   `WorkCard` a filas, en el orden del backend. Se eliminaron el mapeo a `WorkCatalogItemDto`,
+   `ResultsGrid` y el `handleSelectEntity`, que ya no aplican a una fila no navegable.
+
+### Decisiones
+
+- **Filas y no la grilla de la maqueta anterior**: la task pide filas y el humano confirmó el template
+  nuevo `ux_ui/nueva-lista.html`. El encabezado sigue ese template.
+- **Sin drag & drop**: no se renderiza el tirador, no hay `draggable`, el badge dice **Orden de lectura**
+  y se eliminó el hint "arrastra para reordenar". El orden es siempre el del backend.
+- **Las filas no navegan** (ni al lector ni al detalle de la obra) y los botones de lectura todavía no
+  hacen nada. La task dice "Todavía no hacer nada, sólo mostrar el botón" y "las obras no acceden al
+  lector tampoco, no son navegables", y el humano aclaró que retomar necesita `currentIdWork`, que la
+  API aún no expone. Queda anotado en el código con comentarios.
+  ⚠️ Esto contradice el criterio "cada fila ofrece acceso al lector existente": se siguió la regla
+  explícita de la sección "Acceso al lector". Conectar la navegación es un cambio de una línea por botón
+  cuando el contrato traiga el dato.
+- **Sin "N de M obras completadas"**: el contrato da `workCount` y el porcentaje, pero no el conteo de
+  completadas, así que no se muestra ni se deriva.
+- **Sin "• 32 páginas"** en la fila: el contrato no trae páginas por obra. La línea muestra editorial y
+  número cuando existe.
+- **Progreso `null`**: no se muestra ni barra ni porcentaje. `0` se muestra como `0%` (con el porcentaje
+  en gris, como la maqueta).
+- **Colores**: se siguió la maqueta nueva (esmeralda) en el bloque de avance y las filas.
+
+### Archivos modificados
+
+- `public-web/public-web/features/catalog/types/lists.ts`
+- `public-web/public-web/features/catalog/components/list-header.tsx`
+- `public-web/public-web/features/catalog/components/list-work-row.tsx` (nuevo)
+- `public-web/public-web/features/catalog/pages/list-detail-page.tsx` (reescrita)
+- `project/components.md` (sección de listas)
+- `project/pages.md` (filas `List`)
+
+### Verificación
+
+- `npm run typecheck`: sin errores.
+- `npm run build`: sin errores (warnings preexistentes de chunking).
+- No hay script de lint configurado.
+- Pendiente validación visual contra el endpoint real.
