@@ -87,3 +87,30 @@ Leer y revisar:
 6. Crear uno o más commits y realizar el push de los cambios a la rama de trabajo.
 7. Incorporar el resultado de ejecución en esta misma task mediante **append**, sin sobrescribir su contenido previo.
 8. Mover el archivo según `communication.md` a `finished` si se cumplen los criterios, o a `blocked` si existe un bloqueo real, documentando la causa y el trabajo pendiente.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- `GET /api/catalog/lists/{id}` ahora expone `currentWorkId` (long|null) en el contrato `CatalogListDetailDto`.
+- Resolución del Work actual según US-0035 (solo en lectura):
+  - Si `ListReadingProgress` existe y `CurrentWork` pertenece a la lista → se devuelve.
+  - Si el progreso no existe, `CurrentWork` es nulo / no pertenece a la lista / no se resuelve → fallback al primer `WorkListItem` ordenado por `Position`.
+  - Lista sin Works → `currentWorkId: null`.
+
+**Qué se cambió**:
+- `api/Application/DTOs/CatalogListDetailDto.cs`: agregado `currentWorkId`.
+- `api/Application/Services/WorkListService.cs` (`GetCatalogByIdAsync`): resolución read-only de `CurrentWorkId`.
+- Repositorios reutilizados: `IListReadingProgressRepository` / `ListReadingProgressRepository` (GetByUserIdAndListIdAsync); registrados en `IUnitOfWork` y `UnitOfWork` en `Infrastructure/Repositories`.
+- `CurrentWorkId` es FK a la entidad `Work`; la resolución compara `CurrentWorkId` contra los `WorkListItem.WorkId` de la lista (no persiste el fallback).
+
+**Decisiones relevantes**:
+- No se modificó el dominio ni la base de datos.
+- `CurrentWork` se resuelve como lectura derivada: el fallback al primer work por `Position` no persiste ningún cambio (no se crea/actualiza `ListReadingProgress`).
+- `userId` resuelto exclusivamente del claim `sub` (auth obligatoria).
+- `Work` y `WorkListItem` cargados eager (projection/Include) para evitar N+1.
+
+**Notas**:
+- Validaciones: build 0 errores; suite `tests/Infrastructure.Tests` 389/389 pass (incluye `WorkListReaderIntegrationTests` con cases de `CurrentWorkId`).
+- Integrado en `main` (commit `19596f5`, fast-forward; branch `feature/us-0035-api-sequential-list-reading` integrada y borrada).
