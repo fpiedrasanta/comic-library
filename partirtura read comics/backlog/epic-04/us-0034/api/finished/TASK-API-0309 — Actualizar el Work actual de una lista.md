@@ -94,3 +94,28 @@ Crear:
 6. Crear uno o más commits y realizar el push de los cambios a la rama de trabajo.
 7. Incorporar el resultado de ejecución en esta misma task mediante **append**, sin sobrescribir su contenido previo.
 8. Mover el archivo según `communication.md` a `finished` si se cumplen los criterios, o a `blocked` si existe un bloqueo real, documentando la causa y el trabajo pendiente.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Endpoint `PUT /api/reading/lists/{listId}/current-work` (controller `ListReaderController`) que registra el Work al que el usuario cambia dentro de una lista.
+- Operation `WorkListService.SetCurrentWorkAsync(listId, workId, userId)` que realiza un upsert de `ListReadingProgress` (setea `CurrentWorkId` y `LastReadAt`) dentro de una transacción.
+
+**Qué se cambió**:
+- `api/Api/Controllers/ListReaderController.cs`: endpoint + validaciones 404 (lista/work/inexistencia o work que no pertenece a la lista).
+- `api/Application/Services/WorkListService.cs` (`SetCurrentWorkAsync`) + `IWorkListService.cs`.
+- `api/Application/DTOs/SetListCurrentWorkRequest.cs`: contrato de entrada `workId`.
+- `IListReadingProgressRepository`/`ListReadingProgressRepository` ampliados con upsert de `ListReadingProgress`; registrados en `IUnitOfWork`/`UnitOfWork` (`Infrastructure/Repositories`).
+- `endpoints.md`, `services.md`, `repositories.md` actualizados (ruta/verbo/contratos/errores).
+
+**Decisiones relevantes**:
+- `userId` resuelto exclusivamente del claim `sub` (auth obligatoria).
+- No se persiste ni modifica `WorkReadingProgress`, `CurrentPage`/`TotalPages`/`PercentageReading`/`State` de la lista: el cambio de Work no altera el progreso de páginas ni el %.
+- Transaccional con mecanismo existiente (`IDbContextTransaction`).
+
+**Notas**:
+- Validaciones: build 0 errores; `WorkListReaderIntegrationTests.SetCurrentWork_*` cubren upsert, `CurrentWork`/`LastReadAt`, 404 work-not-in-list, inmutabilidad de page-progress y percentage.
+- Suite `tests/Infrastructure.Tests` 389/389 pass.
+- Integrado en `main` (commit `77c8c73`, fast-forward; branch `feature/us-0035-api-sequential-list-reading` integrada y borrada).

@@ -98,3 +98,30 @@ Crear el endpoint de valoración de listas siguiendo las convenciones de rutas, 
 6. Crear uno o más commits y realizar el push de los cambios a la rama de trabajo.
 7. Incorporar el resultado de ejecución en esta misma task mediante **append**, sin sobrescribir su contenido previo.
 8. Mover el archivo según `communication.md` a `finished` si se cumplen los criterios, o a `blocked` si existe un bloqueo real, documentando la causa y el trabajo pendiente.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de acaceptación verificados.
+
+**Qué se implementó**:
+- Endpoints de valoración de lista reusando el patrón de Works: `POST /api/catalog/lists/{listId}/ratings` (create) y `PUT /api/catalog/lists/{listId}/ratings` (update), sobre la entidad `ListRating` existente.
+- Service `ListRatingService.CreateOrUpdateAsync(listId, stars, review, userId)`: upsert in-place (create/reactive/edit) con unique index `WorkListId + UserId` → nunca dos ratings activos del mismo usuario para la lista.
+
+**Qué se cambió**:
+- `api/Api/Controllers/ListRatingsController.cs`.
+- `api/Application/Services/ListRatingService.cs` + `IListRatingService.cs`.
+- `api/Application/DTOs/ListRatingDtos.cs`, `SetListRatingRequest.cs` (stars 1..5, review opcional).
+- `IListRatingRepository`/`ListRatingRepository` (get-by-user-and-list + upsert); registrados en `IUnitOfWork`/`UnitOfWork`.
+- Raw-SQL accumulators update de `WorkList.AverageRating` (double) y `WorkList.RatingCount` (int): increment/decrement según IsActive y delta anterior al editar (no duplicar count).
+- `Program.cs`: registro DI. `endpoints.md`, `services.md`, `repositories.md` sincronizados.
+
+**Decisiones relevantes**:
+- Rango de estrellas 1..5 (lists) vs 0..5 (works); `Review` opcional/nullable.
+- `RatingCount` no se incrementa al editar; al reemplazar/unreactivar se considera el rating anterior (delta) para el promedio → agregados consistentes.
+- Transaccionalidad + consistencia bajo concurrencia (test de concurrencia WorkRatingConcurrencyIntegrationTests como referencia del patrón).
+- `userId` de claim `sub`.
+
+**Notas**:
+- Validaciones: build 0 errores; `ListRatingIntegrationTests` (5 casos: first vote, edit, reactivate, range rejection, multi-user accumulators) pass.
+- Suite `tests/Infrastructure.Tests` 389/389 pass.
+- Integrado en `main` (commit `77c8c73`, fast-forward; branch feature integrada y borrada).

@@ -109,3 +109,29 @@ Leer y revisar:
 6. Crear uno o más commits y realizar el push de los cambios a la rama de trabajo.
 7. Incorporar el resultado de ejecución en esta misma task mediante **append**, sin sobrescribir su contenido previo.
 8. Mover el archivo según `communication.md` a `finished` si se cumplen los criterios, o a `blocked` si existe un bloqueo real, documentando la causa y el trabajo pendiente.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Tests de integración reusando los fixtures/utilidades existentes (`IntegrationTestFixture`, `DatabaseFixture`, `WorkRatingTestSupport`).
+- `WorkListReaderIntegrationTests` (10 tests) para 0307/0308/0309: `currentWorkId` en list-detail, fallback a primer work por `Position`, lista vacía → null, reader context ordering/por usuario/por work, pertenencia 404, inmutabilidad de page-progress/percentage.
+- `ListRatingIntegrationTests` (5 tests, incluidos en `ListRatingIntegrationTests.cs`) para 0310: create, edit reactiva, reactivate inactive, range 1..5 rejection, multi-user accumulators consistency.
+- Corrección adicional: reescritura seed-independent de `WorkCardAverageRatingIntegrationTests`, `RecommendedWorksIntegrationTests` y `WorkDetailReadingProgressIntegrationTests` (crean su dataset controlado de works/pages/images/ratings/reading-progress y lo limpian) para eliminar dependencia del seed dev `TASK-API-0299`.
+
+**Qué se cambió**:
+- `tests/Infrastructure.Tests/Integration/WorkListReaderIntegrationTests.cs` (new), `WorkListTestSupport.cs` (new).
+- `tests/Infrastructure.Tests/Integration/ListRatingIntegrationTests.cs` (new).
+- `tests/Infrastructure.Tests/Integration/WorkCardAverageRatingIntegrationTests.cs`, `RecommendedWorksIntegrationTests.cs`, `WorkDetailReadingProgressIntegrationTests.cs` (rewritten idempotent).
+- `CatalogControllerContractTests.cs` actualizado (currentWorkId en contract).
+
+**Decisiones relevantes**:
+- Priorizados tests de integración para HTTP + persistencia (reusando fixtures), consistente con el proyecto.
+- No se cambió lógica de producción a favor de los tests; los seed-dependent tests se reescribieron para crear/limpiar su propio dataset (`CleanUpWorkWithPagesAsync`, `PickActiveUsersAsync`).
+- Se verificó que el fallback de `CurrentWork` no persiste (test de inmutabilidad incluido).
+
+**Notas**:
+- `dotnet test tests/Infrastructure.Tests/Infrastructure.Tests.csproj`: **389/389 pass** en DB fresh (migraciones + seed limpio).
+- Build 0 errores.
+- Commits: tests incluidos en `93f4904` (0308) y corrección seed-independent en `19596f5`; integrados en `main` (ff).

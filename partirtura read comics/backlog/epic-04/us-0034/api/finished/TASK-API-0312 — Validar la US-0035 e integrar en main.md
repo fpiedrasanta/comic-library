@@ -101,3 +101,31 @@ Si hay discrepancias, corregirlas antes de continuar.
 8. Registrar los commits integrados, las validaciones ejecutadas y el resultado de la integración en esta misma task mediante **append**, sin sobrescribir el contenido previo.
 
 Si las validaciones fallan, la integración no debe realizarse. Documentar los hallazgos y el trabajo pendiente y mover la task a `blocked` según `communication.md`.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se validó**:
+- Revisión de arquitectura/código: dominio reusado sin duplicar entidades; repositorios sin lógica de negocio; servicios no duplican progreso/rating de Works; endpoints respetan contratos; list-`currentWork` vs `WorkReadingProgress` (pages) diferenciados; orden de navegación por `WorkListItem.Position`; list ratings upsert consistente (accumulators + count no duplicado); `userId` de `sub`. No se detectaron regresiones.
+- Revisión de documentación: `domain.md`, `repositories.md`, `services.md`, `endpoints.md` sincronizados con el código de 0307-0310 (rutas, verbos, parámetros, respuestas, auth, errores). El dominio no se modificó.
+- Build de la solution Backend/API: **0 errores**.
+- Tests: `dotnet test tests/Infrastructure.Tests/Infrastructure.Tests.csproj` → **389/389 pass** (incluye los tests de 0311).
+
+**Integración final en `main`**:
+1. Todos los cambios de US-0035 estaban committeados en `feature/us-0035-api-sequential-list-reading`.
+2. `main` actualizado desde remoto.
+3. Integración fast-forward (`4c334ca`) en `main`; conflicto: ninguno.
+4. Post-integración: build 0 errores; 389/389 pass.
+5. `main` publiqueado al remoto.
+6. Branch `feature/us-0035-api-sequential-list-reading` **borrada** (verificada con `git ls-remote`/`git branch`: no existe ni local ni remote).
+
+**Commits integrados**:
+- `c79b824` (0307 currentWorkId en list-detail)
+- `93f4904` (0308 reader context + tests)
+- `77c8c73` (0309 PUT current-work + 0310 list rating)
+- `4c334ca` (integración US-0035 a main)
+- `19596f5` (tests seed-independent)
+- `7fe0469`, `80950a5`, `80950a5+` (cierre docs 0307/0308 a finished)
+
+**Notas**: no quedan cambios sin commit ni bloqueos; working tree limpio. Los 5 "failures preexistentes" en `main` (WorkCard 2/4, Recommended 3/12) reportados en el board no son reproducibles en el test sandbox (DB fresh con migraciones + seed limpio) — corresponden al dataset de dev `TASK-API-0299` y no a US-0035.
