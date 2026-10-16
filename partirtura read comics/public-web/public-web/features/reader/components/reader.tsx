@@ -348,6 +348,10 @@ export function Reader({ workId }: ReaderProps) {
 
     const handleMouseDown = (e: MouseEvent) => {
       if (e.button !== 0) return
+      const target = e.target as HTMLElement
+      // No interferir con el foco de inputs/textarea del formulario de rating:
+      // preventDefault() en mousedown bloquea el enfoque del elemento.
+      if (target.closest('textarea, input, select, button')) return
       e.preventDefault()
       pointerMovedRef.current = false
       dragStartRef.current = {
