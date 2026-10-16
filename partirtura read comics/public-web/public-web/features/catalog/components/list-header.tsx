@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { ProtectedImage } from '@/components/protected-image'
 import {
   colorWithAlpha,
@@ -163,10 +164,18 @@ export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps
           )}
 
           {hasVisibleProgress(list.readingProgressPercentage) ? (
-            <ListProgressBlock percentage={list.readingProgressPercentage} />
+            <ListProgressBlock
+              percentage={list.readingProgressPercentage}
+              listId={list.id}
+              currentWorkId={list.currentWorkId ?? null}
+            />
           ) : (
             <div className="flex justify-center md:justify-start">
-              <ListReadingButton action={resolveAction(list.readingProgressPercentage)} />
+              <ListReadingButton
+                action={resolveAction(list.readingProgressPercentage)}
+                listId={list.id}
+                currentWorkId={list.currentWorkId ?? null}
+              />
             </div>
           )}
 
@@ -224,15 +233,27 @@ export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps
   )
 }
 
-function ListReadingButton({ action }: { action: ListReadingAction }) {
+function ListReadingButton({ action, listId, currentWorkId }: {
+  action: ListReadingAction
+  listId: number
+  currentWorkId: number | null
+}) {
+  const navigate = useNavigate()
+  const disabled = currentWorkId === null
+
   return (
     <button
       type="button"
-      // The reading action of a list has no destination yet: resuming needs to
-      // know which work of the list to open (`currentIdWork`), which the API does
-      // not expose. Until then the button only states the action, as decided in
-      // TASK-PUBLIC-WEB-0089.
-      className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg transition-colors shadow-lg shadow-emerald-500/10"
+      disabled={disabled}
+      onClick={() => {
+        if (currentWorkId) navigate(`/lists/${listId}/work/${currentWorkId}`)
+      }}
+      className={`inline-flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg transition-colors shadow-lg shadow-emerald-500/10 ${
+        disabled
+          ? 'bg-slate-700/40 text-slate-500 cursor-not-allowed'
+          : 'bg-emerald-500 hover:bg-emerald-400 text-slate-950'
+      }`}
+      aria-label={disabled ? `${ACTION_LABELS[action]} (no hay obra actual)` : ACTION_LABELS[action]}
     >
       <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24" aria-hidden>
         <path d="M8 5v14l11-7z" />
@@ -247,7 +268,11 @@ function ListReadingButton({ action }: { action: ListReadingAction }) {
  * from the API: it is never recalculated, and a `null` never reaches this block
  * because there is nothing to report about the progress in that case.
  */
-function ListProgressBlock({ percentage }: { percentage: number }) {
+function ListProgressBlock({ percentage, listId, currentWorkId }: {
+  percentage: number
+  listId: number
+  currentWorkId: number | null
+}) {
   const action = resolveAction(percentage)
 
   return (
@@ -265,7 +290,7 @@ function ListProgressBlock({ percentage }: { percentage: number }) {
       </div>
 
       <div className="flex items-center justify-center md:justify-end pt-1">
-        <ListReadingButton action={action} />
+        <ListReadingButton action={action} listId={listId} currentWorkId={currentWorkId} />
       </div>
     </div>
   )
