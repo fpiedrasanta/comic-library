@@ -35,6 +35,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const dragStartRef = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null)
   const pointerMovedRef = useRef(false)
+  const previousWorkIdRef = useRef<number>(workId)
 
   const navigate = useNavigate()
   const { data, isLoading, error, isFetching } = useListReaderContext(listId, workId)
@@ -96,7 +97,13 @@ export function ListReader({ listId, workId }: ListReaderProps) {
     setIsTransitioning(false)
     setViewState('normal')
     setPageError(null)
-  }, [workId])
+    // Persistir el Work actual al cambiar de work (incluido el primer render),
+    // de modo que al volver a abrir la lista se reanude en el último Work.
+    if (workId !== previousWorkIdRef.current) {
+      previousWorkIdRef.current = workId
+      void setCurrentWork.mutateAsync(workId)
+    }
+  }, [workId, setCurrentWork])
 
   useEffect(() => {
     if (!data || initialized) return
@@ -214,14 +221,6 @@ export function ListReader({ listId, workId }: ListReaderProps) {
     setImageReady(true)
     setIsTransitioning(false)
   }, [userZoom])
-
-  useEffect(() => {
-    if (!data || initialized) return
-    const normalized = normalizeCurrentPage(backendCurrentPage, totalPages)
-    setCurrentPageIndex(normalized)
-    persistCurrentPage(normalized)
-    setInitialized(true)
-  }, [data, initialized, backendCurrentPage, totalPages, normalizeCurrentPage, persistCurrentPage])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -479,6 +478,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
         onToggleFullscreen={toggleFullscreen}
         onZoomIn={() => adjustZoom(ZOOM_STEP)}
         onZoomOut={() => adjustZoom(-ZOOM_STEP)}
+        returnPath={`/lists/${listId}`}
       />
 
       <main
@@ -550,20 +550,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
                   onSaved={() => {}}
                 />
               ) : (
-                <>
-                  <div className="flex items-center justify-between mb-3">
-                    <RatingForm key={workId} workId={workId} myRating={resolvedRating} onClose={handleRatingClose} />
-                    {nextWorkItem && (
-                      <button
-                        type="button"
-                        onClick={() => navigateToWork(nextWorkItem.work.id)}
-                        className="px-4 py-2 rounded-lg bg-neps-primary text-neps-bg text-xs font-semibold hover:bg-neps-primary/90 transition disabled:opacity-50"
-                      >
-                        Siguiente: {nextWorkItem.work.title}
-                      </button>
-                    )}
-                  </div>
-                </>
+                <RatingForm key={workId} workId={workId} myRating={resolvedRating} onClose={handleRatingClose} />
               )}
             </div>
           </div>
