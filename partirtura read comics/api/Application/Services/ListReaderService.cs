@@ -91,7 +91,8 @@ public class ListReaderService : IListReaderService
                 listRating is null
                     ? null
                     : new ReaderListRatingDto(workList.Id, listRating.Stars, listRating.Review, listRating.CreatedAt, listRating.UpdatedAt)),
-            workId,
+            workItems,
+            requestedWork.Id,
             readerPages.Pages,
             readerPages.CurrentPage,
             readerPages.MyRating);

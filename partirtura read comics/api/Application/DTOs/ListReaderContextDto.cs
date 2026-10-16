@@ -32,6 +32,7 @@ public record ReaderListWorkItemDto(
 
 public record ListReaderContextDto(
     ReaderListCatalogDto List,
+    IReadOnlyList<ReaderListWorkItemDto> Works,
     long WorkId,
     IReadOnlyList<ReaderPageDto> Pages,
     int? CurrentPage,

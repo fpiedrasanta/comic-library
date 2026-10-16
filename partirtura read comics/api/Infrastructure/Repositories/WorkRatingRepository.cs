@@ -33,8 +33,8 @@ public class WorkRatingRepository(ApplicationDbContext context) : IWorkRatingRep
         }
 
         return await _context.WorkRatings
-            .AsNoTracking()
-            .Where(wr => wr.User != null && wr.User.Id == userId && wr.Work != null && requestedWorkIds.Contains(wr.Work.Id))
+            .Include(rating => rating.Work)
+            .Where(rating => rating.User != null && rating.User.Id == userId && rating.Work != null && requestedWorkIds.Contains(rating.Work.Id))
             .ToDictionaryAsync(rating => rating.Work!.Id, cancellationToken);
     }
 

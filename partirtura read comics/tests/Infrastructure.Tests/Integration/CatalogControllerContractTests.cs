@@ -88,7 +88,7 @@ public class CatalogControllerContractTests
     [Fact]
     public void CatalogListDetailDto_ExposesRequiredFields()
     {
-        AssertShape(typeof(CatalogListDetailDto), "Id", "Name", "ListTypeId", "ListTypeName", "Description", "Color", "UrlCover", "WorkCount", "ReadingProgressPercentage", "AverageRating", "RatingCount", "Works");
+        AssertShape(typeof(CatalogListDetailDto), "Id", "Name", "ListTypeId", "ListTypeName", "Description", "Color", "UrlCover", "WorkCount", "ReadingProgressPercentage", "CurrentWorkId", "AverageRating", "RatingCount", "Works");
     }
 
     [Fact]
