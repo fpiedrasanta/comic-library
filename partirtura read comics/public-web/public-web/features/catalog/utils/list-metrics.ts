@@ -14,7 +14,9 @@ export function hasVisibleRating(averageRating: number | null): averageRating is
 /**
  * Reading progress is only shown when the API returns it. `null` means the user
  * has no progress recorded at all, which is not the same as `0`, so the two
- * cases must never be collapsed into one.
+ * cases must never be collapsed into one. Identical semantics to `WorkCard`,
+ * where a null `MyReadingProgress` renders nothing and a persisted percentage
+ * (including `0` when status is `Reading`) is always surfaced.
  */
 export function hasVisibleProgress(percentage: number | null): percentage is number {
   return percentage !== null

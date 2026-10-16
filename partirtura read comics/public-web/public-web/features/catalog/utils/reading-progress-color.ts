@@ -58,3 +58,26 @@ export function readingProgressAppearance(progress: MyReadingProgressDto): Readi
 
   return { color, glow: colorWithAlpha(color, GLOW_ALPHA), percentage }
 }
+
+/**
+ * Appearance of the reading scale of a `ListCard`.
+ *
+ * Mirrors the colors of `readingProgressAppearance` (amber→orange while in
+ * progress, emerald when completed) so the visual language of `WorkCard` is
+ * shared with the list cards on `/lists` without duplicating it.
+ *
+ * Unlike `WorkCard`, a list has no `ReadingProgressStatus`: `100%` is the only
+ * signal of completion, and any value strictly between `0` and `100` is
+ * "partial" reading.
+ */
+export function listReadingProgressAppearance(percentage: number): ReadingProgressAppearance {
+  const clamped = clampPercentage(percentage)
+  const ratio = clamped / FULL_PERCENTAGE
+
+  const color =
+    clamped >= FULL_PERCENTAGE
+      ? COMPLETED_COLOR
+      : mixHex(READING_START_COLOR, READING_END_COLOR, ratio)
+
+  return { color, glow: colorWithAlpha(color, GLOW_ALPHA), percentage: clamped }
+}
