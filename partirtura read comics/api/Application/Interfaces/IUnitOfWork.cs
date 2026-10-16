@@ -26,6 +26,7 @@ public interface IUnitOfWork : IDisposable
     IPasswordResetAuthorizationRepository PasswordResetAuthorizationRepository { get; }
     IWorkReadingProgressRepository WorkReadingProgressRepository { get; }
     IWorkRatingRepository WorkRatingRepository { get; }
+    IListRatingRepository ListRatingRepository { get; }
     IListReadingProgressRepository ListReadingProgressRepository { get; }
 
 

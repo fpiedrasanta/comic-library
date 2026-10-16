@@ -131,6 +131,7 @@ builder.Services.AddScoped<IWorkService, WorkService>();
 builder.Services.AddScoped<IRecommendedWorksService, RecommendedWorksService>();
 builder.Services.AddScoped<IReadingHistoryService, ReadingHistoryService>();
 builder.Services.AddScoped<IWorkRatingService, WorkRatingService>();
+builder.Services.AddScoped<IListRatingService, ListRatingService>();
 builder.Services.AddScoped<IWorkRepository, WorkRepository>();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();
