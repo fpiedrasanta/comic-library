@@ -23,6 +23,21 @@ public class WorkRatingRepository(ApplicationDbContext context) : IWorkRatingRep
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    public async Task<Dictionary<long, WorkRating>> GetByUserIdAndWorkIdsAsync(long userId, IEnumerable<long> workIds, CancellationToken cancellationToken = default)
+    {
+        var requestedWorkIds = workIds.ToList();
+
+        if (requestedWorkIds.Count == 0)
+        {
+            return new Dictionary<long, WorkRating>();
+        }
+
+        return await _context.WorkRatings
+            .AsNoTracking()
+            .Where(wr => wr.User != null && wr.User.Id == userId && wr.Work != null && requestedWorkIds.Contains(wr.Work.Id))
+            .ToDictionaryAsync(rating => rating.Work!.Id, cancellationToken);
+    }
+
     public async Task<(IReadOnlyList<WorkRating> Items, int TotalCount)> GetPagedByWorkIdAsync(long workId, int currentPage, int pageSize, string? orderBy, string orderDir, CancellationToken cancellationToken = default)
     {
         var query = _context.WorkRatings
