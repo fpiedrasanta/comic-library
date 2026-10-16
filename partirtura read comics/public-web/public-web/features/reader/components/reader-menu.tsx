@@ -1,4 +1,13 @@
 import { useEffect } from 'react'
+import type { ListReaderListItemDto } from '../types/list-reader-context'
+import { ReaderWorkListItem } from './reader-work-list-item'
+
+interface ReaderListContext {
+  listId: number
+  workId: number
+  works: ListReaderListItemDto[]
+  onSelectWork: (workId: number) => void
+}
 
 interface ReaderMenuProps {
   isOpen: boolean
@@ -6,9 +15,11 @@ interface ReaderMenuProps {
   zoom: number
   onZoomIn: () => void
   onZoomOut: () => void
+  /** Contextual list data. When omitted, the menu renders the individual reader layout unchanged. */
+  listContext?: ReaderListContext
 }
 
-export function ReaderMenu({ isOpen, onClose, zoom, onZoomIn, onZoomOut }: ReaderMenuProps) {
+export function ReaderMenu({ isOpen, onClose, zoom, onZoomIn, onZoomOut, listContext }: ReaderMenuProps) {
   useEffect(() => {
     if (!isOpen) return
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -83,11 +94,27 @@ export function ReaderMenu({ isOpen, onClose, zoom, onZoomIn, onZoomOut }: Reade
               </div>
             </div>
 
-            <button
-              onClick={() => {
-                onClose()
-                toggleFullscreen()
-              }}
+          {listContext && (
+            <div className="p-3 rounded-xl bg-neps-input border border-neps-border space-y-2">
+              <p className="text-xs font-semibold text-white">Works de la Lista</p>
+              <div className="max-h-64 overflow-y-auto pr-1 space-y-1">
+                {listContext.works.map((item) => (
+                  <ReaderWorkListItem
+                    key={item.work.id}
+                    item={item}
+                    isCurrent={item.work.id === listContext.workId}
+                    onSelect={listContext.onSelectWork}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          <button
+            onClick={() => {
+              onClose()
+              toggleFullscreen()
+            }}
               className="w-full flex items-center justify-between p-3 rounded-xl bg-neps-input border border-neps-border hover:border-neps-primary/40 transition text-left"
             >
               <div>

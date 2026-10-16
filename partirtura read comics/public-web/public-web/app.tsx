@@ -5,6 +5,7 @@ import { DashboardHeader, DashboardFooter } from '@/components/dashboard'
 import { useAuth } from '@/features/authentication/hooks/use-auth'
 import ProtectedRoute from '@/app/router/protected-route'
 import { ReaderPageRoute } from '@/features/reader/components/reader-page'
+import { ListReaderPageRoute } from '@/features/reader/components/list-reader-page'
 
 function AppLayout() {
   const { user, role } = useAuth()
@@ -61,14 +62,22 @@ function App() {
           ))}
         </Route>
         <Route element={<ReaderAppLayout />}>
-          <Route
-            path="/works/:id/read"
-            element={
-              <ProtectedRoute>
-                <ReaderPageRoute />
-              </ProtectedRoute>
-            }
-          />
+         <Route
+           path="/works/:id/read"
+           element={
+             <ProtectedRoute>
+               <ReaderPageRoute />
+             </ProtectedRoute>
+           }
+         />
+         <Route
+           path="/lists/:listId/work/:workId"
+           element={
+             <ProtectedRoute>
+               <ListReaderPageRoute />
+             </ProtectedRoute>
+           }
+         />
         </Route>
       </Routes>
     </AuthProvider>

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { voteWork, updateWorkRating, getMyRating, getWorkRatings, type WorkRatingVoteRequest, type WorkRatingListItemDto, type ListResponse } from '../api/ratings-repository'
+import { voteListRating, updateListRating, type ListRatingVoteRequest, type ListRatingVoteResponse } from '../api/list-ratings-repository'
 
 export function useMyRating(workId: number) {
   return useQuery({
@@ -45,3 +46,33 @@ export function useWorkRatings(
     staleTime: 5 * 60 * 1000,
   })
 }
+
+export function listRatingContextKey(listId: number) {
+  return ['listRating', listId]
+}
+
+/** `POST /api/catalog/lists/{listId}/ratings` (create). */
+export function useVoteListRating(listId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: ListRatingVoteRequest) => voteListRating(listId, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: listRatingContextKey(listId) })
+      void queryClient.invalidateQueries({ queryKey: ['catalog', 'list-detail', listId] })
+    },
+  })
+}
+
+/** `PUT /api/catalog/lists/{listId}/ratings` (update / upsert). */
+export function useUpdateListRating(listId: number) {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (body: ListRatingVoteRequest) => updateListRating(listId, body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: listRatingContextKey(listId) })
+      void queryClient.invalidateQueries({ queryKey: ['catalog', 'list-detail', listId] })
+    },
+  })
+}
+
+export type { ListRatingVoteRequest, ListRatingVoteResponse }
