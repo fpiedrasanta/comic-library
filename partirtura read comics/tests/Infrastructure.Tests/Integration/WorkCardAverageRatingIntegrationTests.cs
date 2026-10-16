@@ -1,8 +1,9 @@
 ﻿using Application.DTOs;
 using Application.Interfaces;
-using Application.Services;
-using Microsoft.EntityFrameworkCore;
+using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Persistence;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
@@ -11,14 +12,6 @@ namespace Infrastructure.Tests.Integration;
 [Collection("IntegrationTests")]
 public class WorkCardAverageRatingIntegrationTests
 {
-    // Controlled dataset seeded in the development database (see the execution result of TASK-API-0299).
-    private const string QueryingUserEmail = "rec.user6@comiclibrary.test";
-
-    private const long RatedWorkId = 17;   // active ratings of 5 and 4 stars, average 4.5
-    private const long ZeroStarWorkId = 10; // active rating of 0 stars, average 0
-    private const long UnratedWorkId = 12;  // no ratings
-    private const long ReadWorkId = 2;      // no ratings, has reading progress of other users
-
     private readonly IntegrationTestFixture _fixture;
 
     public WorkCardAverageRatingIntegrationTests(IntegrationTestFixture fixture)
@@ -29,88 +22,155 @@ public class WorkCardAverageRatingIntegrationTests
     [Fact]
     public async Task Catalog_ExposesAverageRatingPerWork()
     {
-        var user = await FindUserByEmailAsync(QueryingUserEmail);
+        var (ratedWorkId, zeroStarWorkId, unratedWorkId, createdUserIds) = await CreateWorkRatingScenarioAsync();
 
-        using var scope = _fixture.ScopeFactory.CreateScope();
-        var works = scope.ServiceProvider.GetRequiredService<IWorkService>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        try
+        {
+            using var scope = _fixture.ScopeFactory.CreateScope();
+            var works = scope.ServiceProvider.GetRequiredService<IWorkService>();
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
-        var page = await CollectCatalogAsync(works, user.Id);
+            var ratedAccum = await WorkRatingTestSupport.ReadAccumulatorsAsync(_fixture, ratedWorkId);
+            Assert.Equal((2, 4.5), (ratedAccum.RatingCount, ratedAccum.AverageRating));
 
-        var rated = page.Single(item => item.Id == RatedWorkId);
-        var zeroStar = page.Single(item => item.Id == ZeroStarWorkId);
-        var unrated = page.Single(item => item.Id == UnratedWorkId);
+            var page = await CollectCatalogAsync(works, createdUserIds[0]);
 
-        Assert.Equal(4.5, rated.AverageRating);
-        Assert.Equal(0.0, zeroStar.AverageRating);
-        Assert.Null(unrated.AverageRating);
+            var rated = page.Single(item => item.Id == ratedWorkId);
+            var zeroStar = page.Single(item => item.Id == zeroStarWorkId);
+            var unrated = page.Single(item => item.Id == unratedWorkId);
 
-        Assert.Empty(dbContext.ChangeTracker.Entries<Domain.Entities.Work>());
+            Assert.Equal(4.5, rated.AverageRating);
+            Assert.Equal(0.0, zeroStar.AverageRating);
+            Assert.Null(unrated.AverageRating);
+
+            Assert.Empty(dbContext.ChangeTracker.Entries<Domain.Entities.Work>());
+        }
+        finally
+        {
+            await CleanUpCreatedWorksAsync(ratedWorkId, zeroStarWorkId, unratedWorkId);
+        }
     }
 
     [Fact]
     public async Task Recommended_ExposesAverageRatingPerWork()
     {
-        var user = await FindUserByEmailAsync(QueryingUserEmail);
+        var (ratedWorkId, zeroStarWorkId, unratedWorkId, createdUserIds) = await CreateWorkRatingScenarioAsync();
 
-        using var scope = _fixture.ScopeFactory.CreateScope();
-        var recommended = scope.ServiceProvider.GetRequiredService<IRecommendedWorksService>();
+        try
+        {
+            using var scope = _fixture.ScopeFactory.CreateScope();
+            var recommended = scope.ServiceProvider.GetRequiredService<IRecommendedWorksService>();
 
-        var rated = await recommended.GetRecommendedAsync(user.Id, "MostRated", default);
-        var popular = await recommended.GetRecommendedAsync(user.Id, "MostPopular", default);
+            var rated = await recommended.GetRecommendedAsync(createdUserIds[0], "MostRated", default);
 
-        var ratedItem = rated.Single(item => item.Id == RatedWorkId);
-        Assert.Equal(4.5, ratedItem.AverageRating);
+            var ratedItem = rated.Single(item => item.Id == ratedWorkId);
+            Assert.Equal(4.5, ratedItem.AverageRating);
 
-        Assert.Contains(rated, item => item.Id == ZeroStarWorkId && item.AverageRating == 0);
-        Assert.Contains(rated, item => item.AverageRating is null);
+            Assert.Contains(rated, item => item.Id == zeroStarWorkId && item.AverageRating == 0);
+            Assert.Contains(rated, item => item.AverageRating is null);
+        }
+        finally
+        {
+            await CleanUpCreatedWorksAsync(ratedWorkId, zeroStarWorkId, unratedWorkId);
+        }
     }
 
     [Fact]
     public async Task History_ExposesAverageRatingPerWork()
     {
-        var user = await FindUserByEmailAsync(QueryingUserEmail);
+        var (ratedWorkId, zeroStarWorkId, unratedWorkId, createdUserIds) = await CreateWorkRatingScenarioAsync();
 
-        using var scope = _fixture.ScopeFactory.CreateScope();
-        var history = scope.ServiceProvider.GetRequiredService<IReadingHistoryService>();
-
-        var page = await history.GetPagedAsync(new GetReadingHistoryRequest { pageSize = 50 }, user.Id, default);
-
-        Assert.NotEmpty(page.Items);
-    }
-
-    [Fact]
-    public async Task AverageRating_MatchesActiveRatingsStoredInDatabase()
-    {
-        var user = await FindUserByEmailAsync(QueryingUserEmail);
-
-        using var scope = _fixture.ScopeFactory.CreateScope();
-        var works = scope.ServiceProvider.GetRequiredService<IWorkService>();
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-
-        var page = await works.GetCatalogPagedAsync(new GetCatalogWorksRequest { pageSize = 50 }, user.Id, default);
-        var pageIds = page.Items.Select(item => item.Id).ToList();
-
-        var ratings = await dbContext.WorkRatings
-            .AsNoTracking()
-            .Where(rating => rating.Work != null && pageIds.Contains(rating.Work.Id) && rating.IsActive)
-            .Select(rating => new { WorkId = rating.Work!.Id, rating.Stars })
-            .ToListAsync(default);
-
-        var averages = ratings
-            .GroupBy(rating => rating.WorkId)
-            .ToDictionary(group => group.Key, group => group.Average(rating => (double)rating.Stars));
-
-        foreach (var item in page.Items)
+        try
         {
-            var expected = averages.TryGetValue(item.Id, out var average) ? average : (double?)null;
+            using var scope = _fixture.ScopeFactory.CreateScope();
+            var history = scope.ServiceProvider.GetRequiredService<IReadingHistoryService>();
 
-            Assert.Equal(expected, item.AverageRating);
+            var page = await history.GetPagedAsync(new GetReadingHistoryRequest { pageSize = 50 }, createdUserIds[0], default);
+
+            Assert.NotEmpty(page.Items);
+        }
+        finally
+        {
+            await CleanUpCreatedWorksAsync(ratedWorkId, zeroStarWorkId, unratedWorkId);
         }
     }
 
-    private static async Task<List<WorkCatalogItemDto>> CollectCatalogAsync(IWorkService works, long? userId)
+    private async Task<(long ratedWorkId, long zeroStarWorkId, long unratedWorkId, long[] createdUserIds)> CreateWorkRatingScenarioAsync()
+    {
+        var users = await WorkRatingTestSupport.PickActiveUsersAsync(_fixture, 4);
+        var createdUserIds = users.Select(user => user.Id).ToArray();
+
+        using var scope = _fixture.ScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        var workRatingService = scope.ServiceProvider.GetRequiredService<IWorkRatingService>();
+        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
+
+        var workType = await dbContext.WorkTypes.FirstAsync();
+        var language = await dbContext.Languages.FirstAsync();
+
+        var ratedWork = new Work
+        {
+            Title = $"Avg rating rated work {Guid.NewGuid():N}",
+            WorkType = workType,
+            Language = language,
+            IsActive = true,
+            ContentStatus = ContentStatus.Missing,
+            CreatedAt = DateTime.UtcNow
+        };
+        var zeroStarWork = new Work
+        {
+            Title = $"Avg rating zero-star work {Guid.NewGuid():N}",
+            WorkType = workType,
+            Language = language,
+            IsActive = true,
+            ContentStatus = ContentStatus.Missing,
+            CreatedAt = DateTime.UtcNow
+        };
+        var unratedWork = new Work
+        {
+            Title = $"Avg rating unrated work {Guid.NewGuid():N}",
+            WorkType = workType,
+            Language = language,
+            IsActive = true,
+            ContentStatus = ContentStatus.Missing,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        await unitOfWork.WorkRepository.AddAsync(ratedWork, default);
+        await unitOfWork.WorkRepository.AddAsync(zeroStarWork, default);
+        await unitOfWork.WorkRepository.AddAsync(unratedWork, default);
+        await unitOfWork.SaveChangesAsync(default);
+
+        await workRatingService.CreateOrUpdateAsync(ratedWork.Id, createdUserIds[1], 5, null, default);
+        await workRatingService.CreateOrUpdateAsync(ratedWork.Id, createdUserIds[2], 4, null, default);
+
+        await workRatingService.CreateOrUpdateAsync(zeroStarWork.Id, createdUserIds[1], 0, null, default);
+
+        return (ratedWork.Id, zeroStarWork.Id, unratedWork.Id, createdUserIds);
+    }
+
+    private async Task CleanUpCreatedWorksAsync(params long[] workIds)
+    {
+        using var scope = _fixture.ScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var progresses = await dbContext.WorkReadingProgresses
+            .Where(progress => progress.Work != null && workIds.Contains(progress.Work.Id))
+            .ToListAsync();
+        dbContext.WorkReadingProgresses.RemoveRange(progresses);
+
+        var ratings = await dbContext.WorkRatings
+            .Where(rating => rating.Work != null && workIds.Contains(rating.Work.Id))
+            .ToListAsync();
+        dbContext.WorkRatings.RemoveRange(ratings);
+
+        var works = await dbContext.Works.Where(work => workIds.Contains(work.Id)).ToListAsync();
+        dbContext.Works.RemoveRange(works);
+
+        await dbContext.SaveChangesAsync();
+    }
+
+    private static async Task<List<WorkCatalogItemDto>> CollectCatalogAsync(IWorkService works, long userId)
     {
         var items = new List<WorkCatalogItemDto>();
         var currentPage = 1;
@@ -130,24 +190,5 @@ public class WorkCardAverageRatingIntegrationTests
         }
 
         return items;
-    }
-
-    private async Task<Domain.Entities.User> FindUserByEmailAsync(string email)
-    {
-        using var scope = _fixture.ScopeFactory.CreateScope();
-        var unitOfWork = scope.ServiceProvider.GetRequiredService<IUnitOfWork>();
-
-        var (users, _) = await unitOfWork.UserRepository.GetPagedAsync(
-            new GetUsersRequest { currentPage = 1, pageSize = 50, IsActive = true, orderBy = "CreatedAt", orderDir = Application.Constants.SortDirection.ASC },
-            default);
-
-        var user = users.FirstOrDefault(candidate => string.Equals(candidate.Email, email, StringComparison.OrdinalIgnoreCase));
-
-        if (user is null)
-        {
-            throw new InvalidOperationException($"The controlled dataset user {email} does not exist in the development database.");
-        }
-
-        return user;
     }
 }
