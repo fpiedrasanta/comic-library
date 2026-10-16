@@ -351,3 +351,29 @@ Crear:
 6. Crear uno o más commits y realizar el push de los cambios a la rama de trabajo.
 7. Incorporar el resultado de ejecución en esta misma task mediante **append**, sin sobrescribir su contenido previo.
 8. Mover el archivo según `communication.md` a `finished` si se cumplen los criterios, o a `blocked` si existe un bloqueo real, documentando la causa y el trabajo pendiente.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Endpoint `GET /api/reading/lists/{listId}/work/{workId}` (controller `ListReaderController`) que devuelve el contexto completo del lector dentro de una lista.
+- Operation `IListReaderService.ListReaderService.GetReaderContextAsync(listId, workId, userId)` que reúne, en una sola respuesta: metadatos de la lista (id, name, listTypeId/Name, description, color, urlCover), workCount, readingProgressPercentage de la lista (del repo de progreso de lista), averageRating + ratingCount de la lista, `currentWorkId` (resolución US-0035), `myRating` de la lista (stars/review o null); los `WorkListItem` ordenados por `Position` con readingProgressPercentage por work, currentPage y `myRating` de cada work; el `workId` solicitado con sus `Page` (number + protected imageUrl via `EF.Property<long>` para FK shadow), `currentPage` y `myRating` del work.
+
+**Qué se cambió**:
+- `api/Api/Controllers/ListReaderController.cs`: endpoint + validación de pertenencia (workId ∈ listId) y códigos 200/404.
+- `api/Application/Interfaces/IListReaderService.cs` + `api/Application/Services/ListReaderService.cs`: orquestación reutilizando `IWorkService.GetReaderPagesAsync`, `IWorkReadingProgressRepository`, `IWorkRatingRepository` y `IListReadingProgressRepository`/`IListRatingRepository`.
+- `api/Application/DTOs/ListReaderContextDto.cs`: contrato de respuesta (payload template del task).
+- `Program.cs`: registro DI de `IListReaderService`.
+- `endpoints.md`, `services.md`, `repositories.md`: documentación sincronizada con rutas/verbos/contratos.
+
+**Decisiones relevantes**:
+- Se reutilizó el mecanismo existente de páginas (`GetReaderPagesAsync`) y de progreso/rating de Works: **no** se duplicó la lógica ni el endpoint de páginas.
+- `currentWorkId` resuelto con la misma regla de 0307 (CurrentWork válido de la lista; fallback al primer work por `Position`; null en lista vacía) y **sin persistir** el fallback.
+- `currentPage` (última página leída del work) proviene del progreso de páginas del usuario/Work (shared entre listas), no del contexto de lista.
+- `userId` resuelto exclusivamente del claim `sub` (auth obligatoria).
+
+**Notas**:
+- Validaciones: build 0 errores; `WorkListReaderIntegrationTests` (10 casos) cubren currentWorkId, ordering por Position, progreso aislado por usuario, shared page-progress, pertenencia work→list 404, lista vacía y ausencia de progreso.
+- Suite `tests/Infrastructure.Tests` 389/389 pass.
+- Integrado en `main` (commit `93f4904`, fast-forward; branch `feature/us-0035-api-sequential-list-reading` integrada y borrada).
