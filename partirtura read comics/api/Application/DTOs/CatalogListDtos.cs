@@ -35,6 +35,7 @@ public record CatalogListDetailDto(
     string? UrlCover,
     int WorkCount,
     int? ReadingProgressPercentage,
+    long? CurrentWorkId,
     double? AverageRating,
     int RatingCount,
     IReadOnlyList<CatalogListWorkItemDto> Works);

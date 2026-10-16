@@ -136,6 +136,85 @@ public class WorkListService : IWorkListService
         }
     }
 
+    public async Task SetCurrentWorkAsync(long workListId, long userId, long workId, CancellationToken cancellationToken = default)
+    {
+        if (workListId <= 0)
+        {
+            throw new ValidationException("Work list identifier is required.");
+        }
+
+        if (userId <= 0)
+        {
+            throw new ValidationException("User identifier is required.");
+        }
+
+        if (workId <= 0)
+        {
+            throw new ValidationException("Work identifier is required.");
+        }
+
+        var workList = await _unitOfWork.WorkListRepository.GetByIdAsync(workListId, cancellationToken);
+        if (workList is null || !workList.IsActive)
+        {
+            throw new BusinessNotFoundException(WorkListNotFound);
+        }
+
+        if (!workList.WorkListItems.Any(workItem => workItem.Work.Id == workId))
+        {
+            throw new BusinessNotFoundException("The work does not belong to the list.");
+        }
+
+        await _unitOfWork.BeginTransAsync(cancellationToken);
+        try
+        {
+            var listProgress = await _unitOfWork.ListReadingProgressRepository
+                .GetByUserIdAndWorkListIdAsync(userId, workListId, cancellationToken);
+
+            Domain.Entities.ListReadingProgress progress;
+            if (listProgress is null)
+            {
+                var user = await _unitOfWork.UserRepository.GetByIdAsync(userId, cancellationToken)
+                           ?? throw new BusinessNotFoundException("The user does not exist.");
+                var work = await _unitOfWork.WorkRepository.GetByIdAsync(workId, cancellationToken)
+                           ?? throw new BusinessNotFoundException(WorkNotFound);
+
+                progress = new Domain.Entities.ListReadingProgress
+                {
+                    User = user,
+                    WorkList = workList,
+                    CurrentWork = work,
+                    LastReadAt = DateTimeOffset.UtcNow
+                };
+                await _unitOfWork.ListReadingProgressRepository.AddAsync(progress, cancellationToken);
+            }
+            else
+            {
+                await _unitOfWork.ListReadingProgressRepository.UpdateAsync(listProgress, workId, cancellationToken);
+            }
+
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            await _unitOfWork.CommitAsync(cancellationToken);
+
+            _logger.LogInformation("Current work set to {CurrentWorkId} for list {WorkListId} by user {UserId}.", workId, workListId, userId);
+        }
+        catch
+        {
+            await _unitOfWork.RollbackAsync(cancellationToken);
+            throw;
+        }
+    }
+
+    private async Task<WorkList> GetActiveWorkListAsync(long workListId, CancellationToken cancellationToken)
+    {
+        var workList = await _unitOfWork.WorkListRepository.GetByIdAsync(workListId, cancellationToken);
+        if (workList is null || !workList.IsActive)
+        {
+            throw new BusinessNotFoundException(WorkListNotFound);
+        }
+
+        return workList;
+    }
+
     public async Task DeactivateAsync(long id, CancellationToken cancellationToken = default)
     {
         var workList = await _unitOfWork.WorkListRepository.GetByIdAsync(id, cancellationToken);
@@ -208,7 +287,37 @@ public class WorkListService : IWorkListService
         }
 
         var progressByWorkId = await GetReadingProgressByWorkIdAsync(workList, userId, cancellationToken);
-        return ToCatalogDetailDto(workList, progressByWorkId);
+        var currentWorkId = await ResolveCurrentWorkIdAsync(workList, userId, cancellationToken);
+        return ToCatalogDetailDto(workList, progressByWorkId, currentWorkId);
+    }
+
+    private async Task<long?> ResolveCurrentWorkIdAsync(
+        WorkList workList,
+        long? userId,
+        CancellationToken cancellationToken)
+    {
+        if (userId is null || userId.Value <= 0)
+        {
+            return null;
+        }
+
+        var listProgress = await _unitOfWork.ListReadingProgressRepository
+            .GetByUserIdAndWorkListIdAsync(userId.Value, workList.Id, cancellationToken);
+
+        var currentWork = listProgress?.CurrentWork;
+        var validWorkIds = workList.WorkListItems.Select(workItem => workItem.Work.Id).ToHashSet();
+
+        if (currentWork is not null && validWorkIds.Contains(currentWork.Id))
+        {
+            return currentWork.Id;
+        }
+
+        var firstWork = workList.WorkListItems
+            .OrderBy(workItem => workItem.Position)
+            .Select(workItem => workItem.Work)
+            .FirstOrDefault();
+
+        return firstWork?.Id;
     }
 
     private async Task<Dictionary<long, WorkReadingProgress>> GetReadingProgressByWorkIdAsync(
@@ -604,7 +713,8 @@ public class WorkListService : IWorkListService
 
     private static CatalogListDetailDto ToCatalogDetailDto(
         WorkList workList,
-        Dictionary<long, WorkReadingProgress> progressByWorkId)
+        Dictionary<long, WorkReadingProgress> progressByWorkId,
+        long? currentWorkId)
     {
         var orderedItems = workList.WorkListItems
             .OrderBy(workItem => workItem.Position)
@@ -624,6 +734,7 @@ public class WorkListService : IWorkListService
             ImageUrlBuilder.ToUrl(workList.Cover),
             works.Count,
             CalculateListReadingProgress(orderedItems, progressByWorkId),
+            currentWorkId,
             workList.RatingCount == 0 ? null : workList.AverageRating,
             workList.RatingCount,
             works);

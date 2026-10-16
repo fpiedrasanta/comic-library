@@ -33,6 +33,7 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     private IPasswordResetAuthorizationRepository? _passwordResetAuthorizationRepository;
     private IWorkReadingProgressRepository? _workReadingProgressRepository;
     private IWorkRatingRepository? _workRatingRepository;
+    private IListReadingProgressRepository? _listReadingProgressRepository;
 
     public IWorkRepository WorkRepository => _workRepository ??= new WorkRepository(_context);
     public IWorkTypeRepository WorkTypeRepository => _workTypeRepository ??= new WorkTypeRepository(_context);
@@ -56,6 +57,7 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     public IPasswordResetAuthorizationRepository PasswordResetAuthorizationRepository => _passwordResetAuthorizationRepository ??= new PasswordResetAuthorizationRepository(_context);
     public IWorkReadingProgressRepository WorkReadingProgressRepository => _workReadingProgressRepository ??= new WorkReadingProgressRepository(_context);
     public IWorkRatingRepository WorkRatingRepository => _workRatingRepository ??= new WorkRatingRepository(_context);
+    public IListReadingProgressRepository ListReadingProgressRepository => _listReadingProgressRepository ??= new ListReadingProgressRepository(_context);
 
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {

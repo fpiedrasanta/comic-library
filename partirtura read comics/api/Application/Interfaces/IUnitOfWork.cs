@@ -26,6 +26,7 @@ public interface IUnitOfWork : IDisposable
     IPasswordResetAuthorizationRepository PasswordResetAuthorizationRepository { get; }
     IWorkReadingProgressRepository WorkReadingProgressRepository { get; }
     IWorkRatingRepository WorkRatingRepository { get; }
+    IListReadingProgressRepository ListReadingProgressRepository { get; }
 
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
