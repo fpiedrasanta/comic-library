@@ -118,3 +118,17 @@ Cuando se actualicen los datos de progreso disponibles, reflejar el nuevo estado
 ## Fuera de alcance
 
 Los formularios de valoración contextual se implementarán en la task siguiente.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- `features/reader/components/reader-work-list-item.tsx`: fila del selector con progress ring (amber→orange por porcentaje, verde al 100%, gris "Sin progreso" cuando `null`) y badge "Actual" en el work actual.
+- `features/reader/components/reader-menu.tsx`: prop opcional `listContext`; renderiza el selector **solo** en contexto de lista.
+- `features/reader/components/list-reader.tsx`: pasa `listContext` (listId, workId, works, onSelectWork) al menú; `onSelectWork` persiste el current work y navega a `/lists/{listId}/work/{workId}` reutilizando el flujo existente.
+
+**Validaciones ejecutadas**:
+- `npm run typecheck` → 0 errores.
+- `npm run build` → OK.
+- El selector no aparece en el reader individual (prop `listContext` no provista).

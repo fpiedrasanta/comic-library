@@ -103,6 +103,12 @@ export function ListReader({ listId, workId }: ListReaderProps) {
       previousWorkIdRef.current = workId
       void setCurrentWork.mutateAsync(workId)
     }
+
+    // Al abandonar el reader (unmount), persistir el Work actual para que el
+    // próximo acceso a la lista retome exactamente aquí.
+    return () => {
+      void setCurrentWork.mutateAsync(workId)
+    }
   }, [workId, setCurrentWork])
 
   useEffect(() => {

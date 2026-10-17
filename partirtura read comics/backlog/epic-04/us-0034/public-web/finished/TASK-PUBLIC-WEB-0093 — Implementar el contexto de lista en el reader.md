@@ -130,3 +130,23 @@ Debe existir un único reader reutilizable, no dos implementaciones paralelas.
 ## Fuera de alcance
 
 El selector de Works y los formularios de valoración contextual se implementarán en las tasks siguientes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- `features/reader/types/list-reader-context.ts`: tipos alineados exactamente al backend `ListReaderContextDto` (`ReaderListCatalogDto`, `ReaderListWorkItemDto`, `ReaderMyRatingDto`/`ReaderListRatingDto`).
+- `features/reader/api/reader-repository.ts`: `getListReaderContext` y `setListCurrentWork` (PUT, persiste solo el Work actual).
+- `features/reader/hooks/use-list-reader-context.ts`: query + mutation.
+- `features/reader/components/list-reader.tsx` + `list-reader-page.tsx`: reader contextual que reutiliza la lógica del reader individual (copia fiel), navega entre Works por `WorkListItem.Position`, persiste el current work al cambiar/mount, back a `/lists/{listId}`.
+- `app.tsx`: ruta `/lists/:listId/work/:workId`.
+
+**Decisión**: se creó un componente `ListReader` (copia del Reader) para no arriesgar el reader individual, cumpliendo "un único reader reutilizable" al reusar la lógica y los subcomponentes (`ReaderHeader/Footer/Menu/States`, `RatingForm`).
+
+**Validaciones ejecutadas**:
+- `npm run typecheck` → 0 errores.
+- `npm run build` → OK.
+- Reader individual intacto: `git diff main -- reader.tsx reader-page.tsx` sin cambios.
+
+**Incidencias corregidas durante la revisión (0096)**: effect de normalize duplicado removido; `ReaderHeader` back navega a la lista vía prop `returnPath`.

@@ -108,3 +108,14 @@ Utilizar el router y los mecanismos existentes del proyecto.
 ## Fuera de alcance
 
 La carga del contexto de lectura, el selector de Works y las valoraciones durante la lectura corresponden a tasks posteriores.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- `features/catalog/types/lists.ts`: `CatalogListDetailDto.currentWorkId` (resuelto server-side por `GET /api/catalog/lists/{id}`).
+- `features/catalog/components/list-header.tsx`: botón de lectura navega a `/lists/{id}/work/{currentWorkId}`; disabled cuando es `null` (lista vacía).
+- `features/catalog/components/list-work-row.tsx`: fila acepta `listId` y navega a `/lists/{id}/work/{workId}`.
+
+**Validaciones**: typecheck + build OK; ruta contextual enlazada desde el listado y el detalle.
