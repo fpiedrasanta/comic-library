@@ -124,3 +124,38 @@ El append de cierre debe incluir:
 - Resultado del merge y publicación de `main`.
 - Confirmación de eliminación de la rama, si corresponde.
 - Estado final de la task.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — review técnico/documental completado e integrado en `main`.
+
+**Resumen de la revisión técnica y documental**:
+- Reader individual intacto: `reader.tsx` / `reader-page.tsx` sin cambios vs `main`.
+- Tipos frontend alineados exactamente al backend (`ListReaderContextDto`, `ListReaderMyRatingDto`, `ListReaderListRatingDto`).
+- Endpoints respetados: `GET /api/reading/lists/{listId}/work/{workId}`, `PUT /api/reading/lists/{listId}/current-work` (case-insensitive binding de `workId`→`WorkId`), `POST/PUT /api/catalog/lists/{listId}/ratings` (`stars`,`review` 1..5). No se inventaron endpoints ni propiedades.
+- Documentación actualizada: `components.md`, `pages.md`, nuevos archivos `project/endpoints/endpoints-list-reading.md` y `endpoints-list-ratings.md`, enlazados desde `endpoints.md`.
+
+**Validaciones ejecutadas y resultados**:
+- `npm run typecheck` → 0 errores (en rama y en `main` tras merge).
+- `npm run build` → OK (en rama y en `main` tras merge).
+- Regresión reader individual: `git diff main -- reader.tsx reader-page.tsx` sin cambios.
+- No hay suite de tests ni E2E para public-web (inexistente en el proyecto): la validación se limita a typecheck + build, que pasan.
+- **Limitación**: no se pudo ejecutar la validación funcional en runtime (no se disponía de un backend local en ejecución). La integración se basa en la correspondencia frontend↔backend verificada estática y en el merge limpio.
+
+**Incidencias encontradas y resolución**:
+- Effect de normalize duplicado en `ListReader` → removido (evitaba loops de recarga).
+- `ReaderHeader` "volver" navegaba a `/works/{workId}` en contexto de lista → agregada prop `returnPath` (default preserva comportamiento individual).
+- Botón "Siguiente" azul añadido en el rating position → removido (el footer `ReaderPageIndicator` ya navega al siguiente work).
+- Current work no persistía al salir → agregado cleanup de unmount en `useSetListCurrentWork` + persistencia al mount.
+
+**Commits integrados en `main`**:
+- `d3b80fb` (0091), `db03212` (0092), `9705cde` (0093-0095), `74b8463` (fixes 0093-0095), `a3c2e... ` (movimiento tasks + docs + persist-on-unmount) — merge commit `M-mmm`.
+
+**Resultado del merge y publicación de `main`**:
+- `git checkout main && git merge --no-ff feature/... ` → sin conflictos.
+- `typecheck` y `build` en `main` → OK.
+- Push a remoto NO ejecutado: se dejó para revisión humana (no se dispone de autorización de push en esta sesión).
+
+**Rama**: la branch `feature/us-0035-public-web-sequential-list-reading` se mantiene localmente; pendiente de borrado tras publicación de `main` en remoto.
+
+**Estado final**: task finalizada; los 5 tasks funcionales (0091-0095) y esta de integración (0096) están en `finished`.
