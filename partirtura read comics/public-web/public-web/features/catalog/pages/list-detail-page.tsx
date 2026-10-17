@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
 import { ListHeader } from '../components/list-header'
 import { ListWorkRow } from '../components/list-work-row'
-import { useCatalogListDetail } from '../hooks/use-list-detail'
+import { getCatalogListDetail } from '../api/lists-repository'
+import type { CatalogListDetailDto } from '../types/lists'
 
 /**
  * `/lists/:id`: the detail of an official list.
@@ -11,7 +13,33 @@ import { useCatalogListDetail } from '../hooks/use-list-detail'
  * sorting, and never reorders what the backend delivers.
  */
 export function ListDetailPage({ entityId }: { entityId: number }) {
-  const { entity: list, isLoading, notFound, error } = useCatalogListDetail(entityId)
+  const [list, setList] = useState<CatalogListDetailDto | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    if (!Number.isFinite(entityId)) {
+      setIsLoading(false)
+      return
+    }
+    setIsLoading(true)
+    setError(null)
+    getCatalogListDetail(entityId)
+      .then((data) => {
+        if (cancelled) return
+        setList(data)
+        setIsLoading(false)
+      })
+      .catch((err) => {
+        if (cancelled) return
+        setError(err instanceof Error ? err : new Error(String(err)))
+        setIsLoading(false)
+      })
+    return () => { cancelled = true }
+  }, [entityId])
+
+  const notFound = !isLoading && !error && list === null
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 flex-grow w-full space-y-10">

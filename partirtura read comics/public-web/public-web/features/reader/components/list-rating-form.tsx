@@ -1,25 +1,22 @@
 import { useState, useEffect, FormEvent } from 'react'
-import { useQueryClient } from '@tanstack/react-query'
 import { useVoteListRating, useUpdateListRating } from '@/features/catalog/hooks/use-ratings'
 import { StarRatingInput } from '@/features/catalog/components/star-rating-input'
-import { listReaderContextKey } from '../hooks/use-list-reader-context'
 import type { ListRatingVoteRequest, ListRatingVoteResponse } from '@/features/catalog/api/list-ratings-repository'
 import type { ListReaderListRatingDto } from '../types/list-reader-context'
 
 interface ListRatingFormProps {
   listId: number
-  listContextKey: ReturnType<typeof listReaderContextKey>
   existingRating: ListReaderListRatingDto | null
   onSaved: (rating: ListRatingVoteResponse) => void
+  variant?: 'work' | 'list'
 }
 
 const RATING_STAR_SIZE = 48
 const MIN_RATING_STARS = 1
 
-export function ListRatingForm({ listId, listContextKey, existingRating, onSaved }: ListRatingFormProps) {
+export function ListRatingForm({ listId, existingRating, onSaved, variant }: ListRatingFormProps) {
   const voteMutation = useVoteListRating(listId)
   const updateMutation = useUpdateListRating(listId)
-  const queryClient = useQueryClient()
   const isSubmitting = voteMutation.isPending || updateMutation.isPending
 
   const [stars, setStars] = useState<number>(0)
@@ -65,8 +62,6 @@ export function ListRatingForm({ listId, listContextKey, existingRating, onSaved
 
       setSubmittedRating(saved)
       onSaved(saved)
-      void queryClient.invalidateQueries({ queryKey: listContextKey })
-      void queryClient.invalidateQueries({ queryKey: ['catalog', 'list-detail', listId] })
       setIsEditing(false)
       setSubmitError(null)
     } catch (err: unknown) {
@@ -85,7 +80,12 @@ export function ListRatingForm({ listId, listContextKey, existingRating, onSaved
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 p-4 rounded-xl bg-slate-900/50 border border-slate-800">
+    <form
+      onSubmit={handleSubmit}
+      className={`space-y-4 p-4 rounded-xl ${
+        variant === 'list' ? 'bg-brand-500/10 border-brand-500/30' : 'bg-slate-900/50 border-slate-800'
+      }`}
+    >
       <h3 className="text-sm font-semibold text-white">
         Valora esta lista, que fue hecha con mucho amor para vos.
       </h3>

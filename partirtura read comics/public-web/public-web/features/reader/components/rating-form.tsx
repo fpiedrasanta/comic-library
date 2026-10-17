@@ -9,12 +9,13 @@ interface RatingFormProps {
   workId: number
   myRating: MyRatingDto | null
   onClose?: () => void
+  onSaved?: (rating: MyRatingDto) => void
 }
 
 const RATING_STAR_SIZE = 48
 const MIN_RATING_STARS = 1
 
-export function RatingForm({ workId, myRating, onClose }: RatingFormProps) {
+export function RatingForm({ workId, myRating, onClose, onSaved }: RatingFormProps) {
   const voteMutation = useVoteWork(workId)
   const updateMutation = useUpdateWorkRating(workId)
   const queryClient = useQueryClient()
@@ -73,6 +74,7 @@ export function RatingForm({ workId, myRating, onClose }: RatingFormProps) {
       // Mantener el myRating cacheado del Reader al día para que, al volver a esta
       // posición, se muestre la valoración guardada sin salir del Reader.
       queryClient.invalidateQueries({ queryKey: readerWorkPagesKey(workId) })
+      onSaved?.(savedRating)
       setIsEditing(false)
       setSubmitError(null)
     } catch (err: unknown) {

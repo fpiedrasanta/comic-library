@@ -2,15 +2,17 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useReaderStore } from '../stores/reader-store'
 import { useProtectedImage } from '@/hooks/use-protected-image'
-import { useUpdateReadingProgress } from '../hooks/use-reading-progress'
-import { useNormalizeCurrentPage } from '../hooks/use-normalize-current-page'
 import { ReaderHeader } from './reader-header'
 import { ReaderFooter } from './reader-footer'
 import { ReaderMenu } from './reader-menu'
 import { ReaderLoading, ReaderError } from './reader-states'
 import { RatingForm } from './rating-form'
 import { ListRatingForm } from './list-rating-form'
-import { useListReaderContext, useSetListCurrentWork, listReaderContextKey } from '../hooks/use-list-reader-context'
+import { getListReaderContext } from '../api/reader-repository'
+import { useSetListCurrentWork } from '../hooks/use-list-reader-context'
+import { useUpdateReadingProgress } from '../hooks/use-reading-progress'
+import { useNormalizeCurrentPage } from '../hooks/use-normalize-current-page'
+import type { ListReaderContextDto } from '../types/list-reader-context'
 import type { MyRatingDto } from '@/features/catalog/api/ratings-repository'
 
 interface ListReaderProps {
@@ -28,34 +30,75 @@ export function ListReader({ listId, workId }: ListReaderProps) {
   const [pageError, setPageError] = useState<string | null>(null)
   const [userZoom, setUserZoom] = useState(1)
   const [displayDimensions, setDisplayDimensions] = useState<{ width: number; height: number } | null>(null)
-  const [initialized, setInitialized] = useState(false)
   const [imageReady, setImageReady] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(false)
 
   const containerRef = useRef<HTMLDivElement | null>(null)
   const dragStartRef = useRef<{ x: number; y: number; scrollLeft: number; scrollTop: number } | null>(null)
   const pointerMovedRef = useRef(false)
-  const previousWorkIdRef = useRef<number>(workId)
 
   const navigate = useNavigate()
-  const { data, isLoading, error, isFetching } = useListReaderContext(listId, workId)
-  const pages = data?.pages ?? []
-  const totalPages = pages.length + 1 // +1 for rating form page
+  const [ctx, setCtx] = useState<ListReaderContextDto | null>(null)
+
+  const setCurrentWorkHook = useSetListCurrentWork(listId)
+  const mutateProgressHook = useUpdateReadingProgress(workId)
+  const normalizeCurrentPageHook = useNormalizeCurrentPage()
+
+  const setCurrentWorkRef = useRef(setCurrentWorkHook)
+  const persistCurrentPageRef = useRef((index: number) => mutateProgressHook.mutate(index + 1))
+  const normalizeCurrentPageRef = useRef(normalizeCurrentPageHook)
+
+  setCurrentWorkRef.current = setCurrentWorkHook
+  persistCurrentPageRef.current = (index: number) => mutateProgressHook.mutate(index + 1)
+  normalizeCurrentPageRef.current = normalizeCurrentPageHook
+
+  const isMenuOpen = useReaderStore((s) => s.isMenuOpen)
+  const setMenuOpen = useReaderStore((s) => s.setMenuOpen)
+
+  const navigateToWork = useCallback(
+    async (targetWorkId: number) => {
+      await setCurrentWorkRef.current.mutateAsync(targetWorkId)
+      navigate(`/lists/${listId}/work/${targetWorkId}`)
+    },
+    [navigate, listId]
+  )
+
+  const displayedWidth = displayDimensions?.width ?? 0
+  const displayedHeight = displayDimensions?.height ?? 0
+
+  // Resetear estado de UI cuando cambia de Work
+  useEffect(() => {
+    setCurrentPageIndex(0)
+    setDisplayDimensions(null)
+    setImageReady(false)
+    setIsTransitioning(false)
+    setViewState('normal')
+    setPageError(null)
+  }, [workId])
+
+  const pages = ctx?.pages ?? []
   const currentPage = currentPageIndex < pages.length ? pages[currentPageIndex] : null
   const currentPageUrl = currentPage?.url ?? null
   const resolvedImageUrl = useProtectedImage(currentPageUrl)
-  const myRating = data?.myRating ?? null
+  const myRating = ctx?.myRating ?? null
   const resolvedRating: MyRatingDto | null = myRating
     ? { stars: myRating.stars, review: myRating.review, createdAt: '', updatedAt: null }
     : null
 
   /** Works of the list ordered by position (already ordered by the backend). */
-  const works = data?.works ?? []
+  const works = ctx?.works ?? []
   const currentWorkIndex = works.findIndex((w) => w.work.id === workId)
   const prevWorkItem = currentWorkIndex > 0 ? works[currentWorkIndex - 1] : null
   const nextWorkItem = currentWorkIndex >= 0 && currentWorkIndex < works.length - 1 ? works[currentWorkIndex + 1] : null
   /** True when the current work is the last one of the list (by position). */
   const isLastWork = currentWorkIndex >= 0 && currentWorkIndex === works.length - 1
+  /** Total pages: content pages + work rating (+ list rating only for the last work). */
+  const totalPages = isLastWork ? pages.length + 2 : pages.length + 1
+  /** Posición del formulario de valoración del work (siempre después del contenido). */
+  const isWorkRatingPosition = currentPageIndex === pages.length
+  /** Posición del formulario de valoración de la lista (solo último work, después del work rating). */
+  const isListRatingPosition = isLastWork && currentPageIndex === pages.length + 1
+  const isAnyRatingPosition = isWorkRatingPosition || isListRatingPosition
 
   const previousWork = prevWorkItem
     ? { id: prevWorkItem.work.id, title: prevWorkItem.work.title, numberValue: null }
@@ -64,60 +107,44 @@ export function ListReader({ listId, workId }: ListReaderProps) {
     ? { id: nextWorkItem.work.id, title: nextWorkItem.work.title, numberValue: null }
     : null
 
-  const backendCurrentPage = data?.currentPage ?? null
-  const setCurrentWork = useSetListCurrentWork(listId)
-  const mutateProgress = useUpdateReadingProgress(workId)
-  const normalizeCurrentPage = useNormalizeCurrentPage()
-
-  const isMenuOpen = useReaderStore((s) => s.isMenuOpen)
-  const setMenuOpen = useReaderStore((s) => s.setMenuOpen)
-
-  const navigateToWork = useCallback(
-    async (targetWorkId: number) => {
-      await setCurrentWork.mutateAsync(targetWorkId)
-      navigate(`/lists/${listId}/work/${targetWorkId}`)
-    },
-    [navigate, listId, setCurrentWork]
-  )
-
-  const displayedWidth = displayDimensions?.width ?? 0
-  const displayedHeight = displayDimensions?.height ?? 0
-
-  const persistCurrentPage = useCallback((index: number) => {
-    // index es 0-based; el Backend usa 1-based
-    mutateProgress.mutate(index + 1)
-  }, [mutateProgress])
-
-  // Resetear estado cuando cambia de Work
+  // Consulta directa al backend y persiste solo si hay diferencia real.
+  // Reglas del usuario:
+  //  - currentPage === null => pagina 1 y PUT /works/{workId}/progress
+  //  - currentPage != null   => mostrarla, no persistir nada
+  //  - workId URL != currentWorkId backend => PUT /reading/lists/{listId}/current-work
+  //  - workId URL == currentWorkId backend => no hacer nada
   useEffect(() => {
-    setCurrentPageIndex(0)
-    setInitialized(false)
-    setDisplayDimensions(null)
-    setImageReady(false)
-    setIsTransitioning(false)
-    setViewState('normal')
-    setPageError(null)
-    // Persistir el Work actual al cambiar de work (incluido el primer render),
-    // de modo que al volver a abrir la lista se reanude en el último Work.
-    if (workId !== previousWorkIdRef.current) {
-      previousWorkIdRef.current = workId
-      void setCurrentWork.mutateAsync(workId)
+    let cancelled = false
+
+    const run = async () => {
+      const data = await getListReaderContext(listId, workId)
+      if (cancelled) return
+      setCtx(data)
+
+      const backendPage = data.currentPage ?? null
+      const backendCurrentWork = data.list.currentWorkId ?? null
+      const works = data.works ?? []
+      const currentWorkIndex = works.findIndex((w) => w.work.id === workId)
+      const isLastWork = currentWorkIndex >= 0 && currentWorkIndex === works.length - 1
+      const totalPages = isLastWork ? data.pages.length + 2 : data.pages.length + 1
+
+      // currentPage null => pagina 1, persistir al backend
+      if (backendPage === null) {
+        setCurrentPageIndex(0)
+        persistCurrentPageRef.current(0)
+      } else {
+        setCurrentPageIndex(normalizeCurrentPageRef.current(backendPage, totalPages))
+      }
+
+      // workId de la url distinto al currentWorkId del backend => persistir work actual
+      if (workId !== backendCurrentWork) {
+        void setCurrentWorkRef.current.mutateAsync(workId)
+      }
     }
 
-    // Al abandonar el reader (unmount), persistir el Work actual para que el
-    // próximo acceso a la lista retome exactamente aquí.
-    return () => {
-      void setCurrentWork.mutateAsync(workId)
-    }
-  }, [workId, setCurrentWork])
-
-  useEffect(() => {
-    if (!data || initialized) return
-    const normalized = normalizeCurrentPage(backendCurrentPage, totalPages)
-    setCurrentPageIndex(normalized)
-    persistCurrentPage(normalized)
-    setInitialized(true)
-  }, [data, initialized, backendCurrentPage, totalPages, normalizeCurrentPage, persistCurrentPage])
+    void run()
+    return () => { cancelled = true }
+  }, [listId, workId])
 
   const navigateTo = useCallback((index: number) => {
     if (index < 0 || index >= totalPages) return
@@ -129,13 +156,13 @@ export function ListReader({ listId, workId }: ListReaderProps) {
     setDisplayDimensions(null)
     setImageReady(false)
     setIsTransitioning(true)
-    persistCurrentPage(index)
+    persistCurrentPageRef.current(index)
 
     if (containerRef.current) {
       containerRef.current.scrollLeft = 0
       containerRef.current.scrollTop = 0
     }
-  }, [currentPageIndex, totalPages, persistCurrentPage])
+  }, [currentPageIndex, totalPages])
 
   const goNext = useCallback(() => {
     if (currentPageIndex >= totalPages - 1) return
@@ -446,7 +473,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
     return null
   }
 
-  if (isLoading && pages.length === 0) {
+  if (!ctx && pages.length === 0) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[#06080d]">
         <ReaderLoading label="Cargando paginas..." />
@@ -454,15 +481,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
     )
   }
 
-  if (error && pages.length === 0) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-[#06080d]">
-        <ReaderError message={error.message} onRetry={() => window.location.reload()} />
-      </div>
-    )
-  }
-
-  if (pages.length === 0) {
+  if (ctx && pages.length === 0) {
     return (
       <div className="fixed inset-0 flex items-center justify-center bg-[#06080d]">
         <ReaderError message="No se encontraron paginas para esta obra." onRetry={() => window.location.reload()} />
@@ -471,9 +490,8 @@ export function ListReader({ listId, workId }: ListReaderProps) {
   }
 
   const showError = viewState === 'error'
-  const showLoading = viewState === 'loading' || isFetching
+  const showLoading = viewState === 'loading'
   const showNormal = !showError && !showLoading
-  const isRatingPosition = currentPageIndex === totalPages - 1
 
   return (
     <div className="fixed inset-0 flex flex-col bg-[#06080d] select-none">
@@ -519,7 +537,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
           </>
         )}
 
-        {showNormal && !isRatingPosition && !imageReady && (
+        {showNormal && !isAnyRatingPosition && !imageReady && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#06080d]">
             <ReaderLoading label="Cargando pagina..." />
           </div>
@@ -544,19 +562,45 @@ export function ListReader({ listId, workId }: ListReaderProps) {
           />
         )}
 
-        {showNormal && isRatingPosition && (
+        {showNormal && isAnyRatingPosition && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#06080d]/80 p-4">
             <div className="w-full max-w-2xl">
-              {isLastWork && data ? (
-                <ListRatingForm
-                  key={workId}
-                  listId={listId}
-                  listContextKey={listReaderContextKey(listId, workId)}
-                  existingRating={data.list.myRating}
-                  onSaved={() => {}}
-                />
+              {isListRatingPosition && ctx ? (
+                <>
+                  <div className="mb-2 flex items-center justify-center gap-1 text-xs text-brand-400 uppercase font-bold tracking-wider">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110 4m0 4v2m0-6V4" />
+                    </svg>
+                    Valorando lista
+                  </div>
+                  <ListRatingForm
+                    key="list-rating"
+                    listId={listId}
+                    existingRating={ctx.list.myRating}
+                    onSaved={() => {}}
+                    variant="list"
+                  />
+                </>
               ) : (
-                <RatingForm key={workId} workId={workId} myRating={resolvedRating} onClose={handleRatingClose} />
+                <>
+                  <div className="mb-2 flex items-center justify-center gap-1 text-xs text-neps-primary uppercase font-bold tracking-wider">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110 4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110 4m0 4v2m0-6V4" />
+                    </svg>
+                    Valorando obra
+                  </div>
+                  <RatingForm
+                    key="work-rating"
+                    workId={workId}
+                    myRating={resolvedRating}
+                    onClose={handleRatingClose}
+                    onSaved={() => {
+                      if (isWorkRatingPosition && isLastWork) {
+                        navigateTo(pages.length + 1)
+                      }
+                    }}
+                  />
+                </>
               )}
             </div>
           </div>
@@ -564,7 +608,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
 
         {showLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-[#06080d]/80">
-            <ReaderLoading label={isFetching ? 'Cargando pagina...' : 'Cargando pagina...'} />
+            <ReaderLoading label="Cargando pagina..." />
           </div>
         )}
 
@@ -589,7 +633,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
         nextWork={nextWork}
         onPreviousWork={goPreviousWork}
         onNextWork={goNextWork}
-        isLastPosition={isRatingPosition}
+        isLastPosition={isAnyRatingPosition}
       />
 
       <ReaderMenu
@@ -599,7 +643,7 @@ export function ListReader({ listId, workId }: ListReaderProps) {
         onZoomIn={() => adjustZoom(ZOOM_STEP)}
         onZoomOut={() => adjustZoom(-ZOOM_STEP)}
         listContext={
-          data
+          ctx
             ? {
                 listId,
                 workId,

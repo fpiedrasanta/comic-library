@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { getListReaderContext, setListCurrentWork } from '../api/reader-repository'
 import type { ListReaderContextDto, ListReaderListItemDto, ListReaderPageDto } from '../types/list-reader-context'
@@ -7,7 +8,7 @@ export function listReaderContextKey(listId: number, workId: number) {
 }
 
 export function useListReaderContext(listId: number, workId: number) {
-  return useQuery<ListReaderContextDto>({
+  const { data, isLoading, error, isFetching, refetch } = useQuery<ListReaderContextDto>({
     queryKey: listReaderContextKey(listId, workId),
     queryFn: () => getListReaderContext(listId, workId),
     enabled: Number.isFinite(listId) && Number.isFinite(workId),
@@ -16,6 +17,8 @@ export function useListReaderContext(listId: number, workId: number) {
     refetchOnMount: 'always',
     refetchOnWindowFocus: true,
   })
+
+  return { data, isLoading, error, isFetching, refetch }
 }
 
 /**
@@ -26,8 +29,10 @@ export function useListReaderContext(listId: number, workId: number) {
 export function useSetListCurrentWork(listId: number) {
   const queryClient = useQueryClient()
 
+  const mutationFn = useCallback((workId: number) => setListCurrentWork(listId, workId), [listId])
+
   return useMutation({
-    mutationFn: (workId: number) => setListCurrentWork(listId, workId),
+    mutationFn,
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['catalog', 'list-detail', listId] })
     },
