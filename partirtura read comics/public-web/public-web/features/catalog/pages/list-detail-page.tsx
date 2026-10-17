@@ -57,7 +57,7 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
           ) : (
             <div className="space-y-2.5">
               {list.works.map((item) => (
-                <ListWorkRow key={item.work.id} work={item.work} position={item.position} />
+                <ListWorkRow key={item.work.id} work={item.work} position={item.position} listId={list.id} />
               ))}
             </div>
           )}

@@ -1,9 +1,9 @@
+import { Link } from 'react-router-dom'
 import { ProtectedImage } from '@/components/protected-image'
 import { hasVisibleProgress } from '../utils/list-metrics'
 import type { CatalogListWorkDto } from '../types/lists'
 
 const FULL_PERCENTAGE = 100
-const NOT_STARTED_PERCENTAGE = 0
 /** Zero padding of the order number, so `1` reads as `01`. */
 const POSITION_PAD = 2
 
@@ -16,6 +16,9 @@ const ACTION_LABELS: Record<ListWorkAction, string> = {
   restart: 'Recomenzar',
 }
 
+const ACTION_BASE_CLASS =
+  'flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg transition-colors text-[11px] font-bold'
+
 function resolveAction(percentage: number | null): ListWorkAction {
   if (percentage === null) return 'read'
   if (percentage >= FULL_PERCENTAGE) return 'restart'
@@ -26,6 +29,8 @@ interface ListWorkRowProps {
   work: CatalogListWorkDto
   /** Position inside the list, as delivered by the backend. */
   position: number
+  /** The list the work belongs to, for the reading action route. */
+  listId: number
 }
 
 /**
@@ -33,12 +38,14 @@ interface ListWorkRowProps {
  *
  * A composition of its own, different from `WorkCard` on purpose: a list row is
  * a reading position, not a catalog card, so it shows the order, the individual
- * progress and the action that resumes the reading. The row itself does not
- * navigate and cannot be reordered: the order belongs to the list and is defined
- * by the backend.
+ * progress and the action that resumes the reading. The reading action opens the
+ * Reader at `/lists/{listId}/work/{workId}`, the contextual route resolved by
+ * TASK-PUBLIC-WEB-0093; the row itself does not navigate and cannot be
+ * reordered: the order belongs to the list and is defined by the backend.
  */
-export function ListWorkRow({ work, position }: ListWorkRowProps) {
+export function ListWorkRow({ work, position, listId }: ListWorkRowProps) {
   const action = resolveAction(work.readingProgressPercentage)
+  const isCompleted = work.readingProgressPercentage !== null && work.readingProgressPercentage >= FULL_PERCENTAGE
 
   const details = [work.publisherName, work.numberValue ? `Nº ${work.numberValue}` : null]
     .filter((detail): detail is string => detail !== null)
@@ -62,7 +69,7 @@ export function ListWorkRow({ work, position }: ListWorkRowProps) {
           {hasVisibleProgress(work.readingProgressPercentage) && (
             <span
               className={`text-[11px] font-mono font-bold flex-shrink-0 ${
-                work.readingProgressPercentage > NOT_STARTED_PERCENTAGE ? 'text-emerald-400' : 'text-slate-500'
+                isCompleted ? 'text-emerald-400' : 'text-slate-500'
               }`}
             >
               {work.readingProgressPercentage}%
@@ -82,18 +89,20 @@ export function ListWorkRow({ work, position }: ListWorkRowProps) {
         )}
       </div>
 
-      <button
-        type="button"
-        // The row of a list is not a navigation: it neither opens the reader nor the
-        // work detail. How a list is read comes later (TASK-PUBLIC-WEB-0089), so the
-        // button only states the reading action of that work for now.
-        className="flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold transition-colors"
+      <Link
+        to={`/lists/${listId}/work/${work.id}`}
+        title={ACTION_LABELS[action]}
+        className={`${ACTION_BASE_CLASS} ${
+          isCompleted
+            ? 'bg-emerald-500/10 border border-emerald-500/30 text-emerald-400'
+            : 'bg-slate-700/30 border border-slate-600 text-slate-300 group-hover:bg-slate-700/50'
+        }`}
       >
         <svg className="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24" aria-hidden>
           <path d="M8 5v14l11-7z" />
         </svg>
         <span className="hidden sm:inline">{ACTION_LABELS[action]}</span>
-      </button>
+      </Link>
     </article>
   )
 }

@@ -56,6 +56,8 @@ All responses are `ApiResponse<T>`. Paginated lists use `ApiResponse<ListRespons
 | `/api/works/{workId}/ratings` | `endpoints/endpoints-work-ratings.md` |
 | `/api/users/me/reading-history` | `endpoints/endpoints-reading-history.md` |
 | `/api/catalog` | `endpoints/endpoints-catalog.md` |
+| `/api/catalog/lists/{listId}/ratings` | `endpoints/endpoints-list-ratings.md` |
+| `/api/reading/lists/{listId}/current-work` | `endpoints/endpoints-list-reading.md` |
 
 Each per-controller file documents:
 

@@ -7,19 +7,22 @@ interface ReaderHeaderProps {
   onToggleFullscreen: () => void
   onZoomIn: () => void
   onZoomOut: () => void
+  /** Destination of the back button. Defaults to `/works/{workId}` (individual reader). */
+  returnPath?: string
 }
 
-export function ReaderHeader({ workId, zoom, onToggleMenu, onToggleFullscreen, onZoomIn, onZoomOut }: ReaderHeaderProps) {
+export function ReaderHeader({ workId, zoom, onToggleMenu, onToggleFullscreen, onZoomIn, onZoomOut, returnPath }: ReaderHeaderProps) {
   const navigate = useNavigate()
+  const handleBack = () => navigate(returnPath ?? `/works/${workId}`)
 
   return (
     <header className="relative z-30 flex items-center justify-between px-3 py-2.5 sm:px-4 sm:py-3 bg-neps-card/90 border-b border-neps-border/80 backdrop-blur-md transition-all duration-300">
       <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-        <button
-          onClick={() => navigate(`/works/${workId}`)}
-          className="p-1.5 rounded-lg border border-neps-primary/40 text-neps-primary hover:bg-neps-primary hover:text-white transition-colors flex-shrink-0"
-          title="Volver al detalle"
-        >
+          <button
+            onClick={handleBack}
+            className="p-1.5 rounded-lg border border-neps-primary/40 text-neps-primary hover:bg-neps-primary hover:text-white transition-colors flex-shrink-0"
+            title="Volver al detalle"
+          >
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
           </svg>

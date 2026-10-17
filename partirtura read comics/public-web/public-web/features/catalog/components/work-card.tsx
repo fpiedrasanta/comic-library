@@ -4,12 +4,12 @@ import type { WorkCatalogItemDto, EntityChainSelection, HierarchyLevel } from '.
 import { ProtectedImage } from '@/components/protected-image'
 import { colorWithAlpha, readableBackgroundColor, readablePillTextColor } from '../utils/entity-color'
 import { readingProgressAppearance } from '../utils/reading-progress-color'
+import { ReadingProgressOverlay } from './reading-progress-overlay'
 
 const PILL_BACKGROUND_ALPHA = 0.85
 const CARD_SURFACE = '#131a26'
 const PILL_BORDER_ALPHA = 0.25
 const WORK_TYPE_PILL_BORDER_ALPHA = 0.45
-const PROGRESS_BADGE_BORDER_ALPHA = 0.4
 const HIERARCHY_PILL_CLASS = 'text-[9px] font-bold px-1.5 py-0.5 rounded border backdrop-blur-md hover:scale-105 transition-transform truncate max-w-[100px]'
 const WORK_TYPE_PILL_CLASS = 'text-[9px] font-extrabold px-1.5 py-0.5 rounded border backdrop-blur-md uppercase tracking-wider'
 
@@ -134,37 +134,10 @@ export function WorkCard({ work, _onSelectEntity, hiddenPills = [] }: WorkCardPr
         </div>
 
         {progressAppearance && readingProgress && (
-          <>
-            <div className="absolute bottom-3 left-2 z-20 pointer-events-none">
-              <span
-                style={{
-                  borderColor: colorWithAlpha(progressAppearance.color, PROGRESS_BADGE_BORDER_ALPHA),
-                  color: progressAppearance.color,
-                }}
-                className="bg-[#0b0f19]/85 backdrop-blur-md border text-[9px] font-mono font-bold px-2 py-0.5 rounded-md flex items-center gap-1 shadow-md whitespace-nowrap"
-              >
-                {readingProgress.status === 'Completed' ? (
-                  '✓ LEÍDO'
-                ) : (
-                  <>
-                    <span className="w-1.5 h-1.5 rounded-full bg-current animate-pulse" />
-                    {progressAppearance.percentage}%
-                  </>
-                )}
-              </span>
-            </div>
-
-            <div className="absolute bottom-0 left-0 right-0 h-1 bg-black/60 z-20 pointer-events-none">
-              <div
-                className="h-full"
-                style={{
-                  width: `${progressAppearance.percentage}%`,
-                  backgroundColor: progressAppearance.color,
-                  boxShadow: `0 0 10px ${progressAppearance.glow}`,
-                }}
-              />
-            </div>
-          </>
+          <ReadingProgressOverlay
+            appearance={progressAppearance}
+            isCompleted={readingProgress.status === 'Completed'}
+          />
         )}
       </div>
 

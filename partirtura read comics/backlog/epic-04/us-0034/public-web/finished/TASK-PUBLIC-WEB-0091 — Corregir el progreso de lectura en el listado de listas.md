@@ -87,3 +87,15 @@ No marcar la task como finalizada si las validaciones obligatorias fallan o si e
 ## Fuera de alcance
 
 El detalle de las listas, la navegación contextual del reader, el selector de Works y las valoraciones se implementarán en tasks posteriores.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- `features/catalog/utils/reading-progress-color.ts`: `listReadingProgressAppearance(percentage)` y `hasVisibleProgress` preserva la distinción `null` (no muestra barra).
+- `features/catalog/components/reading-progress-overlay.tsx`: overlay extraído reutilizable (badge + bar).
+- `features/catalog/components/list-card.tsx`: usa `ReadingProgressOverlay` (amber→orange parcial / verde "✓ LEÍDO" en 100% / nada en `null`).
+- Hotfix grid: columnas de WorkCard 6→4 (multiplos de 12) ya aplicado en `main` (`3d0aef8`).
+
+**Validaciones**: typecheck + build OK en la rama. Reader individual sin regresiones.

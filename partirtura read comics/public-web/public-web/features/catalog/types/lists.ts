@@ -84,6 +84,13 @@ export interface CatalogListDetailDto {
   /** List average rating, `null` when `ratingCount` is 0. */
   averageRating: number | null
   ratingCount: number
+  /**
+   * The work the authenticated user should resume from when continuing this
+   * list. `null` for an empty list or when the API cannot resolve a current
+   * work (the fallback is computed server-side and is never persisted without
+   * the user navigating). Resolved by `GET /api/catalog/lists/{id}`.
+   */
+  currentWorkId: number | null
   /** Ordered by `WorkListItem.Position`, as defined by the list. */
   works: CatalogListWorkItemDto[]
 }

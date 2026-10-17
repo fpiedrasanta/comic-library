@@ -118,3 +118,19 @@ Evitar envíos duplicados mientras una operación está en curso. No mostrar un 
 ## Fuera de alcance
 
 No incorporar funcionalidades ajenas a la lectura secuencial y las valoraciones contempladas en los contratos existentes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Work rating: reutiliza `RatingForm` existente (myRating del work actual via el contexto). Navegación al siguiente Work desde el footer (`ReaderPageIndicator`).
+- List rating (`ListRatingForm`): `catalog/api/list-ratings-repository.ts` (POST/PUT `/api/catalog/lists/{listId}/ratings`) + `useVoteListRating`/`useUpdateListRating`. Reutiliza `StarRatingInput`. Mensaje "Valora esta lista, que fue hecha con mucho amor para vos." — el nombre del creador **no** lo expone el backend (`ReaderListCatalogDto`/`CatalogListDetailDto` no incluyen `userName`), por lo que se usa el tratamiento alternativo sin inventar nombres, conforme a la restricción.
+- `list-reader.tsx`: al finalizar el último Work se muestra `ListRatingForm`; en un Work intermedio se muestra `RatingForm`. `ListReaderRatingDto` se alinea al backend `ReaderListRatingDto` (con createdAt/updatedAt).
+
+**Validaciones ejecutadas**:
+- `npm run typecheck` → 0 errores.
+- `npm run build` → OK.
+- Reuso de componentes (`StarRatingInput`, `RatingForm`) y de hooks de progreso; page progress no se altera por valorar.
+
+**Limitation**: el `PUT /api/reading/lists/{listId}/current-work` y los endpoints de list rating existen en el backend (`ReadingController`, `ListRatingsController`); se documentaron en `project/endpoints/endpoints-list-reading.md` y `endpoints-list-ratings.md` y enlazados desde `endpoints.md` (TASK-0096 no disponía de server para validar runtime).

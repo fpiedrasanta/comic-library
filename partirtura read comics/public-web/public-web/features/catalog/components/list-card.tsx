@@ -6,6 +6,8 @@ import {
   readablePillTextColor,
 } from '../utils/entity-color'
 import { hasVisibleProgress, hasVisibleRating } from '../utils/list-metrics'
+import { listReadingProgressAppearance } from '../utils/reading-progress-color'
+import { ReadingProgressOverlay } from './reading-progress-overlay'
 import type { CatalogListCardDto } from '../types/lists'
 
 const CARD_SURFACE = '#131a26'
@@ -13,6 +15,7 @@ const PILL_BACKGROUND_ALPHA = 0.85
 const PILL_BORDER_ALPHA = 0.3
 const GLOW_ALPHA = 0.25
 const ACCENT_ALPHA = 0.7
+const FULL_PERCENTAGE = 100
 
 /**
  * One list of the `/lists` exploration.
@@ -84,6 +87,13 @@ export function ListCard({ list }: { list: CatalogListCardDto }) {
             style={{ backgroundColor: list.color }}
           />
         )}
+
+        {hasVisibleProgress(list.readingProgressPercentage) && (
+          <ReadingProgressOverlay
+            appearance={listReadingProgressAppearance(list.readingProgressPercentage)}
+            isCompleted={list.readingProgressPercentage >= FULL_PERCENTAGE}
+          />
+        )}
       </div>
 
       <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
@@ -128,21 +138,6 @@ export function ListCard({ list }: { list: CatalogListCardDto }) {
               · {list.ratingCount} {list.ratingCount === 1 ? 'voto' : 'votos'}
             </span>
           </p>
-        )}
-
-        {hasVisibleProgress(list.readingProgressPercentage) && (
-          <div className="space-y-1">
-            <div className="flex items-center justify-between text-[10px] text-neps-muted">
-              <span>Tu avance</span>
-              <span className="font-mono font-bold text-emerald-400">{list.readingProgressPercentage}%</span>
-            </div>
-            <div className="w-full h-1.5 bg-neps-input border border-neps-border rounded-full overflow-hidden">
-              <div
-                className="h-full bg-emerald-500 rounded-full"
-                style={{ width: `${list.readingProgressPercentage}%` }}
-              />
-            </div>
-          </div>
         )}
       </div>
     </Link>
