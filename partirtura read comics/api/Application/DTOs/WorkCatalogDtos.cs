@@ -9,7 +9,8 @@ public record GetCatalogWorksRequest(
     long? seriesId = null,
     long? workTypeId = null,
     string? orderBy = null,
-    string? orderDir = null);
+    string? orderDir = null,
+    bool? isFavorite = null);
 
 public record WorkCatalogNodeDto(
     long Id,
@@ -31,7 +32,8 @@ public record WorkCatalogItemDto(
     WorkCatalogNodeDto? Franchise,
     WorkCatalogNodeDto? Publisher,
     ReaderMyProgressDto? MyReadingProgress,
-    double? AverageRating);
+    double? AverageRating,
+    bool IsFavorite);
 
 public record CatalogWorkContextDto(
     long Id,

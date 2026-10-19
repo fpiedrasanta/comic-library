@@ -54,6 +54,7 @@ All responses are `ApiResponse<T>`. Paginated lists use `ApiResponse<ListRespons
 | `/api/admin-works`, `/api/works` | `endpoints/endpoints-works.md` |
 | `/api/works/recommended` | `endpoints/endpoints-recommended-works.md` |
 | `/api/works/{workId}/ratings` | `endpoints/endpoints-work-ratings.md` |
+| `/api/favorites` | `endpoints/endpoints-favorites.md` |
 | `/api/users/me/reading-history` | `endpoints/endpoints-reading-history.md` |
 | `/api/catalog` | `endpoints/endpoints-catalog.md` |
 | `/api/catalog/lists/{listId}/ratings` | `endpoints/endpoints-list-ratings.md` |

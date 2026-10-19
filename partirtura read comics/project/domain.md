@@ -9,7 +9,7 @@ Domain entities are simple C# classes in `Domain/Entities/`. There is **no commo
 | `domain/domain-overview.md` | Model structure, common patterns, inheritance, key conventions |
 | `domain/domain-users.md` | User, Ban, RefreshToken, PasswordResetToken, PasswordResetAuthorization, AccountDeletionToken |
 | `domain/domain-catalog.md` | Country, Publisher, Image, File, Franchise, Series, Language, Person, Role, PersonByRole, Tag, TagByWork, WorkList, WorkListItem |
-| `domain/domain-content.md` | Work, Page, Work hierarchy, WorkReadingProgress, WorkRating, ListRating, ListReadingProgress |
+| `domain/domain-content.md` | Work, Page, Work hierarchy, WorkReadingProgress, WorkRating, ListRating, ListReadingProgress, Favorite |
 
 ## Entity relationship summary
 
@@ -44,6 +44,7 @@ graph LR
     WorkReadingProgress["WorkReadingProgress"]
     ListRating["ListRating"]
     ListReadingProgress["ListReadingProgress"]
+    Favorite["Favorite"]
     
     User --> Ban
     User --> RefreshToken
@@ -56,6 +57,7 @@ graph LR
     User --> WorkReadingProgress
     User --> ListRating
     User --> ListReadingProgress
+    User --> Favorite
     
     Country --> Publisher
     Publisher --> Franchise
@@ -92,6 +94,7 @@ graph LR
     WorkList --> ListRating
     WorkList --> ListReadingProgress
     ListReadingProgress -->|"CurrentWork"| Work
+    Work --> Favorite
     
     File <|-- Image
 ```
@@ -127,6 +130,8 @@ graph LR
 | `User` | `ListReadingProgress` | One-to-many (one progress per WorkList) |
 | `WorkList` | `ListReadingProgress` | One-to-many (one progress per User) |
 | `ListReadingProgress` | `Work` (CurrentWork) | Many-to-one, optional; must belong to the list |
+| `User` | `Favorite` | One-to-many (one favorite per Work) |
+| `Work` | `Favorite` | One-to-many (one favorite per User) |
 | `File` (abstract) | `Image` | TPH inheritance (discriminator `FileType`) |
 
 ## Audit note (2026-09)

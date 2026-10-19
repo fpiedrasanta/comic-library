@@ -79,7 +79,9 @@ public class WorkService : IWorkService
             request.franchiseId,
             request.seriesId,
             request.workTypeId,
-            cancellationToken);
+            cancellationToken,
+            userId,
+            request.isFavorite);
 
         var progressesByWorkId = new Dictionary<long, WorkReadingProgress>();
 
@@ -91,13 +93,27 @@ public class WorkService : IWorkService
             progressesByWorkId = progresses.ToDictionary(progress => progress.Work!.Id);
         }
 
+        var favoriteWorkIds = await GetFavoriteWorkIdsAsync(userId, items, cancellationToken);
+        var favoriteWorkIdsSet = favoriteWorkIds.ToHashSet();
+
         var dtos = items.Select(work =>
         {
             progressesByWorkId.TryGetValue(work.Id, out var progress);
-            return MapCatalogWork(work, progress);
+            return MapCatalogWork(work, progress, favoriteWorkIdsSet.Contains(work.Id));
         }).ToList();
 
         return PaginationGuard.Build(currentPage, pageSize, totalCount, dtos);
+    }
+
+    private async Task<IReadOnlyList<long>> GetFavoriteWorkIdsAsync(long? userId, IReadOnlyList<Work> items, CancellationToken cancellationToken)
+    {
+        if (!userId.HasValue || userId.Value <= 0 || items.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        var workIds = items.Select(work => work.Id).ToList();
+        return await _unitOfWork.Favorites.GetFavoriteWorkIdsAsync(userId.Value, workIds, cancellationToken);
     }
 
     public async Task<CatalogWorkDetailDto> GetCatalogByIdAsync(long id, long? userId, CancellationToken cancellationToken = default)
@@ -160,9 +176,9 @@ public class WorkService : IWorkService
         return work is null ? null : new CatalogWorkNavigationDto(work.Id, work.Title, work.NumberValue, ImageUrlBuilder.ToUrl(work.Cover));
     }
 
-    private static WorkCatalogItemDto MapCatalogWork(Work work, WorkReadingProgress? readingProgress = null)
+    private static WorkCatalogItemDto MapCatalogWork(Work work, WorkReadingProgress? readingProgress = null, bool isFavorite = false)
     {
-        return WorkCardMapper.ToCard(work, readingProgress);
+        return WorkCardMapper.ToCard(work, readingProgress, isFavorite);
     }
 
     public async Task<WorkDetailDto?> GetByIdAsync(long workId, CancellationToken cancellationToken = default)

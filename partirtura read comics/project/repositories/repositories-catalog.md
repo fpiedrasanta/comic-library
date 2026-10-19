@@ -138,6 +138,13 @@ Task<(IReadOnlyList<TEntity>, int)> GetCatalogPagedAsync(int currentPage, int pa
 - **Loading**: `AsNoTracking` + `AsSplitQuery` with `Cover`, `Language`, `WorkType`, all context images, `PreviousNumber` → `Cover`, `NextNumber` → `Cover`, `PersonByRoles` → `Person`/`Role`, `Tags` → `Tag`. No N+1.
 - **Returns**: `Task<Work?>` — materialized entity or `null`. Mapping to the API contract is the Service responsibility.
 
+## FavoriteRepository
+
+- **Interface**: `IFavoriteRepository`
+- **Location**: `Infrastructure/Repositories/FavoriteRepository.cs`
+- **Operations**: `ExistsAsync` (is the Work a favorite of the user), `GetFavoriteWorkIdsAsync` (batched lookup of the favorites of a set of Works, used to resolve the `isFavorite` state of a page without N+1), `GetAsync` (the favorite of a user/Work pair, with `User` and `Work` navigations), `AddAsync`, `RemoveAsync`
+- **Notes**: Explicit repository for the favorites of a user over Works (`Favorite`). The pair (User, Work) is unique at DB level (`IX_Favorites_UserId_WorkId`), so at most one favorite exists per user and Work. `ExistsAsync` and `GetFavoriteWorkIdsAsync` are read-only (`AsNoTracking`); `GetAsync` is tracked so the Service can mutate the entity. `RemoveAsync` performs a **physical deletion** (`DbSet.Remove`), the explicit exception to the deactivation convention required by US-0035 ("quitar un favorito elimina físicamente su registro"); the `Favorite` entity therefore has no `IsActive` property. `GetFavoriteWorkIdsAsync` resolves the state of a whole page with a single query, so the catalog, the reading history and the recommended works never issue one query per Work. **Indexes**: `(UserId, WorkId)` (unique).
+
 ## WorkTypeRepository
 
 - **Interface**: `IWorkTypeRepository`

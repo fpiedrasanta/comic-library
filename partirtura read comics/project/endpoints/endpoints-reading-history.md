@@ -49,6 +49,9 @@ Behavior:
   following the rule `(currentPage - 1) * 100 / totalPages`, and 0 when the work has no pages.
   A completed work with pages reports 100.
 - The endpoint never creates or modifies reading progress.
+- `isFavorite` is the favorite state of the Work for the authenticated user (US-0035). It is resolved with
+  a single batched query for the whole page, never one query per work. The attribute is exclusively part of
+  the response: the request parameters are unchanged.
 - Pagination metadata (`totalCount`, `totalPages`, `hasNextPage`, `hasPriorPage`, `nextPage`,
   `priorPage`) is computed over the filtered set, before pagination.
 

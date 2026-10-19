@@ -4,6 +4,7 @@ using Application.Helpers;
 using Application.Interfaces;
 using Domain.Enums;
 using Domain.Exceptions;
+using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
@@ -39,7 +40,11 @@ public class ReadingHistoryService : IReadingHistoryService
             pageSize,
             cancellationToken);
 
-        var dtos = progresses.Select(progress => WorkCardMapper.ToCard(progress.Work!, progress)).ToList();
+        var favoriteWorkIds = await GetFavoriteWorkIdsAsync(userId, progresses, cancellationToken);
+        var favoriteWorkIdsSet = favoriteWorkIds.ToHashSet();
+
+        var dtos = progresses.Select(progress =>
+            WorkCardMapper.ToCard(progress.Work!, progress, favoriteWorkIdsSet.Contains(progress.Work!.Id))).ToList();
 
         _logger.LogInformation(
             "Reading history consulted by User {UserId}: page {CurrentPage}, {ItemCount} items of {TotalCount}, state filter {State}.",
@@ -50,6 +55,17 @@ public class ReadingHistoryService : IReadingHistoryService
             request.state ?? ReadingHistoryStates.All);
 
         return PaginationGuard.Build(currentPage, pageSize, totalCount, dtos);
+    }
+
+    private async Task<IReadOnlyList<long>> GetFavoriteWorkIdsAsync(long userId, IReadOnlyList<WorkReadingProgress> progresses, CancellationToken cancellationToken)
+    {
+        if (progresses.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        var workIds = progresses.Select(progress => progress.Work!.Id).ToList();
+        return await _unitOfWork.Favorites.GetFavoriteWorkIdsAsync(userId, workIds, cancellationToken);
     }
 
     private static ReadingState? ParseState(string? state)

@@ -100,6 +100,9 @@ Notes:
   `null` when the Work has no active ratings. It comes from the `Work` accumulators maintained by
   `WorkRatingService`, so the listing adds no extra query and the value matches the detail. It lets the
   card show `★★★★½ 4,5` without a per-work request.
+- `isFavorite` is the favorite state of the Work for the authenticated user (US-0035). It is resolved with
+  a single batched query for the whole list, never one query per work. The attribute is exclusively part of
+  the response: the request parameters are unchanged.
 - The metrics (`SUM(PercentageReading)`, `AVG(Stars)`) are computed in the database through correlated
   subqueries in the `ORDER BY`; no work is loaded to compute them in memory.
 - Read-only. No side effects.

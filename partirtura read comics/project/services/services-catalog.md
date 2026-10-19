@@ -234,3 +234,23 @@ ull when it has none, mapped from the Work accumulators.
 - **Ordering**: resolved by the repository in the database (`MostPopular` orders by the weighted reading progress `SUM(PercentageReading)`; `MostRated` by the average of active ratings with unrated works last; `RecentlyAdded` by `CreatedAt`), always with `CreatedAt` and `Id` as tie-breakers. The service never recalculates metrics in memory.
 - **Contract**: the same `WorkCatalogItemDto` as `GET /api/works`, so the Public Web reuses the existing `WorkCard` and mapping. verageRating is the average of the active ratings of the Work (zero-star votes included) or 
 ull when it has none, mapped from the Work accumulators without any extra query. Documented in `endpoints/endpoints-recommended-works.md`.
+
+## FavoriteService
+
+- **Location**: `Application/Services/FavoriteService.cs`
+- **Interface**: `IFavoriteService`
+- **Dependencies**: `IUnitOfWork`, `ILogger<FavoriteService>`
+- **Operations**: `AddFavoriteAsync`, `RemoveFavoriteAsync`
+- **Notes**: Serves US-0035 (Gestionar favoritos). The user identity comes from the authenticated context (`userId` received from the controller, extracted from the JWT `sub` claim); a client-supplied `UserId` is never trusted and is not part of the request contract, so a user can never modify the favorites of another user. The service never touches the reading progress, the reading history, the ratings or the membership of a Work in lists.
+
+### AddFavoriteAsync
+
+- **Signature**: `AddFavoriteAsync(long workId, long userId, CancellationToken)`.
+- **Responsibilities**: validates that the user exists, that the Work exists and is active, and that the Work is not already a favorite of the user; creates the `Favorite` record with `CreatedAt` = now (UTC) and persists it through the Unit of Work.
+- **Errors**: `BusinessNotFoundException` (404) when the user does not exist or the Work does not exist / is inactive; `BusinessConflictException` (409) when the Work is already a favorite of the user. The uniqueness of the pair (User, Work) is also enforced at database level.
+
+### RemoveFavoriteAsync
+
+- **Signature**: `RemoveFavoriteAsync(long workId, long userId, CancellationToken)`.
+- **Responsibilities**: validates that the user exists, that the Work exists and is active, and that the favorite exists; removes the record **physically** (the `Favorite` entity has no `IsActive` property).
+- **Errors**: `BusinessNotFoundException` (404) when the user does not exist, the Work does not exist / is inactive, or the favorite does not exist. The data is never left in an inconsistent state.

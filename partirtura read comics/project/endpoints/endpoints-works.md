@@ -26,6 +26,7 @@ Request parameters:
 - workTypeId: long (optional, filter by WorkType; never used to resolve hierarchy membership)
 - orderBy: string (optional, allowed: Title, PublicationDate, CreatedAt, UploadedAt (alias of CreatedAt), Number)
 - orderDir: string (default DESC)
+- isFavorite: boolean (optional, US-0035). `true` returns only the favorites of the authenticated user; `false`, `null` or any other value does not filter the catalog. The filter is applied in the database before counting, ordering and pagination, so the paging metadata describes the filtered set.
 
 Behavior:
 - Several filters combine with AND; the hierarchy never returns works outside the selected context.
@@ -78,39 +79,41 @@ Response:
                        "name": "DC Comics",
                        "color": "#1F2D3D"
                    },
-                   "myReadingProgress": {
-                       "currentPage": 12,
-                       "totalPages": 32,
-                       "percentage": 34,
-                       "status": "Reading",
-                       "lastReadAt": "2026-10-09T14:22:10Z"
-                   },
-                   "averageRating": 4.5
-               },
-               {
-                   "id": 2,
-                   "workTypeId": 1,
-                   "workTypeName": "Number",
-                   "title": "Batman #2",
-                   "description": null,
-                   "numberValue": "2",
-                   "publicationDate": "1940-05-25T00:00:00Z",
-                   "createdAt": "2026-01-11T15:30:00Z",
-                   "coverId": null,
-                   "urlCover": null,
-                   "series": null,
-                   "franchise": null,
-                   "publisher": null,
-                   "myReadingProgress": null,
-                   "averageRating": 4.5
-               }
+                    "myReadingProgress": {
+                        "currentPage": 12,
+                        "totalPages": 32,
+                        "percentage": 34,
+                        "status": "Reading",
+                        "lastReadAt": "2026-10-09T14:22:10Z"
+                    },
+                    "averageRating": 4.5,
+                    "isFavorite": true
+                },
+                {
+                    "id": 2,
+                    "workTypeId": 1,
+                    "workTypeName": "Number",
+                    "title": "Batman #2",
+                    "description": null,
+                    "numberValue": "2",
+                    "publicationDate": "1940-05-25T00:00:00Z",
+                    "createdAt": "2026-01-11T15:30:00Z",
+                    "coverId": null,
+                    "urlCover": null,
+                    "series": null,
+                    "franchise": null,
+                    "publisher": null,
+                    "myReadingProgress": null,
+                    "averageRating": 4.5,
+                    "isFavorite": false
+                }
            ]
        }
    }
 - 401 Unauthorized when the bearer token is missing or invalid.
 
 DTO:
-`Application/DTOs/WorkCatalogDtos.cs` â€” `GetCatalogWorksRequest`, `WorkCatalogItemDto` (Id, WorkTypeId, WorkTypeName, Title, Description, NumberValue, PublicationDate, CreatedAt, CoverId, UrlCover, Series/Franchise/Publisher as `WorkCatalogNodeDto`, MyReadingProgress as `ReaderMyProgressDto`: CurrentPage, TotalPages, Percentage, LastReadAt, Status; AverageRating), `WorkCatalogNodeDto`.
+`Application/DTOs/WorkCatalogDtos.cs` â€” `GetCatalogWorksRequest`, `WorkCatalogItemDto` (Id, WorkTypeId, WorkTypeName, Title, Description, NumberValue, PublicationDate, CreatedAt, CoverId, UrlCover, Series/Franchise/Publisher as `WorkCatalogNodeDto`, MyReadingProgress as `ReaderMyProgressDto`: CurrentPage, TotalPages, Percentage, LastReadAt, Status; AverageRating, IsFavorite), `WorkCatalogNodeDto`.
 
 Notes:
 - `averageRating` is the average of the active ratings of the Work (zero-star votes included), or `null` when the Work has no active ratings. It comes from the `Work` accumulators (`RatingCount` / `AverageRating`) maintained by `WorkRatingService`, the same values used by the detail, so the listing adds no extra query. A card must check for `null` before showing the rating.

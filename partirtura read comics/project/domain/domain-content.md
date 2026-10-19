@@ -168,3 +168,13 @@ These corrections were validated by re-reading the entity files during the 2026-
   - irtual Work? CurrentWork — optional work of the list the user is currently reading; null when the user has not started the list or has finished it. It must belong to the list; the rules for updating it when the list composition changes belong to the service layer.
   - DateTimeOffset? LastReadAt — date of the last reading activity; null while the user has not read.
 - **Notes**: Aggregate reading progress of a user on a list, created when the user starts reading the list. **No scalar FK properties** (UserId, WorkListId, CurrentWorkId): EF Core manages them as shadow properties. One record per User + WorkList (unique index on (WorkListId, UserId)). The percentage and the state of a list are **not persisted**: they are derived from the list composition and from the existing WorkReadingProgress records (completed works / total works, and Reading when at least one work of the list is in that state). **Index**: (WorkListId, UserId) (unique).
+
+## Favorite
+
+- **Location**: Domain/Entities/Favorite.cs
+- **Fields**:
+  - long Id
+  - irtual User User — required navigation.
+  - irtual Work Work — required navigation.
+  - DateTime CreatedAt — creation date in UTC.
+- **Notes**: A Work marked as favorite by a user (US-0035). **No scalar FK properties** (UserId, WorkId): EF Core manages them as shadow properties. One favorite per User + Work (unique index on (UserId, WorkId)), so a Work can never be duplicated in the favorites of the same user. **No `IsActive` property**: removing a favorite is a physical deletion of the record, as defined by US-0035. A favorite never modifies the reading progress, the reading history, the ratings of the Work or its membership in lists. **Index**: (UserId, WorkId) (unique).

@@ -7,7 +7,7 @@ Quick reference for repository interfaces and their operations. The per-module d
 | File | Contents |
 | --- | --- |
 | `repositories/repositories-users.md` | UserRepository, RefreshTokenRepository, PasswordResetTokenRepository, PasswordResetAuthorizationRepository, AccountDeletionTokenRepository, BanRepository, ImageRepository |
-| `repositories/repositories-catalog.md` | CountryRepository, PublisherRepository, FranchiseRepository, SeriesRepository, LanguageRepository, PersonRepository, RoleRepository, TagRepository, ListTypeRepository, WorkListRepository, WorkRepository, WorkTypeRepository |
+| `repositories/repositories-catalog.md` | CountryRepository, PublisherRepository, FranchiseRepository, SeriesRepository, LanguageRepository, PersonRepository, RoleRepository, TagRepository, ListTypeRepository, WorkListRepository, WorkRepository, WorkTypeRepository, FavoriteRepository |
 | `repositories/repositories-numbers.md` | PageRepository, UnitOfWork |
 
 ## Conventions (enforced as of 2026-09 audit)
@@ -17,6 +17,8 @@ Quick reference for repository interfaces and their operations. The per-module d
 - Every FK column has a corresponding `HasIndex` in the EF configuration. Shadow FKs use the `HasIndex("ColumnName")` string overload.
 - No `IQueryable<T>` is exposed in interfaces. Repositories return `Task<T>`, `Task<(IReadOnlyList<T>, int)>`, or already-materialized DTOs.
 - No `DbSet.Remove` / `DbSet.RemoveRange`. Deactivation uses `IsActive = false`.
+  - **Exception**: `FavoriteRepository.RemoveAsync` performs a physical deletion. US-0035 requires that removing a
+    favorite deletes its record instead of deactivating it, and the `Favorite` entity has no `IsActive` property.
 
 ## Quick reference
 
@@ -44,3 +46,4 @@ Quick reference for repository interfaces and their operations. The per-module d
 | AccountDeletionTokenRepository | `IAccountDeletionTokenRepository` | 4 |
 | BanRepository | `IBanRepository` | 5 |
 | ImageRepository | `IImageRepository` | 3 |
+| FavoriteRepository | `IFavoriteRepository` | 5 |

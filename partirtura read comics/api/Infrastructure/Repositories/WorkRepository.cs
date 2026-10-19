@@ -141,7 +141,9 @@ public class WorkRepository(ApplicationDbContext context) : IWorkRepository
         long? franchiseId,
         long? seriesId,
         long? workTypeId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        long? userId = null,
+        bool? isFavorite = null)
     {
         IQueryable<Work> query = _context.Works
             .AsNoTracking()
@@ -150,6 +152,7 @@ public class WorkRepository(ApplicationDbContext context) : IWorkRepository
         query = ApplyCatalogSearch(query, search);
         query = ApplyCatalogHierarchy(query, publisherId, franchiseId, seriesId);
         query = ApplyWorkTypeFilter(query, workTypeId);
+        query = ApplyFavoriteFilter(query, userId, isFavorite);
 
         var totalCount = await query.CountAsync(cancellationToken);
 
@@ -335,6 +338,22 @@ public class WorkRepository(ApplicationDbContext context) : IWorkRepository
         return workTypeId.HasValue
             ? query.Where(w => w.WorkType != null && w.WorkType.Id == workTypeId.Value)
             : query;
+    }
+
+    private IQueryable<Work> ApplyFavoriteFilter(IQueryable<Work> query, long? userId, bool? isFavorite)
+    {
+        if (isFavorite != true)
+        {
+            return query;
+        }
+
+        if (!userId.HasValue || userId.Value <= 0)
+        {
+            return query.Where(_ => false);
+        }
+
+        return query.Where(work => _context.Favorites.Any(
+            favorite => favorite.Work != null && favorite.Work.Id == work.Id && favorite.User != null && favorite.User.Id == userId.Value));
     }
 
     private static IQueryable<Work> ApplyCatalogOrdering(IQueryable<Work> query, string? orderBy, string orderDir)

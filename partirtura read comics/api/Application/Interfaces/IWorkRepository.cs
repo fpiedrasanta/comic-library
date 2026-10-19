@@ -36,7 +36,9 @@ public interface IWorkRepository
         long? franchiseId,
         long? seriesId,
         long? workTypeId,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        long? userId = null,
+        bool? isFavorite = null);
 
     Task<Work?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
     Task<Work?> GetByIdWithNavigationAsync(long id, CancellationToken cancellationToken = default);
