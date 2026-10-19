@@ -1,9 +1,6 @@
+using Application.Interfaces;
+using Domain.Entities;
 using Domain.Exceptions;
-using Application.Interfaces;
-using Domain.Entities;
-using Microsoft.Extensions.Logging;
-using Application.Interfaces;
-using Domain.Entities;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
