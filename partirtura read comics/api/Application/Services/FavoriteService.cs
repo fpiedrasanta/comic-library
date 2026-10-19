@@ -1,4 +1,4 @@
-﻿using Domain.Exceptions;
+using Domain.Exceptions;
 using Application.Interfaces;
 using Domain.Entities;
 using Microsoft.Extensions.Logging;
@@ -73,4 +73,3 @@ public class FavoriteService : IFavoriteService
         await _unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
-

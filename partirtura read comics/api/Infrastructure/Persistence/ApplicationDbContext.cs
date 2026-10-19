@@ -80,4 +80,3 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfiguration(new FavoriteConfiguration());
     }
 }
-

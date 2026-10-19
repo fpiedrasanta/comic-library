@@ -65,3 +65,33 @@ Agregar `isFavorite` a cada Work devuelto por:
 ## Resultado de ejecución
 
 Registrar rama, commit, archivos modificados, validaciones y bloqueos.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- `isFavorite` agregado a cada Work devuelto por `GET /api/users/me/reading-history` y por
+  `GET /api/works/recommended`, con el estado del usuario autenticado.
+- El atributo es **exclusivamente de respuesta**: no se modificó ningún parámetro, filtro, ordenamiento,
+  paginación ni cuerpo de request de ambos endpoints.
+- El estado se resuelve con **una única consulta por página/lista**
+  (`IFavoriteRepository.GetFavoriteWorkIdsAsync`), nunca con una consulta por Work.
+
+**Qué se cambió**:
+- `api/Application/Services/ReadingHistoryService.cs`: batch de favoritos de la página y mapeo de `isFavorite`.
+- `api/Application/Services/RecommendedWorksService.cs`: ídem para la lista de recomendados.
+- `project/endpoints/endpoints-reading-history.md`, `project/endpoints/endpoints-recommended-works.md`,
+  `project/endpoints/endpoints-favorites.md`, `project/services.md`, `project/services/services-catalog.md`.
+
+**Decisiones relevantes**:
+- La identidad del usuario sigue viniendo exclusivamente del contexto autenticado (`userId` resuelto en el
+  controller desde el claim `sub`); no se acepta ninguna identidad enviada por el cliente.
+- No se modificaron las reglas de progreso de lectura ni las de recomendación: solo se agrega un atributo
+  de salida.
+
+**Notas**:
+- Commit: 78330ab. Branch: feature/us-0036.
+- Tests: `FavoritesIntegrationTests.ReadingHistory_ExposesTheFavoriteStateOfEveryWork` y
+  `RecommendedWorks_ExposeTheFavoriteStateOfEveryWork`.
+- Build 0 errores; suite completa 408/408 pass.

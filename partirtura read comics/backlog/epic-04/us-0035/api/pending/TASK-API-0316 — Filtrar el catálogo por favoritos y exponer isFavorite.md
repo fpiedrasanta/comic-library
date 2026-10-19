@@ -68,3 +68,48 @@ Agregar `isFavorite` a cada elemento de la respuesta.
 ## Resultado de ejecución
 
 Registrar rama, commit, archivos modificados, validaciones y bloqueos.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Parámetro opcional `isFavorite` en `GET /api/works` (`GetCatalogWorksRequest.isFavorite`, `bool?`).
+  - `true`: devuelve únicamente los Works favoritos del usuario autenticado.
+  - `false`, `null` o cualquier otro valor: no filtra el catálogo (devuelve todos los Works).
+- El filtro se aplica **en la base de datos, antes del conteo, del ordenamiento y de la paginación**
+  (`WorkRepository.ApplyFavoriteFilter`), de modo que `totalCount`, `totalPages` y `hasNextPage` describen
+  el conjunto filtrado. Sin `userId` (o `userId <= 0`) el filtro `true` devuelve el conjunto vacío.
+- `isFavorite` agregado a cada Work de la respuesta (`WorkCatalogItemDto.IsFavorite`), con el estado real
+  del usuario autenticado, también cuando el filtro no está activo.
+- El estado se resuelve con **una única consulta por página** (`IFavoriteRepository.GetFavoriteWorkIdsAsync`),
+  sin una consulta por Work.
+
+**Qué se cambió**:
+- `api/Application/DTOs/WorkCatalogDtos.cs`: `GetCatalogWorksRequest.isFavorite` y `WorkCatalogItemDto.IsFavorite`.
+- `api/Application/Helpers/WorkCardMapper.cs`: `ToCard(Work, WorkReadingProgress?, bool isFavorite = false)`.
+- `api/Application/Interfaces/IWorkRepository.cs` y `api/Infrastructure/Repositories/WorkRepository.cs`:
+  `GetCatalogPagedAsync` recibe `userId` e `isFavorite`; nuevo `ApplyFavoriteFilter`.
+- `api/Application/Services/WorkService.cs`: pasa el filtro al repositorio y arma el estado de favorito de la
+  página con una consulta batched (`GetFavoriteWorkIdsAsync`).
+- `api/Application/Interfaces/IFavoriteRepository.cs` y `api/Infrastructure/Repositories/FavoriteRepository.cs`:
+  nueva operación `GetFavoriteWorkIdsAsync`.
+- `project/endpoints/endpoints-favorites.md` (nuevo), `project/endpoints/endpoints-works.md`,
+  `project/endpoints.md`, `project/repositories.md`, `project/repositories/repositories-catalog.md`,
+  `project/services.md`, `project/services/services-catalog.md`, `project/domain.md`,
+  `project/domain/domain-content.md`.
+
+**Decisiones relevantes**:
+- La búsqueda, los filtros jerárquicos, el filtro por WorkType, el ordenamiento y la paginación existentes se
+  conservan sin cambios; el filtro de favoritos se combina con ellos mediante AND.
+- El filtro se resuelve con un subquery `EXISTS` sobre `Favorites` en la misma consulta del catálogo: no se
+  cargan los favoritos en memoria y no hay N+1.
+- El atributo `isFavorite` es de solo respuesta: no se agrega a ningún request.
+
+**Notas**:
+- Commit: 78330ab. Branch: feature/us-0036.
+- Tests: `FavoritesIntegrationTests.Catalog_WithIsFavoriteTrue_ReturnsOnlyTheFavoritesOfTheUser`,
+  `Catalog_WithIsFavoriteFalseOrNull_DoesNotFilterTheCatalog` y
+  `Catalog_IsFavoriteFilter_IsAppliedBeforeCountingAndPaginating` (verifican filtro, estado por Work y
+  metadatos de paginación sobre el conjunto filtrado).
+- Build 0 errores; suite completa 408/408 pass.

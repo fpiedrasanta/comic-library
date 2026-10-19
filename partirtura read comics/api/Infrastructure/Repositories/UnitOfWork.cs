@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -102,5 +102,3 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
         _context.Dispose();
     }
 }
-
-
