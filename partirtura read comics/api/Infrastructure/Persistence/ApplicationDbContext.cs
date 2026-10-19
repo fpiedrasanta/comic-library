@@ -32,6 +32,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Domain.Entities.WorkRating> WorkRatings => Set<Domain.Entities.WorkRating>();
     public DbSet<Domain.Entities.ListRating> ListRatings => Set<Domain.Entities.ListRating>();
     public DbSet<Domain.Entities.ListReadingProgress> ListReadingProgresses => Set<Domain.Entities.ListReadingProgress>();
+    public DbSet<Domain.Entities.Favorite> Favorites => Set<Domain.Entities.Favorite>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -76,5 +77,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
         modelBuilder.ApplyConfiguration(new WorkRatingConfiguration());
         modelBuilder.ApplyConfiguration(new ListRatingConfiguration());
         modelBuilder.ApplyConfiguration(new ListReadingProgressConfiguration());
+        modelBuilder.ApplyConfiguration(new FavoriteConfiguration());
     }
 }
+

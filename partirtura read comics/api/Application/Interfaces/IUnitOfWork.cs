@@ -1,4 +1,4 @@
-using Domain.Entities;
+﻿using Domain.Entities;
 
 namespace Application.Interfaces;
 
@@ -28,6 +28,7 @@ public interface IUnitOfWork : IDisposable
     IWorkRatingRepository WorkRatingRepository { get; }
     IListRatingRepository ListRatingRepository { get; }
     IListReadingProgressRepository ListReadingProgressRepository { get; }
+    IFavoriteRepository Favorites { get; }
 
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
@@ -35,3 +36,6 @@ public interface IUnitOfWork : IDisposable
     Task CommitAsync(CancellationToken cancellationToken = default);
     Task RollbackAsync(CancellationToken cancellationToken = default);
 }
+
+
+
