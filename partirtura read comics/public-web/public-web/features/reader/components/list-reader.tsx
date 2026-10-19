@@ -577,7 +577,11 @@ export function ListReader({ listId, workId }: ListReaderProps) {
                     key="list-rating"
                     listId={listId}
                     existingRating={ctx.list.myRating}
-                    onSaved={() => {}}
+                    onSaved={(savedRating) => {
+                      setCtx((prev) =>
+                        prev ? { ...prev, list: { ...prev.list, myRating: savedRating } } : null
+                      )
+                    }}
                     variant="list"
                   />
                 </>
@@ -594,7 +598,10 @@ export function ListReader({ listId, workId }: ListReaderProps) {
                     workId={workId}
                     myRating={resolvedRating}
                     onClose={handleRatingClose}
-                    onSaved={() => {
+                    onSaved={(savedRating) => {
+                      setCtx((prev) =>
+                        prev ? { ...prev, myRating: savedRating } : null
+                      )
                       if (isWorkRatingPosition && isLastWork) {
                         navigateTo(pages.length + 1)
                       }

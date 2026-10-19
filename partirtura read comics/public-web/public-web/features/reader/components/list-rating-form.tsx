@@ -1,13 +1,13 @@
 import { useState, useEffect, FormEvent } from 'react'
 import { useVoteListRating, useUpdateListRating } from '@/features/catalog/hooks/use-ratings'
 import { StarRatingInput } from '@/features/catalog/components/star-rating-input'
-import type { ListRatingVoteRequest, ListRatingVoteResponse } from '@/features/catalog/api/list-ratings-repository'
+import type { ListRatingVoteRequest } from '@/features/catalog/api/list-ratings-repository'
 import type { ListReaderListRatingDto } from '../types/list-reader-context'
 
 interface ListRatingFormProps {
   listId: number
   existingRating: ListReaderListRatingDto | null
-  onSaved: (rating: ListRatingVoteResponse) => void
+  onSaved: (rating: ListReaderListRatingDto) => void
   variant?: 'work' | 'list'
 }
 
@@ -23,7 +23,7 @@ export function ListRatingForm({ listId, existingRating, onSaved, variant }: Lis
   const [review, setReview] = useState<string>('')
   const [isEditing, setIsEditing] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
-  const [submittedRating, setSubmittedRating] = useState<ListRatingVoteResponse | null>(null)
+  const [submittedRating, setSubmittedRating] = useState<ListReaderListRatingDto | null>(null)
 
   const activeRating = submittedRating ?? existingRating
   const hasExistingRating = activeRating !== null
@@ -60,8 +60,15 @@ export function ListRatingForm({ listId, existingRating, onSaved, variant }: Lis
         ? await updateMutation.mutateAsync(body)
         : await voteMutation.mutateAsync(body)
 
-      setSubmittedRating(saved)
-      onSaved(saved)
+      const savedRating: ListReaderListRatingDto = {
+        workListId: listId,
+        stars: saved.stars,
+        review: saved.review,
+        createdAt: saved.createdAt,
+        updatedAt: saved.updatedAt,
+      }
+      setSubmittedRating(savedRating)
+      onSaved(savedRating)
       setIsEditing(false)
       setSubmitError(null)
     } catch (err: unknown) {
@@ -76,7 +83,32 @@ export function ListRatingForm({ listId, existingRating, onSaved, variant }: Lis
       setReview(activeRating!.review ?? '')
       setIsEditing(false)
       setSubmitError(null)
+    } else {
+      // No hay onClose para ListRatingForm; el cierre lo maneja el padre (navigate a la lista)
     }
+  }
+
+  if (hasExistingRating && !isEditing) {
+    return (
+      <div className={`space-y-4 p-4 rounded-xl ${
+        variant === 'list' ? 'bg-brand-500/10 border-brand-500/30' : 'bg-slate-900/50 border-slate-800'
+      }`}>
+        <h3 className="text-sm font-semibold text-white">Tu valoración</h3>
+        <div className="flex items-center justify-center">
+          <StarRatingInput value={activeRating!.stars ?? 0} onChange={() => {}} size={RATING_STAR_SIZE} disabled />
+        </div>
+        {activeRating!.review && (
+          <p className="text-slate-300 text-sm leading-relaxed">{activeRating!.review}</p>
+        )}
+        <button
+          type="button"
+          onClick={() => setIsEditing(true)}
+          className="w-full mt-2 px-4 py-2 rounded-lg bg-brand-500/10 text-brand-400 font-medium border border-brand-500/30 hover:bg-brand-500/20 transition"
+        >
+          Editar valoración
+        </button>
+      </div>
+    )
   }
 
   return (
