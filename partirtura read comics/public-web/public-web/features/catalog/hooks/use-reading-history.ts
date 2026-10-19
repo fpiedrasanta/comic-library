@@ -1,5 +1,6 @@
 import { getReadingHistory } from '../api'
 import type { ReadingHistoryState } from '../types/works'
+import { READING_HISTORY_KEY } from './query-keys'
 import { useWorksPagination } from './use-works-pagination'
 import { WORKS_PAGE_SIZE } from './use-works'
 
@@ -14,7 +15,7 @@ const HISTORY_STALE_TIME = 0
 
 export function useReadingHistory(state: ReadingHistoryState, pageSize: number = WORKS_PAGE_SIZE) {
   return useWorksPagination({
-    queryKey: ['reading-history', state, pageSize],
+    queryKey: [READING_HISTORY_KEY, state, pageSize],
     fetchPage: (page) => getReadingHistory({ currentPage: page, pageSize, state }),
     staleTime: HISTORY_STALE_TIME,
   })

@@ -7,5 +7,6 @@ export type { GetCatalogListsParams, CatalogListOrderBy, CatalogListOrderDir } f
 export { getCatalogLists, getCatalogListDetail, getListTypes } from './lists-repository'
 export { getWorkDetail } from './works-repository'
 export { getCatalogWorks } from './works-catalog-repository'
+export { addFavorite, removeFavorite } from './favorites-repository'
 export { getReadingHistory } from './reading-history-repository'
 export { getRecommendedWorks } from './recommended-works-repository'

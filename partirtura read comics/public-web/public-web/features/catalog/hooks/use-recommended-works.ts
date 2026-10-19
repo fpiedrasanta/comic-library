@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getRecommendedWorks } from '../api'
 import type { RecommendedSortField } from '../types/works'
+import { RECOMMENDED_WORKS_KEY } from './query-keys'
 
 /**
  * Recommended works of the index (`GET /api/works/recommended`).
@@ -12,7 +13,7 @@ const RECOMMENDED_STALE_TIME = 0
 
 export function useRecommendedWorks(sortBy: RecommendedSortField) {
   return useQuery({
-    queryKey: ['recommended-works', sortBy],
+    queryKey: [RECOMMENDED_WORKS_KEY, sortBy],
     queryFn: () => getRecommendedWorks({ sortBy }),
     staleTime: RECOMMENDED_STALE_TIME,
   })

@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { getCatalogWorks } from '../api'
 import type { WorkCatalogItemDto } from '../types/works'
+import { WORKS_LISTING_KEY } from './query-keys'
 
 interface UseWorksOptions {
   currentPage?: number
@@ -34,23 +35,33 @@ interface InfiniteWorksOptions {
   franchiseId?: number
   seriesId?: number
   workTypeId?: number
+  /** Only the favorites of the authenticated user when `true`. */
+  isFavorite?: boolean
   orderBy?: string
   orderDir?: string
+  /**
+   * Cache namespace of the listing. The favorites listing has its own: it is
+   * the catalog with the `isFavorite` criterion, so it holds a different set
+   * of works.
+   */
+  namespace?: string
 }
 
 export function useInfiniteWorks(options: InfiniteWorksOptions = {}) {
+  const { namespace = WORKS_LISTING_KEY, ...params } = options
   const searchParams = new URLSearchParams()
 
   searchParams.set('pageSize', String(WORKS_PAGE_SIZE))
-  if (options.search) searchParams.set('search', options.search)
-  if (options.publisherId !== undefined && options.publisherId !== null) searchParams.set('publisherId', String(options.publisherId))
-  if (options.franchiseId !== undefined && options.franchiseId !== null) searchParams.set('franchiseId', String(options.franchiseId))
-  if (options.seriesId !== undefined && options.seriesId !== null) searchParams.set('seriesId', String(options.seriesId))
-  if (options.workTypeId !== undefined && options.workTypeId !== null) searchParams.set('workTypeId', String(options.workTypeId))
-  if (options.orderBy) searchParams.set('orderBy', options.orderBy)
-  if (options.orderDir) searchParams.set('orderDir', options.orderDir)
+  if (params.search) searchParams.set('search', params.search)
+  if (params.publisherId !== undefined && params.publisherId !== null) searchParams.set('publisherId', String(params.publisherId))
+  if (params.franchiseId !== undefined && params.franchiseId !== null) searchParams.set('franchiseId', String(params.franchiseId))
+  if (params.seriesId !== undefined && params.seriesId !== null) searchParams.set('seriesId', String(params.seriesId))
+  if (params.workTypeId !== undefined && params.workTypeId !== null) searchParams.set('workTypeId', String(params.workTypeId))
+  if (params.isFavorite !== undefined) searchParams.set('isFavorite', String(params.isFavorite))
+  if (params.orderBy) searchParams.set('orderBy', params.orderBy)
+  if (params.orderDir) searchParams.set('orderDir', params.orderDir)
 
-  const baseQueryKey = ['works', Object.fromEntries(searchParams)]
+  const baseQueryKey = [namespace, Object.fromEntries(searchParams)]
 
   return {
     baseQueryKey,

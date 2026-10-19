@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useCatalogUrlState, useInfiniteWorks, extractEntities, useEntityFilterOptions, useWorksPagination } from '../hooks'
 import { getCatalogWorks } from '../api'
 import { getWorkTypes } from '../api/catalog-repository'
+import { FAVORITES_LISTING_KEY, WORKS_LISTING_KEY } from '../hooks/query-keys'
 import { CatalogSearch } from './catalog-search'
 import { EntityAutocomplete } from './entity-autocomplete'
 import { franchiseOption, seriesOption, workTypeOption } from './option-mappers'
@@ -26,7 +27,7 @@ const FILTER_SORT_DIRECTION = 'asc'
 const ALL_WORK_TYPES = 'ALL'
 
 interface WorksPageProps {
-  contextType?: 'catalog' | 'publisher' | 'franchise' | 'series'
+  contextType?: 'catalog' | 'publisher' | 'franchise' | 'series' | 'favorites'
   contextEntity?: {
     publisher?: PublisherNode
     franchise?: FranchiseNode
@@ -43,6 +44,12 @@ interface WorksPageProps {
     franchiseId?: number
     seriesId?: number
   }
+  /** Heading of the page, for the listings that name themselves. */
+  header?: React.ReactNode
+  /** Message of the empty state, when it is not the generic one. */
+  emptyMessage?: string
+  /** What the count says the results are, e.g. "obras favoritas". */
+  resultLabel?: string
 }
 
 /**
@@ -60,8 +67,12 @@ export function WorksPage({
   contextEntity,
   hiddenFilters = [],
   contextIds = {},
+  header,
+  emptyMessage,
+  resultLabel = 'resultados coincidentes',
 }: WorksPageProps) {
   const { filters, sort, updateFilters, updateSort } = useCatalogUrlState()
+  const isFavoritesListing = contextType === 'favorites'
 
   const [workTypeSearch, setWorkTypeSearch] = useState('')
   const [workTypeFocused, setWorkTypeFocused] = useState(false)
@@ -113,13 +124,19 @@ export function WorksPage({
       seriesId: activeFilters.seriesId ?? undefined,
       workTypeId:
         activeFilters.workTypeId === ALL_WORK_TYPES ? undefined : activeFilters.workTypeId,
+      // The favorites listing is the catalog with this one extra criterion,
+      // applied by the backend before it counts, orders and paginates.
+      isFavorite: isFavoritesListing ? true : undefined,
       orderBy: SORT_FIELD_MAP[sort.field] || 'CreatedAt',
       orderDir: sort.direction,
     }),
-    [activeFilters, sort]
+    [activeFilters, sort, isFavoritesListing]
   )
 
-  const { baseQueryKey, pageSize } = useInfiniteWorks(worksParams)
+  const { baseQueryKey, pageSize } = useInfiniteWorks({
+    ...worksParams,
+    namespace: isFavoritesListing ? FAVORITES_LISTING_KEY : WORKS_LISTING_KEY,
+  })
   const fetchWorksPage = useCallback(
     (page: number) => getCatalogWorks({ currentPage: page, pageSize, ...worksParams }),
     [pageSize, worksParams],
@@ -134,7 +151,7 @@ export function WorksPage({
     hasNextPage,
     loaderRef,
     refetch: refetchWorks,
-  } = useWorksPagination({ queryKey: baseQueryKey, fetchPage: fetchWorksPage, pageSize })
+  } = useWorksPagination({ queryKey: baseQueryKey, fetchPage: fetchWorksPage })
 
   const workTypesQuery = useQuery({
     queryKey: ['catalog', 'work-types', workTypeSearch],
@@ -286,6 +303,8 @@ export function WorksPage({
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative z-10 flex-grow w-full space-y-8">
+      {header}
+
       {contextType === 'publisher' && contextIds.publisherId != null && (
         <PublisherHeader publisherId={contextIds.publisherId} />
       )}
@@ -417,7 +436,8 @@ export function WorksPage({
         onRetry={refetchWorks}
         onSelectEntity={handleSelectEntity}
         hiddenPills={HIDDEN_PILLS_BY_CONTEXT[contextType] ?? []}
-        resultLabel="resultados coincidentes"
+        emptyMessage={emptyMessage}
+        resultLabel={resultLabel}
       />
     </div>
   )

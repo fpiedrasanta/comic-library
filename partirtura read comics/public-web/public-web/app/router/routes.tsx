@@ -21,6 +21,7 @@ import {
   ListsPage,
   ListRoutePage,
   MyCollectionPage,
+  FavoritesPage,
   WorkRoutePage,
 } from '@/features/catalog/pages'
 
@@ -157,6 +158,14 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <MyCollectionPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/favorites',
+    element: (
+      <ProtectedRoute>
+        <FavoritesPage />
       </ProtectedRoute>
     ),
   },

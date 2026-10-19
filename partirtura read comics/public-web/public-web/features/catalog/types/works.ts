@@ -33,6 +33,12 @@ export interface WorkCatalogItemDto {
    * (list details, for example) do not expose it.
    */
   myReadingProgress?: MyReadingProgressDto | null
+  /**
+   * Whether the work is a favorite of the authenticated user. The backend
+   * resolves it for the catalog, the reading history and the recommended
+   * works, so the star never needs a query of its own.
+   */
+  isFavorite: boolean
 }
 
 export type WorkCatalogListResponse = ListResponse<WorkCatalogItemDto>

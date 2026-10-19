@@ -9,6 +9,8 @@ export interface GetCatalogWorksParams {
   franchiseId?: number
   seriesId?: number
   workTypeId?: number
+  /** Only the favorites of the authenticated user when `true`. */
+  isFavorite?: boolean
   orderBy?: string
   orderDir?: string
 }
@@ -29,6 +31,7 @@ export async function getCatalogWorks(
   if (params.franchiseId !== undefined && params.franchiseId !== null) searchParams.set('franchiseId', String(params.franchiseId))
   if (params.seriesId !== undefined && params.seriesId !== null) searchParams.set('seriesId', String(params.seriesId))
   if (params.workTypeId !== undefined && params.workTypeId !== null) searchParams.set('workTypeId', String(params.workTypeId))
+  if (params.isFavorite !== undefined) searchParams.set('isFavorite', String(params.isFavorite))
   if (params.orderBy) searchParams.set('orderBy', params.orderBy)
   if (params.orderDir) searchParams.set('orderDir', params.orderDir)
 

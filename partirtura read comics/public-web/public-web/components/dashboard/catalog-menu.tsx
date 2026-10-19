@@ -17,9 +17,9 @@ export interface NavMenuGroup {
  * Shared contents of the catalog menu, used by the desktop dropdown and by the
  * mobile menu so both offer exactly the same sections.
  *
- * Favoritos and Mis listas have no route yet, so they are listed as disabled:
- * the menu shows what is coming without offering a navigation that would land on
- * an empty screen.
+ * Mis listas has no route yet, so it is listed as disabled: the menu shows
+ * what is coming without offering a navigation that would land on an empty
+ * screen.
  */
 export const CATALOG_MENU_GROUPS: NavMenuGroup[] = [
   {
@@ -35,15 +35,15 @@ export const CATALOG_MENU_GROUPS: NavMenuGroup[] = [
     divider: true,
     items: [
       { label: 'Mi colección', to: '/my-collection' },
-      { label: 'Favoritos' },
+      { label: 'Favoritos', to: '/favorites' },
       { label: 'Mis listas' },
     ],
   },
 ]
 
-/** True when the path belongs to the catalog, listing or collection pages. */
+/** True when the path belongs to the catalog, listing, collection or favorites pages. */
 export function isCatalogPath(pathname: string): boolean {
-  return ['/catalog', '/publishers', '/franchises', '/series', '/lists', '/my-collection'].some(
+  return ['/catalog', '/publishers', '/franchises', '/series', '/lists', '/my-collection', '/favorites'].some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   )
 }
