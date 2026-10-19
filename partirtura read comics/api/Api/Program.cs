@@ -1,4 +1,4 @@
-using Api.DTOs;
+﻿using Api.DTOs;
 using Api.Middleware;
 using Application.Configuration;
 using Application.Interfaces;
@@ -225,9 +225,9 @@ builder.Services
                 var response = new
                 {
                     success = false,
-                    message = "Se generó un error durante el proceso de autenticación.",
+                    message = "Se generÃ³ un error durante el proceso de autenticaciÃ³n.",
                     code = StatusCodes.Status401Unauthorized,
-                    payload = new { detail = "Se generó un error durante el proceso de autenticación." }
+                    payload = new { detail = "Se generÃ³ un error durante el proceso de autenticaciÃ³n." }
                 };
 
                 return context.Response.WriteAsync(System.Text.Json.JsonSerializer.Serialize(response));
@@ -276,3 +276,4 @@ app.MapGet("/health", () => Results.Ok(new { status = "healthy" }))
 app.MapControllers();
 
 app.Run();
+
