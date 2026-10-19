@@ -22,7 +22,7 @@ export function useWorks(options: UseWorksOptions = {}) {
   const { enabled = true, ...params } = options
 
   return useQuery({
-    queryKey: ['works', params],
+    queryKey: [WORKS_LISTING_KEY, params],
     queryFn: () => getCatalogWorks({ pageSize: WORKS_PAGE_SIZE, ...params }),
     enabled,
     staleTime: 1000 * 60 * 2,

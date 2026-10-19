@@ -1,13 +1,7 @@
 export { useWorks, useInfiniteWorks, extractEntities, WORKS_PAGE_SIZE } from './use-works'
 export { useWorksPagination } from './use-works-pagination'
 export type { WorksPageFetcher } from './use-works-pagination'
-export { useToggleFavorite, favoriteMutationKey } from './use-favorite'
-export {
-  WORKS_LISTING_KEY,
-  FAVORITES_LISTING_KEY,
-  READING_HISTORY_KEY,
-  RECOMMENDED_WORKS_KEY,
-} from './query-keys'
+export { useToggleFavorite } from './use-favorite'
 export { useReadingHistory } from './use-reading-history'
 export { useContinueReading } from './use-continue-reading'
 export { useRecommendedWorks } from './use-recommended-works'

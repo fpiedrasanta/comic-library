@@ -7,7 +7,7 @@ import {
 } from './query-keys'
 
 /** Key of the mutation that adds or removes the favorite of a work. */
-export function favoriteMutationKey(workId: number) {
+function favoriteMutationKey(workId: number) {
   return ['favorite', workId] as const
 }
 
