@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   DndContext,
@@ -39,51 +38,49 @@ const DRAG_ACTIVATION_DISTANCE = 6
  * sorting, and never reorders what the backend delivers.
  *
  * A personal list of the user can also be administered: its works can be
- * reordered and removed. The system lists keep their previous behavior, and
+ * reordered and removed. The changes are applied on the spot and the backend
+ * confirms them: the page never empties and never shows an order that the
+ * backend did not accept. The system lists keep their previous behavior, and
  * the reading, the progress and the ratings of the works are the same in both.
  */
 export function ListDetailPage({ entityId }: { entityId: number }) {
-  const { entity: list, isLoading, notFound, error, reload } = useCatalogListDetail(entityId)
+  const {
+    entity: list,
+    isLoading,
+    notFound,
+    error,
+    reload,
+    setData,
+  } = useCatalogListDetail(entityId)
   const { isPersonal } = useIsPersonalList(entityId)
   const { reorder, removeWork, isPending, error: actionError } = usePersonalListWorks(
     entityId,
     reload
   )
 
-  /**
-   * The order shown while a reordering waits for the backend to confirm it.
-   * `null` means that the order of the list is the one of the backend.
-   */
-  const [pendingWorks, setPendingWorks] = useState<CatalogListWorkItemDto[] | null>(null)
-
-  const works = pendingWorks ?? list?.works ?? []
-
-  // A new answer of the backend replaces the order that was pending.
-  useEffect(() => {
-    setPendingWorks(null)
-  }, [list?.works])
+  const works: CatalogListWorkItemDto[] = list?.works ?? []
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: DRAG_ACTIVATION_DISTANCE } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
   )
 
-  function persistOrder(nextWorks: CatalogListWorkItemDto[]) {
-    // Only the works that change their place travel to the backend: the ones
-    // that keep their position are not sent and stay where they are.
+  /**
+   * Applies the new order on the spot and asks the backend to confirm it.
+   *
+   * Only the works that change their place travel to the backend: the ones
+   * that keep their position are not sent and stay where they are.
+   */
+  function applyOrder(nextWorks: CatalogListWorkItemDto[]) {
+    setData((current) => (current ? { ...current, works: nextWorks } : current))
+
     const changes = nextWorks
       .map((item, index) => ({ workId: item.work.id, position: index }))
       .filter((change, index) => works[index]?.work.id !== change.workId)
 
-    if (changes.length === 0) {
-      setPendingWorks(null)
-      return
-    }
+    if (changes.length === 0) return
 
-    void reorder(changes).then((succeeded) => {
-      // The confirmed order is the one of the backend.
-      if (!succeeded) setPendingWorks(null)
-    })
+    void reorder(changes)
   }
 
   function handleDragEnd(event: DragEndEvent) {
@@ -94,9 +91,7 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
     const newIndex = works.findIndex((item) => item.work.id === Number(over.id))
     if (oldIndex === -1 || newIndex === -1) return
 
-    const nextWorks = arrayMove(works, oldIndex, newIndex)
-    setPendingWorks(nextWorks)
-    persistOrder(nextWorks)
+    applyOrder(arrayMove(works, oldIndex, newIndex))
   }
 
   function handleMove(workId: number, direction: -1 | 1) {
@@ -104,9 +99,23 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
     const newIndex = oldIndex + direction
     if (oldIndex === -1 || newIndex < 0 || newIndex >= works.length) return
 
-    const nextWorks = arrayMove(works, oldIndex, newIndex)
-    setPendingWorks(nextWorks)
-    persistOrder(nextWorks)
+    applyOrder(arrayMove(works, oldIndex, newIndex))
+  }
+
+  async function handleRemove(workId: number) {
+    const succeeded = await removeWork(workId)
+    if (!succeeded) return
+
+    // The work leaves the list on the spot; the reload confirms it.
+    setData((current) =>
+      current
+        ? {
+            ...current,
+            works: current.works.filter((item) => item.work.id !== workId),
+            workCount: Math.max(0, current.workCount - 1),
+          }
+        : current
+    )
   }
 
   return (
@@ -187,7 +196,7 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
                       canMoveUp={index > 0}
                       canMoveDown={index < works.length - 1}
                       onMove={(direction) => handleMove(item.work.id, direction)}
-                      onRemove={() => void removeWork(item.work.id)}
+                      onRemove={() => void handleRemove(item.work.id)}
                       isRemoving={isPending}
                     />
                   ))}

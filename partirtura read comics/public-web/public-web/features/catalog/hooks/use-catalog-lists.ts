@@ -26,6 +26,7 @@ export interface CatalogLists {
   items: CatalogListCardDto[]
   totalCount: number
   hasNextPage: boolean
+  /** There is nothing on screen yet: the page shows its loading state. */
   isLoading: boolean
   /** A page after the first is being loaded. */
   isFetchingMore: boolean
@@ -51,7 +52,7 @@ export function useCatalogLists(filters: ListCardsFilters): CatalogLists {
   const [pages, setPages] = useState<CatalogCardListResponse<CatalogListCardDto>[]>([])
   const [hasNextPage, setHasNextPage] = useState(false)
   const [nextPage, setNextPage] = useState<number | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(true)
   const [isFetchingMore, setIsFetchingMore] = useState(false)
   const [error, setError] = useState<Error | null>(null)
   const [reloadCount, setReloadCount] = useState(0)
@@ -65,7 +66,7 @@ export function useCatalogLists(filters: ListCardsFilters): CatalogLists {
       requestRef.current = requestId
 
       if (append) setIsFetchingMore(true)
-      else setIsLoading(true)
+      else setIsRefreshing(true)
       setError(null)
 
       try {
@@ -90,7 +91,7 @@ export function useCatalogLists(filters: ListCardsFilters): CatalogLists {
         setError(reason instanceof Error ? reason : new Error(String(reason)))
       } finally {
         if (requestId === requestRef.current) {
-          setIsLoading(false)
+          setIsRefreshing(false)
           setIsFetchingMore(false)
         }
       }
@@ -121,7 +122,7 @@ export function useCatalogLists(filters: ListCardsFilters): CatalogLists {
     items: flattenListCards(pages),
     totalCount: pages[0]?.totalCount ?? 0,
     hasNextPage,
-    isLoading,
+    isLoading: isRefreshing && pages.length === 0,
     isFetchingMore,
     error,
     loadMore,

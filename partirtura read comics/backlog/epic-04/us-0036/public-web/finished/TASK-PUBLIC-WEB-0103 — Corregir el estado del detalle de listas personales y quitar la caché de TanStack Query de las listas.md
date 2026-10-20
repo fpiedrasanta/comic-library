@@ -72,3 +72,27 @@ Fuera de alcance: quitar TanStack Query del resto de la aplicación (catálogo d
 - `qa-favorites.mjs` → sin regresiones en los favoritos, el catálogo, el historial y el scroll infinito.
 
 **Notas**: la API de desarrollo limita los inicios de sesión (10 por 15 minutos por IP), lo que obliga a espaciar las corridas de QA; es una restricción del entorno de pruebas, no de la implementación. La base de desarrollo queda sin listas personales de prueba.
+
+### Segunda ronda: la actualización en el lugar
+
+Al usar la implementación apareció otro defecto: al quitar una obra o al cambiar su lugar, **la página se vaciaba y volvía a paintedarse**. La causa no era el backend sino la propia carga: `isLoading` se encendía en cada consulta, así que la pantalla volvía a su estado de carga —el esqueleto y sin obras— aunque el backend respondiera en milisegundos. Para el usuario eso era indistinguible de una recarga.
+
+**Qué se corrigió**:
+
+1. **Preguntar de nuevo no vacía la pantalla** (`useRemoteData` y `useCatalogLists`) — se separó el estado de carga inicial del estado de "hay una consulta en vuelo": `isLoading` es cierto solo mientras no hay nada que mostrar, y `isRefreshing` es el que acompaña a una consulta posterior. La pantalla conserva lo que tiene y lo reemplaza cuando llega la respuesta nueva.
+2. **Los cambios se aplican en el lugar** — el reordenamiento y la eliminación de una obra se escriben en el estado de la pantalla apenas el backend los confirma, y la consulta posterior solo confirma lo que ya se ve. `setData` permite hacerlo sin volver a pintar desde cero.
+3. **El estado confirmado es el del backend** — si una operación falla, la pantalla vuelve al orden y al contenido que el backend tiene, y el error se informa.
+
+**Validaciones ejecutadas** (`qa-lists-live.mjs`):
+
+| Comprobación | Resultado |
+|---|---|
+| Quitar una obra: las filas pasan de 3 a 2 | ok |
+| El encabezado sigue visible durante la operación y no cambia | ok |
+| La pantalla nunca queda vacía | ok |
+| Solo desaparece la obra quitada | ok |
+| El reordenamiento cambia el orden al instante | ok |
+| Las filas nunca desaparecen al reordenar | ok |
+| Recargas de página | 0 |
+
+Sin errores de página. `npm run typecheck` → 0 errores y `npm run build` compila sin errores. Se repitieron `qa-lists-state.mjs`, `qa-personal-lists.mjs`, `qa-personal-list-detail.mjs` y `qa-favorites.mjs` sin regresiones.

@@ -15,7 +15,7 @@ const NOT_FOUND_STATUS = 404
  * screen is never hidden behind a state that is still "fresh".
  */
 export function useCatalogListDetail(id: number) {
-  const { data, isLoading, error, reload } = useRemoteData<CatalogListDetailDto>(
+  const { data, isLoading, error, reload, setData } = useRemoteData<CatalogListDetailDto>(
     () => getCatalogListDetail(id),
     [id]
   )
@@ -26,5 +26,6 @@ export function useCatalogListDetail(id: number) {
     notFound: error != null && (error as { status?: number }).status === NOT_FOUND_STATUS,
     error,
     reload,
+    setData,
   }
 }

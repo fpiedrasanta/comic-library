@@ -60,6 +60,9 @@ export function usePersonalListWorks(
         return true
       } catch (reason) {
         setError(reason instanceof Error ? reason : new Error(String(reason)))
+        // The confirmed state is the one of the backend, so the screen goes
+        // back to it instead of keeping a change that was not saved.
+        onChanged()
         return false
       } finally {
         setIsPending(false)
