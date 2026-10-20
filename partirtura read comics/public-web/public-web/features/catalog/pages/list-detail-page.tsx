@@ -132,7 +132,13 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
         </Link>
       </div>
 
-      <ListHeader list={list} isLoading={isLoading} notFound={notFound} error={error} />
+      <ListHeader
+        list={list}
+        isLoading={isLoading}
+        notFound={notFound}
+        error={error}
+        isPersonal={isPersonal}
+      />
 
       {!isLoading && !error && list != null && (
         <section className="space-y-4">

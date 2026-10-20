@@ -35,6 +35,8 @@ interface ListHeaderProps {
   isLoading: boolean
   notFound: boolean
   error: Error | null
+  /** The list is a personal one of the user, which has no type of list. */
+  isPersonal?: boolean
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
@@ -58,7 +60,7 @@ function Shell({ children }: { children: React.ReactNode }) {
  * and the rating, which is shown only when the average is a valid
  * score.
  */
-export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps) {
+export function ListHeader({ list, isLoading, notFound, error, isPersonal = false }: ListHeaderProps) {
   if (isLoading) {
     return (
       <Shell>
@@ -90,6 +92,8 @@ export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps
   if (!list) return null
 
   const accent = list.color ?? ''
+  // A personal list has no type of list, so the pill says what it is.
+  const typeLabel = isPersonal ? 'Lista personal' : list.listTypeName
 
   return (
     <div className="relative bg-neps-card border border-neps-border rounded-2xl p-6 sm:p-8 overflow-hidden shadow-2xl">
@@ -141,16 +145,18 @@ export function ListHeader({ list, isLoading, notFound, error }: ListHeaderProps
 
         <div className="flex-1 space-y-4 text-center md:text-left min-w-0">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
-            <span
-              className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg border shadow-sm"
-              style={{
-                backgroundColor: readableBackgroundColor(list.color, PILL_BACKGROUND_ALPHA),
-                borderColor: colorWithAlpha(list.color, PILL_BORDER_ALPHA),
-                color: readablePillTextColor(list.color, PILL_BACKGROUND_ALPHA, CARD_SURFACE),
-              }}
-            >
-              {list.listTypeName}
-            </span>
+            {typeLabel && (
+              <span
+                className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-lg border shadow-sm"
+                style={{
+                  backgroundColor: readableBackgroundColor(list.color, PILL_BACKGROUND_ALPHA),
+                  borderColor: colorWithAlpha(list.color, PILL_BORDER_ALPHA),
+                  color: readablePillTextColor(list.color, PILL_BACKGROUND_ALPHA, CARD_SURFACE),
+                }}
+              >
+                {typeLabel}
+              </span>
+            )}
           </div>
 
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white tracking-tight leading-tight break-words">
