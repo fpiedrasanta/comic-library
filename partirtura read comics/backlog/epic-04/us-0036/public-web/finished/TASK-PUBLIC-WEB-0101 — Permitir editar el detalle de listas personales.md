@@ -144,3 +144,36 @@ Confirmar persistencia del orden, eliminación exclusiva de relaciones, protecci
 6. Crear commits y publicar los cambios en la rama de trabajo.
 7. Registrar el resultado en esta misma task mediante **append**, sin sobrescribir el contenido previo.
 8. Mover el archivo a `finished` o `blocked` conforme a `communication.md`, documentando resultados y pendientes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — el propietario de una lista personal puede reordenar y quitar sus obras desde el detalle, y las listas del sistema conservan su comportamiento.
+
+**Commits**: `41aa806` (implementación), `7433216` (documentación).
+
+**Qué se implementó**:
+
+1. **Detalle único** — `/lists/:id` sigue siendo la única página de detalle. `ListDetailPage` pasó a usar `useCatalogListDetail` (React Query) en lugar de una consulta manual, para que los cambios puedan invalidar el detalle; la consulta que ya existía y no se usaba quedó en uso.
+2. **Identificación de la lista personal** — `useIsPersonalList` consulta `GET /api/users/me/lists/{listId}`, que responde 404 para una lista del sistema o de otro usuario. Solo las listas personales del usuario autenticado ofrecen los controles de edición.
+3. **Reordenamiento** — `SortableListWorkRow` con dnd-kit: arrastre con el puntero (con distancia de activación, para que el scroll del táctil siga funcionando) y sensor de teclado. Además, los botones que mueven la obra un lugar hacia arriba o hacia abajo, que son la alternativa operable con el dedo y con el teclado. El orden se persiste con `PUT /api/users/me/lists/{listId}/works/order` enviando **solo las obras que cambian de posición**; las que conservan su lugar no viajan y el backend las mantiene donde están.
+4. **Quitar una obra** — `DELETE /api/users/me/lists/{listId}/works/{workId}`. Al confirmarse, la obra sale de la lista y el contador se actualiza sin recargar la página; la obra conserva su progreso, sus valoraciones, sus comentarios y sus favoritos, y sigue en el catálogo.
+5. **Filas** — `ListWorkRow` acepta de forma opcional los controles de reordenamiento y la acción de quitar, así que la misma fila sirve para las listas del sistema (sin controles) y para las personales.
+6. **Estados** — el error de una operación se muestra junto a las obras y el orden confirmado es siempre el del backend: si el reordenamiento falla, se descarta el orden pendiente.
+7. **Documentación** — `project/pages.md` y `project/components/public-web-components.md`.
+
+**Decisiones durante la ejecución**:
+
+- **La propiedad de la lista se resuelve con los contratos existentes**: `GET /api/users/me/lists/{listId}` responde 404 para todo lo que no sea una lista personal del usuario, así que no hace falta un campo nuevo en el contrato de las listas.
+- **Solo se envían las obras que cambian de lugar**: es lo que exige el contrato del backend, y evita que una posición solicitada siga ocupada por una obra que no viaja en la solicitud.
+- **El número de orden de una lista personal es su posición en el orden actual**, no la posición cruda del backend: las posiciones pueden quedar con huecos después de un reordenamiento, y el número que se ve es el orden de lectura.
+- **El reordenamiento se persiste al soltar, no en cada movimiento intermedio**: el orden se muestra al instante y se confirma al terminar.
+
+**Validaciones ejecutadas**:
+
+- `npm run typecheck` → 0 errores. `npm run build` → compila sin errores.
+- `qa-personal-list-detail.mjs` (Playwright): el detalle de una lista personal ofrece 3 filas ordenables, 3 acciones de quitar y 3 de subir; el reordenamiento con los botones cambia el orden y **persiste al recargar**; el arrastre con el puntero también cambia el orden y persiste; quitar una obra la saca de la lista (3 → 2 obras) y la obra sigue en el catálogo; una lista del sistema no ofrece ningún control de edición (`GET /api/users/me/lists/{id}` → 404 en la lista del sistema y 200 en la personal). Sin errores de página.
+
+**Notas**:
+
+- Las listas personales no se pueden valorar: el Backend/API rechaza la valoración de una lista que no es del sistema, así que la interfaz no ofrece esa acción. El detalle solo muestra la valoración cuando existe.
+- La lectura de una lista personal funciona como la de una lista del sistema: el contexto del reader resuelve la lista con el usuario autenticado.

@@ -118,3 +118,30 @@ Confirmar la navegación, el aislamiento de listas personales, la reutilización
 6. Crear commits y publicar los cambios en la rama de trabajo.
 7. Registrar el resultado en esta misma task mediante **append**, sin sobrescribir el contenido previo.
 8. Mover el archivo a `finished` o `blocked` conforme a `communication.md`, documentando resultados y pendientes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — la sección «Mis listas» existe, consulta `myLists=true` y reutiliza la página y las tarjetas de `/lists`.
+
+**Commits**: `d1438a0` (implementación), `7433216` (documentación).
+
+**Qué se implementó**:
+
+1. **Consulta** — `myLists` en `GetCatalogListsParams` y en `useCatalogLists`, que viaja como query param a `GET /api/catalog/lists` y forma parte de la query key, de modo que las listas del sistema y las personales nunca comparten resultados.
+2. **Página reutilizada** — `ListsPage` acepta el modo `myLists`: mismo encabezado, misma búsqueda, mismos filtros jerárquicos, mismo scroll infinito y mismos estados. `MyListsPage` es la ruta `/my-lists` que la monta con ese modo. No hay una segunda implementación del catálogo de listas.
+3. **Filtro de tipo de lista** — no se ofrece en el modo personal: una lista personal no tiene tipo de lista, así que el filtro no es compatible con ese modo.
+4. **Tarjetas** — `ListCard` muestra la píldora de tipo solo cuando la lista tiene tipo, y `listTypeId`/`listTypeName` pasaron a ser opcionales en los contratos, como los devuelve el backend para las listas personales. La portada genérica y el contador de obras vienen de la respuesta de la API.
+5. **Navegación** — el ítem `Mis listas` del menú del catálogo (desktop y móvil) dejó de estar deshabilitado y navega a `/my-lists`; `isCatalogPath` incluye la ruta. Cada página enlaza con la otra: `/lists` ofrece «Ver mis listas» y `/my-lists` ofrece «Ver las listas del sistema».
+6. **Documentación** — `project/pages.md` y `project/components/public-web-components.md`.
+
+**Decisiones durante la ejecución**:
+
+- **Ruta propia `/my-lists`** en lugar de una pestaña dentro de `/lists`, para que el ítem de menú que ya existía sea navegable y para que las listas del sistema y las personales queden separadas de forma inequívoca. La página es la misma en ambos casos.
+- **El filtro de tipo de lista se oculta en el modo personal**: no se inventan tipos para las listas personales ni se ofrece un filtro que siempre devolvería vacío.
+
+**Validaciones ejecutadas**:
+
+- `npm run typecheck` → 0 errores. `npm run build` → compila sin errores.
+- `qa-my-lists.mjs` (Playwright): `/my-lists` muestra el título «Mis listas», consulta `currentPage=1&pageSize=24&myLists=true`, muestra la tarjeta de la lista personal, no ofrece el filtro de tipo de lista, y la tarjeta abre el detalle `/lists/{id}` con sus obras. `/lists` sigue consultando `myLists=false`, conserva las listas del sistema y no muestra la personal. El ítem «Mis listas» del menú navega. Sin errores de página.
+
+**Notas**: la lista de prueba que usa el script se elimina al terminar; la base de desarrollo queda sin listas personales.

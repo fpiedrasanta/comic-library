@@ -215,3 +215,39 @@ Confirmar los siete contextos, la integración con los contratos reales, el comp
 6. Crear commits y publicar los cambios en la rama de trabajo.
 7. Registrar el resultado en esta misma task mediante **append**, sin sobrescribir el contenido previo.
 8. Mover el archivo a `finished` o `blocked` conforme a `communication.md`, documentando resultados y pendientes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — el botón de listas y su modal funcionan en los siete contextos, con los endpoints existentes.
+
+**Rama de trabajo**: `feature/us-0036-public-web`, creada desde `main` actualizado (`ddc3989`).
+
+**Commits**: `9463539` (implementación), `d1438a0` (sección Mis listas), `41aa806` (detalle editable), `7433216` (documentación de la US).
+
+**Qué se implementó**:
+
+1. **Contrato** — `isInPersonalList` en `WorkCatalogItemDto`, que el Backend/API ya devuelve en el catálogo, el historial y los recomendados.
+2. **Repositorio** (`features/catalog/api/personal-lists-repository.ts`) — `GET /api/users/me/lists` (búsqueda, `workId` y `pageSize`), `POST /api/users/me/lists`, `PUT /api/users/me/lists/{listId}`, `DELETE /api/users/me/lists/{listId}`, `POST /api/users/me/lists/{listId}/works` y `DELETE /api/users/me/lists/{listId}/works/{workId}`. Toda la operación usa el cliente HTTP centralizado y el usuario autenticado del token: no se envía ninguna identidad de usuario.
+3. **Estructura de modales** — `components/ui/dialog.tsx` sobre `@radix-ui/react-dialog` (foco atrapado, Escape, bloqueo de scroll, nombre accesible) y `components/ui/confirm-dialog.tsx` para las confirmaciones. El proyecto no tenía ninguna primitiva de modal.
+4. **Botón** (`personal-list-button.tsx`) — azul cuando la obra pertenece a alguna lista personal y gris cuando no, junto a la estrella en la fila del número de la tarjeta. No depende de una sola lista: `isInPersonalList` significa "pertenece a una o más".
+5. **Modal selector** (`personal-lists-modal.tsx`) — búsqueda por nombre, botón `Nueva`, una fila por lista con el checkbox de pertenencia y las acciones de editar y eliminar, indicador de posición («Mostrando 5 de 20») y botón «Ver más listas». Paginación local de 5 por página sobre el máximo de 50 que admite el endpoint. Estados de carga, error y vacío. El orden de la respuesta del backend se conserva tal cual.
+6. **Crear, renombrar y eliminar** — `PersonalListNameDialog` (nombre precargado al editar, validación de nombre vacío y longitud, y error de la API) y `ConfirmDialog` para la eliminación. Ninguna lista del sistema es alcanzable: el endpoint de listas personales solo devuelve las del usuario.
+7. **Estado compartido** (`features/catalog/hooks/work-listing-cache.ts`) — el estado de una obra vive en la caché de los listados que muestran obras, así que el botón refleja la operación en todas las pantallas. La nueva caché compartida también la usa el hook de favoritos, que deja de llevar su propia copia de esa lógica. Al quitar un favorito de una lista el botón no se pone gris mientras la obra siga en otra: el estado se recalcula sobre el conjunto de listas.
+8. **Documentación** — `project/pages.md` y `project/components/public-web-components.md`.
+
+**Decisiones durante la ejecución**:
+
+- **La pertenencia se recalcula, no se alterna**: el modal conoce todas las listas del usuario y su pertenencia, así que después de cada operación se recalcula si la obra pertenece a alguna lista. Es lo que impide que el botón se ponga gris con la obra todavía en otra lista.
+- **El orden de las listas no lo decide el cliente**: al crear o renombrar una lista se vuelve a consultar el selector en lugar de colocarla a mano, porque el orden (las que contienen la obra primero y luego por nombre) es una regla del endpoint.
+- **Al eliminar una lista se reconsultan los listados de obras**: el cliente no sabe qué obras estaban en la lista eliminada, así que es el backend quien vuelve a resolver `isInPersonalList`.
+- **El estado en vuelo se cuenta sobre todas las mutaciones de la obra**: la misma obra puede estar en pantalla más de una vez (catálogo y recomendados), y no debe haber dos operaciones simultáneas para la misma obra.
+
+**Validaciones ejecutadas**:
+
+- `npm run typecheck` (`tsc --noEmit`) → 0 errores. `npm run build` (`tsc -b && vite build`) → compila sin errores.
+- `qa-personal-lists.mjs` (Playwright, contra la API y el dev server locales): el botón aparece en los siete contextos (`/index` 12, `/catalog` 24, `/publishers/5` 2, `/franchises/5` 2, `/series/7` 5, `/my-collection` 12, `/favorites` 1); el modal abre y muestra el estado vacío; se crea una lista, la obra se agrega y se quita de ella, el botón de la tarjeta pasa a azul y vuelve al estado anterior, la lista se renombra y se elimina con su confirmación; las llamadas van a los endpoints esperados (`GET/POST/PUT/DELETE /api/users/me/lists` y `POST/DELETE .../works`) y sin errores de página.
+
+**Notas**:
+
+- Public Web no tiene tests unitarios (no hay Vitest/RTL y `test:e2e` no tiene configuración ni casos), así que la verificación disponible es `typecheck` + `build` + los scripts de QA, que se dejan en el repositorio siguiendo la convención de los `qa-*.mjs` existentes.
+- Se agregaron `@radix-ui/react-dialog`, `@dnd-kit/core`, `@dnd-kit/sortable` y `@dnd-kit/utilities` al stack de Public Web; el proyecto no tenía primitiva de modal ni de arrastre. Queda documentado en `frontend-public-web-stack-technology.md`.
