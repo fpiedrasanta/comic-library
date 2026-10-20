@@ -46,6 +46,18 @@ public interface IWorkListRepository
     /// </summary>
     Task<WorkList?> GetPersonalWithItemsAsync(long id, long userId, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Returns the personal lists of the given user with the membership of an optional work, the optional
+    /// name filter and the result limit already applied in the database. The lists that contain the work
+    /// come first and, inside each group, the lists are ordered by name.
+    /// </summary>
+    Task<IReadOnlyList<PersonalListMembershipData>> GetPersonalWithMembershipAsync(
+        long userId,
+        string? search,
+        int pageSize,
+        long? workId,
+        CancellationToken cancellationToken = default);
+
     Task<WorkList?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
 
     Task<WorkList?> GetByNameAsync(string name, CancellationToken cancellationToken = default);

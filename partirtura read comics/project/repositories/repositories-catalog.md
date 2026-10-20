@@ -98,6 +98,7 @@ Task<(IReadOnlyList<TEntity>, int)> GetCatalogPagedAsync(int currentPage, int pa
   - `GetCatalogByIdAsync` (fully loaded detail with WorkListItems ordered by Position, including Work, WorkType, Series.Franchise.Publisher, Franchise.Publisher, Publisher, and Work.Cover; `AsSplitQuery` + `AsNoTracking`. For US-0034 the per-Work reading progress is resolved by the Service through the batched `IWorkReadingProgressRepository.GetByWorkIdsAndUserIdAsync`, so this query is unchanged. Added 2026-10 for US-0036: accepts the optional `long? userId` so the detail of a personal list is only returned to its owner.)
   - `GetPersonalByIdAsync` (personal list of a given owner, with `ListType` and `Cover` loaded)
   - `GetPersonalWithItemsAsync` (personal list of a given owner with its `WorkListItems` and their `Work` loaded, `AsSplitQuery`)
+  - `GetPersonalWithMembershipAsync` (personal lists of a given owner with the membership of an optional work, the optional name filter, the ordering (lists that contain the work first, then by name) and the result limit already applied in the database. Added 2026-10 for US-0036.)
   - `GetByIdAsync` (fully loaded edit detail ordered by `Position`)
   - `GetByNameAsync`, `AddAsync`, `UpdateAsync`
   - `DeleteAsync` (physical deletion of a list and its items; personal list deletion use case)
@@ -111,6 +112,7 @@ Task<(IReadOnlyList<TEntity>, int)> GetCatalogPagedAsync(int currentPage, int pa
   - `GetAsync` (the relation between a list and a work, with the `Work` loaded)
   - `GetByWorkListAsync` (all the items of a list ordered by `Position`, with the `Work` loaded)
   - `GetMaxPositionAsync` (highest position of the list, or `-1` when the list has no items, so the first work of a list takes position 0)
+  - `GetPersonalWorkIdsAsync` (works of the given set that belong to at least one personal list of the given user; a single query resolves the whole page, so the callers never issue one query per work. Added 2026-10 for US-0036.)
   - `AddAsync`, `UpdateAsync`
   - `RemoveAsync` (physical deletion of the relation; the `Work` is never deleted)
 - **Notes**: Explicit repository for the relation between a list and a work, added 2026-10 for US-0036 (personal lists). `RemoveAsync` is the second documented exception to the "no physical deletion" convention: removing a work from a list deletes the `WorkListItem` row instead of deactivating it, and the `Work` itself is never touched. **Indexes**: `(WorkListId, WorkId)` unique, `(WorkListId, Position)` unique.

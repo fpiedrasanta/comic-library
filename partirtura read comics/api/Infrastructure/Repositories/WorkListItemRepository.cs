@@ -1,5 +1,6 @@
 using Application.Interfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,6 +37,24 @@ public class WorkListItemRepository(ApplicationDbContext context) : IWorkListIte
             .MaxAsync(item => (int?)item.Position, cancellationToken);
 
         return maxPosition ?? -1;
+    }
+
+    public async Task<IReadOnlyList<long>> GetPersonalWorkIdsAsync(long userId, IReadOnlyCollection<long> workIds, CancellationToken cancellationToken = default)
+    {
+        if (workIds.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        return await _context.WorkListItems
+            .AsNoTracking()
+            .Where(item => item.WorkList.OwnerType == OwnerType.User
+                           && item.WorkList.Owner != null
+                           && item.WorkList.Owner.Id == userId
+                           && workIds.Contains(item.Work.Id))
+            .Select(item => item.Work.Id)
+            .Distinct()
+            .ToListAsync(cancellationToken);
     }
 
     public async Task AddAsync(WorkListItem workListItem, CancellationToken cancellationToken = default)

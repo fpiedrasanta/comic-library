@@ -24,3 +24,17 @@ public record PersonalListSummaryDto(
     string? UrlCover,
     int WorkCount,
     DateTime CreatedAt);
+
+public record GetPersonalListsRequest(
+    string? search = null,
+    int pageSize = PaginationGuard.DefaultPageSize,
+    long? workId = null);
+
+public record PersonalListMembershipDto(
+    long Id,
+    string Name,
+    string? Description,
+    string? Color,
+    string? UrlCover,
+    int WorkCount,
+    bool ContainsWork);

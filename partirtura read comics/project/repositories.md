@@ -36,8 +36,8 @@ Quick reference for repository interfaces and their operations. The per-module d
 | PersonRepository | `IPersonRepository` | 5 |
 | RoleRepository | `IRoleRepository` | 5 |
 | ListTypeRepository | `IListTypeRepository` | 5 |
-| WorkListRepository | `IWorkListRepository` | 10 |
-| WorkListItemRepository | `IWorkListItemRepository` | 6 |
+| WorkListRepository | `IWorkListRepository` | 11 |
+| WorkListItemRepository | `IWorkListItemRepository` | 7 |
 | WorkRepository | `IWorkRepository` | 6 |
 | WorkTypeRepository | `IWorkTypeRepository` | 7 |
 | PageRepository | `IPageRepository` | 6 |

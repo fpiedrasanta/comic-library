@@ -84,6 +84,42 @@ public class PersonalListService : IPersonalListService
         return ToSummaryDto(workList, workList.WorkListItems.Count);
     }
 
+    public async Task<IReadOnlyList<PersonalListMembershipDto>> GetWithMembershipAsync(
+        GetPersonalListsRequest request,
+        long userId,
+        CancellationToken cancellationToken = default)
+    {
+        if (userId <= 0)
+        {
+            throw new ValidationException("User identifier is required.");
+        }
+
+        if (request.pageSize < 1)
+        {
+            throw new ValidationException("The page size must be greater than zero.");
+        }
+
+        var pageSize = Math.Min(request.pageSize, PaginationGuard.MaxPageSize);
+
+        var lists = await _unitOfWork.WorkListRepository.GetPersonalWithMembershipAsync(
+            userId,
+            request.search,
+            pageSize,
+            request.workId,
+            cancellationToken);
+
+        return lists
+            .Select(list => new PersonalListMembershipDto(
+                list.Id,
+                list.Name,
+                list.Description,
+                list.Color,
+                ImageUrlBuilder.ToUrl(list.Cover),
+                list.WorkCount,
+                list.ContainsWork))
+            .ToList();
+    }
+
     public async Task<PersonalListSummaryDto> RenameAsync(
         long listId,
         UpdatePersonalListRequest request,

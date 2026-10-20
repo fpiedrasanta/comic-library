@@ -174,6 +174,51 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
                 cancellationToken);
     }
 
+    public async Task<IReadOnlyList<PersonalListMembershipData>> GetPersonalWithMembershipAsync(
+        long userId,
+        string? search,
+        int pageSize,
+        long? workId,
+        CancellationToken cancellationToken = default)
+    {
+        var query = _context.WorkLists
+            .AsNoTracking()
+            .Where(workList => workList.OwnerType == OwnerType.User
+                               && workList.Owner != null
+                               && workList.Owner.Id == userId);
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var pattern = search.Trim();
+            query = query.Where(workList => workList.Name.Contains(pattern));
+        }
+
+        var requestedWorkId = workId;
+
+        IOrderedQueryable<WorkList> ordered = requestedWorkId.HasValue
+            ? query.OrderByDescending(workList =>
+                workList.WorkListItems.Any(item => item.Work.Id == requestedWorkId.Value))
+            : query.OrderBy(workList => workList.Name);
+
+        if (requestedWorkId.HasValue)
+        {
+            ordered = ordered.ThenBy(workList => workList.Name);
+        }
+
+        return await ordered
+            .Take(pageSize)
+            .Select(workList => new PersonalListMembershipData(
+                workList.Id,
+                workList.Name,
+                workList.Description,
+                workList.Color,
+                workList.Cover,
+                workList.WorkListItems.Count,
+                requestedWorkId.HasValue
+                    && workList.WorkListItems.Any(item => item.Work.Id == requestedWorkId.Value)))
+            .ToListAsync(cancellationToken);
+    }
+
     public async Task<WorkList?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         return await _context.WorkLists

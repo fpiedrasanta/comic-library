@@ -52,6 +52,9 @@ Behavior:
 - `isFavorite` is the favorite state of the Work for the authenticated user (US-0035). It is resolved with
   a single batched query for the whole page, never one query per work. The attribute is exclusively part of
   the response: the request parameters are unchanged.
+- `isInPersonalList` is `true` when the Work belongs to at least one personal list of the authenticated user
+  (US-0036), and `false` otherwise. It is resolved with a single batched query for the whole page, never one
+  query per work. The attribute is exclusively part of the response.
 - Pagination metadata (`totalCount`, `totalPages`, `hasNextPage`, `hasPriorPage`, `nextPage`,
   `priorPage`) is computed over the filtered set, before pagination.
 

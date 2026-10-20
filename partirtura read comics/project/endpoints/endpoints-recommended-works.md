@@ -103,6 +103,9 @@ Notes:
 - `isFavorite` is the favorite state of the Work for the authenticated user (US-0035). It is resolved with
   a single batched query for the whole list, never one query per work. The attribute is exclusively part of
   the response: the request parameters are unchanged.
+- `isInPersonalList` is `true` when the Work belongs to at least one personal list of the authenticated user
+  (US-0036), and `false` otherwise. It is resolved with a single batched query for the whole list, never one
+  query per work. The attribute is exclusively part of the response.
 - The metrics (`SUM(PercentageReading)`, `AVG(Stars)`) are computed in the database through correlated
   subqueries in the `ORDER BY`; no work is loaded to compute them in memory.
 - Read-only. No side effects.

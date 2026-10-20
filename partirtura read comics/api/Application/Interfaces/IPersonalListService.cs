@@ -8,6 +8,8 @@ public interface IPersonalListService
 
     Task<PersonalListSummaryDto> GetSummaryAsync(long listId, long userId, CancellationToken cancellationToken = default);
 
+    Task<IReadOnlyList<PersonalListMembershipDto>> GetWithMembershipAsync(GetPersonalListsRequest request, long userId, CancellationToken cancellationToken = default);
+
     Task<PersonalListSummaryDto> RenameAsync(long listId, UpdatePersonalListRequest request, long userId, CancellationToken cancellationToken = default);
 
     Task DeleteAsync(long listId, long userId, CancellationToken cancellationToken = default);

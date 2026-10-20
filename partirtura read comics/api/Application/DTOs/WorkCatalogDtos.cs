@@ -33,7 +33,8 @@ public record WorkCatalogItemDto(
     WorkCatalogNodeDto? Publisher,
     ReaderMyProgressDto? MyReadingProgress,
     double? AverageRating,
-    bool IsFavorite);
+    bool IsFavorite,
+    bool IsInPersonalList);
 
 public record CatalogWorkContextDto(
     long Id,

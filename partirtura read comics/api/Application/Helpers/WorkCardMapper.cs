@@ -5,7 +5,7 @@ namespace Application.Helpers;
 
 public static class WorkCardMapper
 {
-    public static WorkCatalogItemDto ToCard(Work work, WorkReadingProgress? readingProgress = null, bool isFavorite = false)
+    public static WorkCatalogItemDto ToCard(Work work, WorkReadingProgress? readingProgress = null, bool isFavorite = false, bool isInPersonalList = false)
     {
         return new WorkCatalogItemDto(
             work.Id,
@@ -23,7 +23,8 @@ public static class WorkCardMapper
             ToPublisherNode(work),
             ToProgress(readingProgress),
             ToAverageRating(work),
-            isFavorite);
+            isFavorite,
+            isInPersonalList);
     }
 
     public static double? ToAverageRating(Work work)

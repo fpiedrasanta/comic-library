@@ -42,9 +42,11 @@ public class ReadingHistoryService : IReadingHistoryService
 
         var favoriteWorkIds = await GetFavoriteWorkIdsAsync(userId, progresses, cancellationToken);
         var favoriteWorkIdsSet = favoriteWorkIds.ToHashSet();
+        var personalListWorkIds = await GetPersonalListWorkIdsAsync(userId, progresses, cancellationToken);
+        var personalListWorkIdsSet = personalListWorkIds.ToHashSet();
 
         var dtos = progresses.Select(progress =>
-            WorkCardMapper.ToCard(progress.Work!, progress, favoriteWorkIdsSet.Contains(progress.Work!.Id))).ToList();
+            WorkCardMapper.ToCard(progress.Work!, progress, favoriteWorkIdsSet.Contains(progress.Work!.Id), personalListWorkIdsSet.Contains(progress.Work!.Id))).ToList();
 
         _logger.LogInformation(
             "Reading history consulted by User {UserId}: page {CurrentPage}, {ItemCount} items of {TotalCount}, state filter {State}.",
@@ -55,6 +57,17 @@ public class ReadingHistoryService : IReadingHistoryService
             request.state ?? ReadingHistoryStates.All);
 
         return PaginationGuard.Build(currentPage, pageSize, totalCount, dtos);
+    }
+
+    private async Task<IReadOnlyList<long>> GetPersonalListWorkIdsAsync(long userId, IReadOnlyList<WorkReadingProgress> progresses, CancellationToken cancellationToken)
+    {
+        if (progresses.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        var workIds = progresses.Select(progress => progress.Work!.Id).ToList();
+        return await _unitOfWork.WorkListItemRepository.GetPersonalWorkIdsAsync(userId, workIds, cancellationToken);
     }
 
     private async Task<IReadOnlyList<long>> GetFavoriteWorkIdsAsync(long userId, IReadOnlyList<WorkReadingProgress> progresses, CancellationToken cancellationToken)

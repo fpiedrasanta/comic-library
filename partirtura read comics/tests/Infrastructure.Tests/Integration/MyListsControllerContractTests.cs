@@ -1,5 +1,6 @@
 using System.Reflection;
 using Api.Controllers;
+using Application.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
@@ -67,6 +68,26 @@ public class MyListsControllerContractTests
         Assert.Equal("{listId:long}/works", addWork!.Template);
         Assert.Equal("{listId:long}/works/{workId:long}", removeWork!.Template);
         Assert.Equal("{listId:long}/works/order", reorder!.Template);
+    }
+
+    [Fact]
+    public void MyListsController_ExposesTheCollectionQueryWithoutAPathParameter()
+    {
+        var method = typeof(MyListsController).GetMethod("Get", new[] { typeof(GetPersonalListsRequest), typeof(CancellationToken) });
+        var httpGet = method!.GetCustomAttribute<HttpGetAttribute>();
+
+        Assert.NotNull(httpGet);
+        Assert.True(string.IsNullOrEmpty(httpGet!.Template));
+    }
+
+    [Fact]
+    public void MyListsController_ExposesTheSingleListQueryWithTheListId()
+    {
+        var method = typeof(MyListsController).GetMethod("GetById");
+        var httpGet = method!.GetCustomAttribute<HttpGetAttribute>();
+
+        Assert.NotNull(httpGet);
+        Assert.Equal("{listId:long}", httpGet!.Template);
     }
 
     [Fact]

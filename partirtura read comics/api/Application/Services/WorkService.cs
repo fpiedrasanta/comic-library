@@ -95,14 +95,27 @@ public class WorkService : IWorkService
 
         var favoriteWorkIds = await GetFavoriteWorkIdsAsync(userId, items, cancellationToken);
         var favoriteWorkIdsSet = favoriteWorkIds.ToHashSet();
+        var personalListWorkIds = await GetPersonalListWorkIdsAsync(userId, items, cancellationToken);
+        var personalListWorkIdsSet = personalListWorkIds.ToHashSet();
 
         var dtos = items.Select(work =>
         {
             progressesByWorkId.TryGetValue(work.Id, out var progress);
-            return MapCatalogWork(work, progress, favoriteWorkIdsSet.Contains(work.Id));
+            return MapCatalogWork(work, progress, favoriteWorkIdsSet.Contains(work.Id), personalListWorkIdsSet.Contains(work.Id));
         }).ToList();
 
         return PaginationGuard.Build(currentPage, pageSize, totalCount, dtos);
+    }
+
+    private async Task<IReadOnlyList<long>> GetPersonalListWorkIdsAsync(long? userId, IReadOnlyList<Work> items, CancellationToken cancellationToken)
+    {
+        if (!userId.HasValue || userId.Value <= 0 || items.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        var workIds = items.Select(work => work.Id).ToList();
+        return await _unitOfWork.WorkListItemRepository.GetPersonalWorkIdsAsync(userId.Value, workIds, cancellationToken);
     }
 
     private async Task<IReadOnlyList<long>> GetFavoriteWorkIdsAsync(long? userId, IReadOnlyList<Work> items, CancellationToken cancellationToken)
@@ -176,9 +189,9 @@ public class WorkService : IWorkService
         return work is null ? null : new CatalogWorkNavigationDto(work.Id, work.Title, work.NumberValue, ImageUrlBuilder.ToUrl(work.Cover));
     }
 
-    private static WorkCatalogItemDto MapCatalogWork(Work work, WorkReadingProgress? readingProgress = null, bool isFavorite = false)
+    private static WorkCatalogItemDto MapCatalogWork(Work work, WorkReadingProgress? readingProgress = null, bool isFavorite = false, bool isInPersonalList = false)
     {
-        return WorkCardMapper.ToCard(work, readingProgress, isFavorite);
+        return WorkCardMapper.ToCard(work, readingProgress, isFavorite, isInPersonalList);
     }
 
     public async Task<WorkDetailDto?> GetByIdAsync(long workId, CancellationToken cancellationToken = default)

@@ -57,6 +57,75 @@ Notes:
   its own file and a later change on one list never affects another one.
 - A new list may be created without works.
 
+## GET /api/users/me/lists
+
+Description:
+Returns the personal lists of the authenticated user with the membership of an optional work, so Public Web can
+render the list selector of the work card (one checkbox per list) and know the initial state of each one.
+
+Controller:
+MyListsController
+
+Authentication:
+- Required. Bearer token in Authorization header.
+- Any authenticated user. Does not require the Administrator role.
+- The owner is always the authenticated user; the request never accepts a user identifier.
+
+Request parameters (query):
+- search: string (optional) — filters the lists by name (partial match).
+- pageSize: int (optional, default 12, max 50) — maximum number of lists to return.
+- workId: long (optional) — the work whose membership is checked. When it is omitted, `containsWork` is `false`
+  for every list.
+
+Response:
+- 200 OK
+  Body:
+  {
+      "success": true,
+      "message": "OK",
+      "code": 200,
+      "payload": [
+          {
+              "id": 42,
+              "name": "Mi lista",
+              "description": "Lista creada por Ana Pérez",
+              "color": "#38BDF8",
+              "urlCover": "/images/318",
+              "workCount": 3,
+              "containsWork": true
+          },
+          {
+              "id": 43,
+              "name": "Otra lista",
+              "description": "Lista creada por Ana Pérez",
+              "color": "#38BDF8",
+              "urlCover": "/images/319",
+              "workCount": 1,
+              "containsWork": false
+          }
+      ]
+  }
+- 400 Bad Request when `pageSize` is not a positive number.
+- 401 Unauthorized when the bearer token is missing or invalid.
+- 422 Unprocessable Entity when `pageSize` is zero or negative.
+
+Errors:
+- 401 Unauthorized
+- 422 Unprocessable Entity (invalid `pageSize`)
+
+Notes:
+- The response contains **only** the personal lists of the authenticated user. The system lists and the personal
+  lists of other users are never included.
+- `containsWork` is `true` when the work of `workId` belongs to that personal list, and `false` otherwise. A work
+  that belongs to no personal list returns `false` for every list.
+- The ordering is: first the lists that contain the work, then the lists that do not, and inside each group the
+  lists are sorted by name ascending. The `search` filter does not change that order.
+- The search, the membership calculation, the ordering and the `pageSize` limit are applied in the database
+  before the results are materialized: no query per list.
+- The operation is read-only: it never modifies data.
+- The Public Web can use the existing `POST /api/users/me/lists/{listId}/works` and
+  `DELETE /api/users/me/lists/{listId}/works/{workId}` to add or remove the work from each list.
+
 ## GET /api/users/me/lists/{listId}
 
 Description:

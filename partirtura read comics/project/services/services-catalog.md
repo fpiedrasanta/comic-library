@@ -153,7 +153,7 @@ Application services for catalog and content management.
 - **Location**: `Application/Services/PersonalListService.cs`
 - **Controller**: `MyListsController`
 - **Dependencies**: `IFileStorageService`, `IUnitOfWork`, `ILogger<PersonalListService>`
-- **Operations**: `CreateAsync`, `GetSummaryAsync`, `RenameAsync`, `DeleteAsync`, `AddWorkAsync`, `RemoveWorkAsync`, `ReorderWorksAsync`
+- **Operations**: `CreateAsync`, `GetSummaryAsync`, `GetWithMembershipAsync`, `RenameAsync`, `DeleteAsync`, `AddWorkAsync`, `RemoveWorkAsync`, `ReorderWorksAsync`
 - **Notes**: Serves US-0036 (administrar listas personales de obras). Dedicated service for the personal work lists of the authenticated user (`OwnerType = User`); the system lists keep their own administration rules in `WorkListService` and `/api/admin-work-lists`. The user identity is resolved from the authenticated context (`userId` received from the controller, extracted from the JWT `sub` claim); a client-supplied `UserId` is never trusted and is not part of any request contract, so a user can never administer the personal lists of another user, nor reach a system list through these operations. A personal list is persisted with `OwnerType = User`, `Visibility = Private`, `IsActive = true`, no `ListType`, the brand blue as color and the description `Lista creada por {nombre de usuario}`; its cover is a copy of the packaged generic cover asset, persisted through the regular image flow so every list owns an independent file. The service never touches the reading progress, the reading history, the ratings, the comments, the favorites or the membership of the works in the system lists.
 
 ### CreateAsync
@@ -161,6 +161,12 @@ Application services for catalog and content management.
 - **Signature**: `CreateAsync(CreatePersonalListRequest request, long userId, CancellationToken)`.
 - **Responsibilities**: validates the name (required, trimmed, max 200 characters) and that it is not already used by another list (the name is unique in the system, as in the administration endpoints); persists the generic cover as an independent image; creates the list with the values defined by the backend and saves it inside a transaction.
 - **Errors**: `ValidationException` (422) when the name is empty or too long; `BusinessNotFoundException` (404) when the user does not exist; `BusinessConflictException` (409) when the name is already used. When the persistence fails, the transaction is rolled back and the copied cover file is removed.
+
+### GetWithMembershipAsync
+
+- **Signature**: `GetWithMembershipAsync(GetPersonalListsRequest request, long userId, CancellationToken)`.
+- **Responsibilities**: returns the personal lists of the authenticated user with the membership of the optional work of the request (`containsWork`), the optional name filter (`search`) and the result limit (`pageSize`). The filter, the membership calculation, the ordering (the lists that contain the work first, then by name ascending) and the limit are applied in the database, so the operation never issues one query per list.
+- **Errors**: `ValidationException` (422) when `pageSize` is zero or negative; the limit is capped to `PaginationGuard.MaxPageSize`. The operation is read-only and never modifies data.
 
 ### RenameAsync
 

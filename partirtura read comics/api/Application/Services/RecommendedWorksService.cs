@@ -26,8 +26,10 @@ public class RecommendedWorksService : IRecommendedWorksService
 
         var favoriteWorkIds = await GetFavoriteWorkIdsAsync(userId, works, cancellationToken);
         var favoriteWorkIdsSet = favoriteWorkIds.ToHashSet();
+        var personalListWorkIds = await GetPersonalListWorkIdsAsync(userId, works, cancellationToken);
+        var personalListWorkIdsSet = personalListWorkIds.ToHashSet();
 
-        var dtos = works.Select(work => WorkCardMapper.ToCard(work, null, favoriteWorkIdsSet.Contains(work.Id))).ToList();
+        var dtos = works.Select(work => WorkCardMapper.ToCard(work, null, favoriteWorkIdsSet.Contains(work.Id), personalListWorkIdsSet.Contains(work.Id))).ToList();
 
         _logger.LogInformation(
             "Recommended works consulted by User {UserId}: {Count} items ordered by {Criterion}.",
@@ -36,6 +38,17 @@ public class RecommendedWorksService : IRecommendedWorksService
             criterion);
 
         return dtos;
+    }
+
+    private async Task<IReadOnlyList<long>> GetPersonalListWorkIdsAsync(long? userId, IReadOnlyList<Domain.Entities.Work> works, CancellationToken cancellationToken)
+    {
+        if (!userId.HasValue || userId.Value <= 0 || works.Count == 0)
+        {
+            return Array.Empty<long>();
+        }
+
+        var workIds = works.Select(work => work.Id).ToList();
+        return await _unitOfWork.WorkListItemRepository.GetPersonalWorkIdsAsync(userId.Value, workIds, cancellationToken);
     }
 
     private async Task<IReadOnlyList<long>> GetFavoriteWorkIdsAsync(long? userId, IReadOnlyList<Domain.Entities.Work> works, CancellationToken cancellationToken)

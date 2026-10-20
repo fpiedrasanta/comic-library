@@ -25,13 +25,20 @@ public class MyListsController : ControllerBase
         var result = await _personalListService.CreateAsync(request, GetUserId(), cancellationToken);
 
         return CreatedAtAction(
-            actionName: nameof(Get),
+            actionName: nameof(GetById),
             routeValues: new { listId = result.Id },
             value: new ApiResponse<PersonalListSummaryDto>(true, "Personal list created successfully.", StatusCodes.Status201Created, result));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] GetPersonalListsRequest request, CancellationToken cancellationToken)
+    {
+        var result = await _personalListService.GetWithMembershipAsync(request, GetUserId(), cancellationToken);
+        return Ok(new ApiResponse<IReadOnlyList<PersonalListMembershipDto>>(true, "OK", StatusCodes.Status200OK, result));
+    }
+
     [HttpGet("{listId:long}")]
-    public async Task<IActionResult> Get(long listId, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(long listId, CancellationToken cancellationToken)
     {
         var result = await _personalListService.GetSummaryAsync(listId, GetUserId(), cancellationToken);
         return Ok(new ApiResponse<PersonalListSummaryDto>(true, "OK", StatusCodes.Status200OK, result));

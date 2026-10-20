@@ -84,6 +84,46 @@ internal static class PersonalListTestSupport
         return systemListId ?? throw new InvalidOperationException("The development database does not have system work lists.");
     }
 
+    public static async Task AddWorkToSystemListAsync(IntegrationTestFixture fixture, long systemListId, long workId)
+    {
+        using var scope = fixture.ScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var workList = await dbContext.WorkLists.FirstAsync(list => list.Id == systemListId, default);
+        var work = await dbContext.Works.FirstAsync(item => item.Id == workId, default);
+
+        var maxPosition = await dbContext.WorkListItems
+            .Where(item => item.WorkList.Id == systemListId)
+            .MaxAsync(item => (int?)item.Position, default);
+
+        dbContext.WorkListItems.Add(new WorkListItem
+        {
+            WorkList = workList,
+            Work = work,
+            Position = (maxPosition ?? -1) + 1
+        });
+
+        await dbContext.SaveChangesAsync(default);
+    }
+
+    public static async Task CleanupSystemListItemsAsync(IntegrationTestFixture fixture, long systemListId)
+    {
+        using var scope = fixture.ScopeFactory.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+        var items = await dbContext.WorkListItems
+            .Where(item => item.WorkList.Id == systemListId)
+            .ToListAsync(default);
+
+        if (items.Count == 0)
+        {
+            return;
+        }
+
+        dbContext.WorkListItems.RemoveRange(items);
+        await dbContext.SaveChangesAsync(default);
+    }
+
     public static async Task CleanupAsync(IntegrationTestFixture fixture, long listId)
     {
         using var scope = fixture.ScopeFactory.CreateScope();

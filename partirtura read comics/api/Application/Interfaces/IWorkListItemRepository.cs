@@ -10,6 +10,12 @@ public interface IWorkListItemRepository
 
     Task<int> GetMaxPositionAsync(long workListId, CancellationToken cancellationToken = default);
 
+    /// <summary>
+    /// Returns the works of the given set that belong to at least one personal list of the given user.
+    /// A single query resolves the whole page, so the callers never issue one query per work.
+    /// </summary>
+    Task<IReadOnlyList<long>> GetPersonalWorkIdsAsync(long userId, IReadOnlyCollection<long> workIds, CancellationToken cancellationToken = default);
+
     Task AddAsync(WorkListItem workListItem, CancellationToken cancellationToken = default);
 
     Task UpdateAsync(WorkListItem workListItem, CancellationToken cancellationToken = default);

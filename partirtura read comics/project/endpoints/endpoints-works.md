@@ -27,6 +27,9 @@ Request parameters:
 - orderBy: string (optional, allowed: Title, PublicationDate, CreatedAt, UploadedAt (alias of CreatedAt), Number)
 - orderDir: string (default DESC)
 - isFavorite: boolean (optional, US-0035). `true` returns only the favorites of the authenticated user; `false`, `null` or any other value does not filter the catalog. The filter is applied in the database before counting, ordering and pagination, so the paging metadata describes the filtered set.
+- The response adds `isInPersonalList` (boolean, US-0036): `true` when the work belongs to at least one personal
+  list of the authenticated user, `false` otherwise. It is resolved with a single batched query for the whole
+  page, never one query per work.
 
 Behavior:
 - Several filters combine with AND; the hierarchy never returns works outside the selected context.
@@ -87,7 +90,8 @@ Response:
                         "lastReadAt": "2026-10-09T14:22:10Z"
                     },
                     "averageRating": 4.5,
-                    "isFavorite": true
+                    "isFavorite": true,
+                    "isInPersonalList": false
                 },
                 {
                     "id": 2,
@@ -105,7 +109,8 @@ Response:
                     "publisher": null,
                     "myReadingProgress": null,
                     "averageRating": 4.5,
-                    "isFavorite": false
+                    "isFavorite": false,
+                    "isInPersonalList": true
                 }
            ]
        }
@@ -113,7 +118,7 @@ Response:
 - 401 Unauthorized when the bearer token is missing or invalid.
 
 DTO:
-`Application/DTOs/WorkCatalogDtos.cs` â€” `GetCatalogWorksRequest`, `WorkCatalogItemDto` (Id, WorkTypeId, WorkTypeName, Title, Description, NumberValue, PublicationDate, CreatedAt, CoverId, UrlCover, Series/Franchise/Publisher as `WorkCatalogNodeDto`, MyReadingProgress as `ReaderMyProgressDto`: CurrentPage, TotalPages, Percentage, LastReadAt, Status; AverageRating, IsFavorite), `WorkCatalogNodeDto`.
+`Application/DTOs/WorkCatalogDtos.cs` â€” `GetCatalogWorksRequest`, `WorkCatalogItemDto` (Id, WorkTypeId, WorkTypeName, Title, Description, NumberValue, PublicationDate, CreatedAt, CoverId, UrlCover, Series/Franchise/Publisher as `WorkCatalogNodeDto`, MyReadingProgress as `ReaderMyProgressDto`: CurrentPage, TotalPages, Percentage, LastReadAt, Status; AverageRating, IsFavorite, IsInPersonalList), `WorkCatalogNodeDto`.
 
 Notes:
 - `averageRating` is the average of the active ratings of the Work (zero-star votes included), or `null` when the Work has no active ratings. It comes from the `Work` accumulators (`RatingCount` / `AverageRating`) maintained by `WorkRatingService`, the same values used by the detail, so the listing adds no extra query. A card must check for `null` before showing the rating.
