@@ -9,7 +9,11 @@ public class WorkList
     public string? Description { get; set; }
     public virtual Image? Cover { get; set; }
     public string? Color { get; set; }
-    public virtual ListType ListType { get; set; } = null!;
+
+    /// <summary>
+    /// Optional. System lists always have a type; personal lists (OwnerType = User) have none.
+    /// </summary>
+    public virtual ListType? ListType { get; set; }
     public OwnerType OwnerType { get; set; }
     public virtual User? Owner { get; set; }
     public Visibility Visibility { get; set; }

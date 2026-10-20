@@ -76,6 +76,7 @@ public sealed class IntegrationTestFixture : IAsyncLifetime
                 services.AddScoped<IListRatingService, ListRatingService>();
                 services.AddScoped<IListReaderService, ListReaderService>();
                 services.AddScoped<IFavoriteService, FavoriteService>();
+                services.AddScoped<IPersonalListService, PersonalListService>();
                 services.AddScoped(typeof(ILogger<>), typeof(NullLogger<>));
                 services.AddSingleton<IWebHostEnvironment>(new FakeWebHostEnvironment());
             })

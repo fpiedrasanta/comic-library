@@ -109,7 +109,7 @@ public class CatalogControllerContractTests
 
         if (requestType == typeof(GetCatalogListsRequest))
         {
-            Assert.Equal(new[] { "currentPage", "franchiseId", "listTypeId", "orderBy", "orderDir", "pageSize", "publisherId", "search", "seriesId" }, properties);
+            Assert.Equal(new[] { "currentPage", "franchiseId", "listTypeId", "myLists", "orderBy", "orderDir", "pageSize", "publisherId", "search", "seriesId" }, properties);
         }
         else
         {

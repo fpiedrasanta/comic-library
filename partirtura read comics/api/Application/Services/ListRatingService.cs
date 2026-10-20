@@ -1,6 +1,7 @@
 using Application.DTOs;
 using Application.Interfaces;
 using Domain.Entities;
+using Domain.Enums;
 using Domain.Exceptions;
 using Microsoft.Extensions.Logging;
 
@@ -43,6 +44,11 @@ public class ListRatingService : IListRatingService
                        ?? throw new BusinessNotFoundException("The work list does not exist.");
 
         if (!workList.IsActive)
+        {
+            throw new BusinessNotFoundException("The work list does not exist.");
+        }
+
+        if (workList.OwnerType != OwnerType.System)
         {
             throw new BusinessNotFoundException("The work list does not exist.");
         }

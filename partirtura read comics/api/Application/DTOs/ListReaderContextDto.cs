@@ -5,8 +5,8 @@ public record ReaderListRatingDto(long? WorkListId, int Stars, string? Review, D
 public record ReaderListCatalogDto(
     long Id,
     string Name,
-    long ListTypeId,
-    string ListTypeName,
+    long? ListTypeId,
+    string? ListTypeName,
     string? Description,
     string? Color,
     string? UrlCover,

@@ -134,6 +134,7 @@ builder.Services.AddScoped<IWorkRatingService, WorkRatingService>();
 builder.Services.AddScoped<IListRatingService, ListRatingService>();
 builder.Services.AddScoped<IListReaderService, ListReaderService>();
 builder.Services.AddScoped<IFavoriteService, FavoriteService>();
+builder.Services.AddScoped<IPersonalListService, PersonalListService>();
 builder.Services.AddScoped<IWorkRepository, WorkRepository>();
 
 builder.Services.AddScoped<IPasswordHasher, PasswordHasher>();

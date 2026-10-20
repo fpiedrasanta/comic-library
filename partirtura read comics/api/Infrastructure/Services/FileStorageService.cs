@@ -8,6 +8,10 @@ namespace Infrastructure.Services;
 
 public class FileStorageService : IFileStorageService
 {
+    private const string DefaultListCoverAsset = "default-list-cover.jfif";
+    private const string DefaultListCoverStoredName = "default-list-cover.webp";
+    private const string AssetsFolder = "Assets";
+
     private readonly IWebHostEnvironment _env;
     private readonly string _storagePath;
     private readonly string _relativeStoragePath;
@@ -90,6 +94,30 @@ public class FileStorageService : IFileStorageService
         await System.IO.File.WriteAllBytesAsync(physicalPath, data, cancellationToken);
 
         return relativePath;
+    }
+
+    public async Task<Image> SaveDefaultListCoverAsync(CancellationToken cancellationToken = default)
+    {
+        var assetPath = ResolveDefaultListCoverAssetPath();
+
+        if (!global::System.IO.File.Exists(assetPath))
+        {
+            throw new FileNotFoundException("The default list cover asset was not found.", assetPath);
+        }
+
+        var data = await global::System.IO.File.ReadAllBytesAsync(assetPath, cancellationToken);
+        return await SaveAsync(data, DefaultListCoverStoredName, ImageType.Cover, cancellationToken);
+    }
+
+    private string ResolveDefaultListCoverAssetPath()
+    {
+        var candidates = new[]
+        {
+            Path.Combine(AppContext.BaseDirectory, AssetsFolder, DefaultListCoverAsset),
+            Path.Combine(_env.ContentRootPath, AssetsFolder, DefaultListCoverAsset)
+        };
+
+        return candidates.FirstOrDefault(global::System.IO.File.Exists) ?? candidates[0];
     }
 
     public string GetPhysicalPath(string storagePath)

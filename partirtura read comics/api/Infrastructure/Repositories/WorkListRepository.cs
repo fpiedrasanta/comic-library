@@ -52,7 +52,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
         return (items, totalCount);
     }
 
-    public async Task<(IReadOnlyList<WorkListCardData> Items, int TotalCount)> GetCatalogPagedAsync(long? userId, 
+    public async Task<(IReadOnlyList<WorkListCardData> Items, int TotalCount)> GetCatalogPagedAsync(long? userId,
         int currentPage,
         int pageSize,
         string? search,
@@ -62,14 +62,19 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
         long? listTypeId,
         string? orderBy,
         string? orderDir,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default,
+        bool myLists = false)
     {
         var query = _context.WorkLists
             .AsNoTracking()
             .Include(workList => workList.ListType)
             .Include(workList => workList.Cover)
             .AsSplitQuery()
-            .Where(workList => workList.IsActive && workList.OwnerType == OwnerType.System);
+            .Where(workList => workList.IsActive);
+
+        query = myLists
+            ? ApplyPersonalListsFilter(query, userId)
+            : ApplySystemListsFilter(query);
 
         query = ApplyCatalogSearch(query, search);
         query = ApplyCatalogHierarchy(query, publisherId, franchiseId, seriesId);
@@ -104,7 +109,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
         return (items, totalCount);
     }
 
-    public async Task<WorkList?> GetCatalogByIdAsync(long id, CancellationToken cancellationToken = default)
+    public async Task<WorkList?> GetCatalogByIdAsync(long id, CancellationToken cancellationToken = default, long? userId = null)
     {
         return await _context.WorkLists
             .AsNoTracking()
@@ -129,7 +134,44 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
                 .ThenInclude(workItem => workItem.Work)
                 .ThenInclude(work => work.Publisher)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(workList => workList.Id == id && workList.IsActive && workList.OwnerType == OwnerType.System, cancellationToken);
+            .FirstOrDefaultAsync(
+                workList => workList.Id == id &&
+                            workList.IsActive &&
+                            (workList.OwnerType == OwnerType.System ||
+                             (workList.OwnerType == OwnerType.User &&
+                              workList.Owner != null &&
+                              workList.Owner.Id == userId)),
+                cancellationToken);
+    }
+
+    public async Task<WorkList?> GetPersonalByIdAsync(long id, long userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.WorkLists
+            .AsNoTracking()
+            .Include(workList => workList.ListType)
+            .Include(workList => workList.Cover)
+            .FirstOrDefaultAsync(
+                workList => workList.Id == id &&
+                            workList.OwnerType == OwnerType.User &&
+                            workList.Owner != null &&
+                            workList.Owner.Id == userId,
+                cancellationToken);
+    }
+
+    public async Task<WorkList?> GetPersonalWithItemsAsync(long id, long userId, CancellationToken cancellationToken = default)
+    {
+        return await _context.WorkLists
+            .Include(workList => workList.ListType)
+            .Include(workList => workList.Cover)
+            .Include(workList => workList.WorkListItems)
+                .ThenInclude(item => item.Work)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(
+                workList => workList.Id == id &&
+                            workList.OwnerType == OwnerType.User &&
+                            workList.Owner != null &&
+                            workList.Owner.Id == userId,
+                cancellationToken);
     }
 
     public async Task<WorkList?> GetByIdAsync(long id, CancellationToken cancellationToken = default)
@@ -153,6 +195,30 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
     {
         _context.WorkLists.Update(workList);
         return Task.CompletedTask;
+    }
+
+    public Task DeleteAsync(WorkList workList, CancellationToken cancellationToken = default)
+    {
+        _context.WorkLists.Remove(workList);
+        return Task.CompletedTask;
+    }
+
+    private static IQueryable<WorkList> ApplySystemListsFilter(IQueryable<WorkList> query)
+    {
+        return query.Where(workList => workList.OwnerType == OwnerType.System);
+    }
+
+    private static IQueryable<WorkList> ApplyPersonalListsFilter(IQueryable<WorkList> query, long? userId)
+    {
+        if (!userId.HasValue || userId.Value <= 0)
+        {
+            return query.Where(_ => false);
+        }
+
+        return query.Where(workList =>
+            workList.OwnerType == OwnerType.User &&
+            workList.Owner != null &&
+            workList.Owner.Id == userId.Value);
     }
 
     private static IQueryable<WorkList> ApplySearch(IQueryable<WorkList> query, string? search)
@@ -201,7 +267,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
 
         if (listTypeId.HasValue)
         {
-            query = query.Where(workList => workList.ListType.Id == listTypeId.Value);
+            query = query.Where(workList => workList.ListType != null && workList.ListType.Id == listTypeId.Value);
         }
 
         if (createdAtFrom.HasValue)
@@ -288,7 +354,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
     private static IQueryable<WorkList> ApplyCatalogListType(IQueryable<WorkList> query, long? listTypeId)
     {
         return listTypeId.HasValue
-            ? query.Where(workList => workList.ListType.Id == listTypeId.Value)
+            ? query.Where(workList => workList.ListType != null && workList.ListType.Id == listTypeId.Value)
             : query;
     }
 

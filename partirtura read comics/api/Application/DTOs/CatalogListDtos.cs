@@ -11,13 +11,14 @@ public record GetCatalogListsRequest(
     long? seriesId = null,
     long? listTypeId = null,
     string? orderBy = null,
-    string? orderDir = null);
+    string? orderDir = null,
+    string? myLists = null);
 
 public record CatalogListCardDto(
     long Id,
     string Name,
-    long ListTypeId,
-    string ListTypeName,
+    long? ListTypeId,
+    string? ListTypeName,
     string? Color,
     string? UrlCover,
     int WorkCount,
@@ -28,8 +29,8 @@ public record CatalogListCardDto(
 public record CatalogListDetailDto(
     long Id,
     string Name,
-    long ListTypeId,
-    string ListTypeName,
+    long? ListTypeId,
+    string? ListTypeName,
     string? Description,
     string? Color,
     string? UrlCover,

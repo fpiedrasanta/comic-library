@@ -30,9 +30,21 @@ public interface IWorkListRepository
         long? listTypeId,
         string? orderBy,
         string? orderDir,
-        CancellationToken cancellationToken = default);
+        CancellationToken cancellationToken = default,
+        bool myLists = false);
 
-    Task<WorkList?> GetCatalogByIdAsync(long id, CancellationToken cancellationToken = default);
+    Task<WorkList?> GetCatalogByIdAsync(long id, CancellationToken cancellationToken = default, long? userId = null);
+
+    /// <summary>
+    /// Returns a list that the given user owns (personal list), or null when the list does not
+    /// exist, is not personal or belongs to another user.
+    /// </summary>
+    Task<WorkList?> GetPersonalByIdAsync(long id, long userId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Returns a personal list owned by the given user with its work items loaded, ordered by position.
+    /// </summary>
+    Task<WorkList?> GetPersonalWithItemsAsync(long id, long userId, CancellationToken cancellationToken = default);
 
     Task<WorkList?> GetByIdAsync(long id, CancellationToken cancellationToken = default);
 
@@ -41,4 +53,9 @@ public interface IWorkListRepository
     Task AddAsync(WorkList workList, CancellationToken cancellationToken = default);
 
     Task UpdateAsync(WorkList workList, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Physically deletes a list and its work items. Used by the personal list deletion use case.
+    /// </summary>
+    Task DeleteAsync(WorkList workList, CancellationToken cancellationToken = default);
 }

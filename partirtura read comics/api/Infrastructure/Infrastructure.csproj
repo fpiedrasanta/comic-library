@@ -37,4 +37,10 @@
     <InternalsVisibleTo Include="Infrastructure.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="Assets\default-list-cover.jfif">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

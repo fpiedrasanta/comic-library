@@ -32,7 +32,7 @@ public class ListReaderService : IListReaderService
             throw new ValidationException("Work identifier is required.");
         }
 
-        var workList = await _unitOfWork.WorkListRepository.GetCatalogByIdAsync(workListId, cancellationToken);
+        var workList = await _unitOfWork.WorkListRepository.GetCatalogByIdAsync(workListId, cancellationToken, userId);
         if (workList is null)
         {
             throw new BusinessNotFoundException("Work list does not exist.");
@@ -78,8 +78,8 @@ public class ListReaderService : IListReaderService
             new ReaderListCatalogDto(
                 workList.Id,
                 workList.Name,
-                workList.ListType.Id,
-                workList.ListType.Name,
+                workList.ListType?.Id,
+                workList.ListType?.Name,
                 workList.Description,
                 workList.Color,
                 ImageUrlBuilder.ToUrl(workList.Cover),

@@ -65,7 +65,9 @@ public class WorkListService : IWorkListService
     public async Task<WorkListDetailDto> GetByIdAsync(long id, CancellationToken cancellationToken = default)
     {
         var workList = await _unitOfWork.WorkListRepository.GetByIdAsync(id, cancellationToken);
-        return workList is null ? throw new BusinessNotFoundException(WorkListNotFound) : ToDetailDto(workList);
+        return workList is null || workList.OwnerType != OwnerType.System
+            ? throw new BusinessNotFoundException(WorkListNotFound)
+            : ToDetailDto(workList);
     }
 
     public async Task<WorkListDetailDto> CreateAsync(
@@ -159,6 +161,11 @@ public class WorkListService : IWorkListService
             throw new BusinessNotFoundException(WorkListNotFound);
         }
 
+        if (workList.OwnerType == OwnerType.User && (workList.Owner is null || workList.Owner.Id != userId))
+        {
+            throw new BusinessNotFoundException(WorkListNotFound);
+        }
+
         if (!workList.WorkListItems.Any(workItem => workItem.Work.Id == workId))
         {
             throw new BusinessNotFoundException("The work does not belong to the list.");
@@ -218,7 +225,7 @@ public class WorkListService : IWorkListService
     public async Task DeactivateAsync(long id, CancellationToken cancellationToken = default)
     {
         var workList = await _unitOfWork.WorkListRepository.GetByIdAsync(id, cancellationToken);
-        if (workList is null)
+        if (workList is null || workList.OwnerType != OwnerType.System)
         {
             throw new BusinessNotFoundException(WorkListNotFound);
         }
@@ -236,7 +243,7 @@ public class WorkListService : IWorkListService
     public async Task ActivateAsync(long id, CancellationToken cancellationToken = default)
     {
         var workList = await _unitOfWork.WorkListRepository.GetByIdAsync(id, cancellationToken);
-        if (workList is null)
+        if (workList is null || workList.OwnerType != OwnerType.System)
         {
             throw new BusinessNotFoundException(WorkListNotFound);
         }
@@ -272,15 +279,25 @@ public class WorkListService : IWorkListService
             request.listTypeId,
             request.orderBy,
             request.orderDir,
-            cancellationToken);
+            cancellationToken,
+            IsMyListsRequest(request.myLists));
 
         var items = workLists.Select(ToCatalogCardDto).ToList();
         return PaginationGuard.Build(currentPage, pageSize, totalCount, items);
     }
 
+    /// <summary>
+    /// Only the literal value "true" enables the personal lists query. Any other value (false, omitted,
+    /// empty or not recognized) keeps the system lists query, without producing a binding error.
+    /// </summary>
+    private static bool IsMyListsRequest(string? myLists)
+    {
+        return string.Equals(myLists?.Trim(), "true", StringComparison.OrdinalIgnoreCase);
+    }
+
     public async Task<CatalogListDetailDto> GetCatalogByIdAsync(long id, long? userId = null, CancellationToken cancellationToken = default)
     {
-        var workList = await _unitOfWork.WorkListRepository.GetCatalogByIdAsync(id, cancellationToken);
+        var workList = await _unitOfWork.WorkListRepository.GetCatalogByIdAsync(id, cancellationToken, userId);
         if (workList is null)
         {
             throw new BusinessNotFoundException(WorkListNotFound);
@@ -644,7 +661,7 @@ public class WorkListService : IWorkListService
             workList.Id,
             workList.Name,
             workList.CreatedAt,
-            workList.ListType?.Name ?? string.Empty,
+            workList.ListType?.Name,
             workList.Cover?.Id,
             ImageUrlBuilder.ToUrl(workList.Cover),
             workList.IsActive);
@@ -659,8 +676,8 @@ public class WorkListService : IWorkListService
             workList.Cover?.Id,
             ImageUrlBuilder.ToUrl(workList.Cover),
             workList.Color,
-            workList.ListType.Id,
-            workList.ListType.Name,
+            workList.ListType?.Id,
+            workList.ListType?.Name,
             workList.Visibility,
             workList.OwnerType,
             workList.Owner?.Id,
@@ -701,8 +718,8 @@ public class WorkListService : IWorkListService
         return new CatalogListCardDto(
             workList.Id,
             workList.Name,
-            workList.ListType.Id,
-            workList.ListType.Name,
+            workList.ListType?.Id,
+            workList.ListType?.Name,
             workList.Color,
             ImageUrlBuilder.ToUrl(workList.Cover),
             workListData.WorkCount,
@@ -727,8 +744,8 @@ public class WorkListService : IWorkListService
         return new CatalogListDetailDto(
             workList.Id,
             workList.Name,
-            workList.ListType.Id,
-            workList.ListType.Name,
+            workList.ListType?.Id,
+            workList.ListType?.Name,
             workList.Description,
             workList.Color,
             ImageUrlBuilder.ToUrl(workList.Cover),

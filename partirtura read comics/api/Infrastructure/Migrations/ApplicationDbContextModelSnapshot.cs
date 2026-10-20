@@ -17,6 +17,9 @@ namespace Infrastructure.Migrations
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "10.0.11")
+                .HasAnnotation("Proxies:ChangeTracking", false)
+                .HasAnnotation("Proxies:CheckEquality", false)
+                .HasAnnotation("Proxies:LazyLoading", true)
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             modelBuilder.Entity("Domain.Entities.AccountDeletionToken", b =>
@@ -928,7 +931,7 @@ namespace Infrastructure.Migrations
                         .HasColumnType("tinyint(1)")
                         .HasDefaultValue(true);
 
-                    b.Property<long>("ListTypeId")
+                    b.Property<long?>("ListTypeId")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Name")
@@ -1444,8 +1447,7 @@ namespace Infrastructure.Migrations
                     b.HasOne("Domain.Entities.ListType", "ListType")
                         .WithMany()
                         .HasForeignKey("ListTypeId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("Domain.Entities.User", "Owner")
                         .WithMany()

@@ -20,6 +20,7 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     private IRoleRepository? _roleRepository;
     private IListTypeRepository? _listTypeRepository;
     private IWorkListRepository? _workListRepository;
+    private IWorkListItemRepository? _workListItemRepository;
     private ITagRepository? _tagRepository;
     private ILanguageRepository? _languageRepository;
     private IImageRepository? _imageRepository;
@@ -46,6 +47,7 @@ public class UnitOfWork(ApplicationDbContext context) : IUnitOfWork
     public IRoleRepository RoleRepository => _roleRepository ??= new RoleRepository(_context);
     public IListTypeRepository ListTypeRepository => _listTypeRepository ??= new ListTypeRepository(_context);
     public IWorkListRepository WorkListRepository => _workListRepository ??= new WorkListRepository(_context);
+    public IWorkListItemRepository WorkListItemRepository => _workListItemRepository ??= new WorkListItemRepository(_context);
     public ITagRepository TagRepository => _tagRepository ??= new TagRepository(_context);
     public ILanguageRepository LanguageRepository => _languageRepository ??= new LanguageRepository(_context);
     public IImageRepository ImageRepository => _imageRepository ??= new ImageRepository(_context);

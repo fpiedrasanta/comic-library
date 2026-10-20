@@ -13,6 +13,7 @@ public interface IUnitOfWork : IDisposable
     IRoleRepository RoleRepository { get; }
     IListTypeRepository ListTypeRepository { get; }
     IWorkListRepository WorkListRepository { get; }
+    IWorkListItemRepository WorkListItemRepository { get; }
     ITagRepository TagRepository { get; }
     ILanguageRepository LanguageRepository { get; }
     IImageRepository ImageRepository { get; }
