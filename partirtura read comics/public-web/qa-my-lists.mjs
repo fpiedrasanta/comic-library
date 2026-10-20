@@ -77,4 +77,20 @@ log(`"Mis listas" en el menu: ${(await myListsLink.count()) > 0}`)
 
 log(`errores de pagina: ${pageErrors.length === 0 ? 'ninguno' : JSON.stringify(pageErrors.slice(0, 5))}`)
 
+// Limpieza: la lista de prueba no queda en la base.
+const token = await page.evaluate(async () => {
+  const res = await fetch('/api/users/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'fede.piedrasanta@gmail.com', password: 'CHANGE_ME_ADMIN_PASSWORD' }),
+  })
+  return (await res.json()).payload.accessToken
+})
+const auth = { Authorization: `Bearer ${token}` }
+const personalLists = await (await page.request.get(`${BASE}/api/users/me/lists`, { headers: auth })).json()
+for (const list of personalLists.payload) {
+  await page.request.delete(`${BASE}/api/users/me/lists/${list.id}`, { headers: auth })
+}
+log(`listas personales de prueba eliminadas: ${personalLists.payload.length}`)
+
 await browser.close()
