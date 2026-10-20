@@ -106,13 +106,13 @@ internal static class PersonalListTestSupport
         await dbContext.SaveChangesAsync(default);
     }
 
-    public static async Task CleanupSystemListItemsAsync(IntegrationTestFixture fixture, long systemListId)
+    public static async Task CleanupSystemListItemsAsync(IntegrationTestFixture fixture, long systemListId, long workId)
     {
         using var scope = fixture.ScopeFactory.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
 
         var items = await dbContext.WorkListItems
-            .Where(item => item.WorkList.Id == systemListId)
+            .Where(item => item.WorkList.Id == systemListId && item.Work.Id == workId)
             .ToListAsync(default);
 
         if (items.Count == 0)

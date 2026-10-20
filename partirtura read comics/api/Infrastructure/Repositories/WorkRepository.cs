@@ -251,12 +251,12 @@ public class WorkRepository(ApplicationDbContext context) : IWorkRepository
                     .ThenByDescending(work => work.Id);
 
             case Application.Constants.RecommendedSortFields.MostRated:
+                // The persisted accumulators are the same source of truth the card displays
+                // (AverageRating / RatingCount), so the order always matches the rating the user sees.
+                // A work without votes has AverageRating = 0 and RatingCount = 0, and goes last.
                 return query
-                    .OrderByDescending(work => _context.WorkRatings.Count(
-                        rating => rating.Work != null && rating.Work.Id == work.Id && rating.IsActive) > 0)
-                    .ThenByDescending(work => _context.WorkRatings
-                        .Where(rating => rating.Work != null && rating.Work.Id == work.Id && rating.IsActive)
-                        .Average(rating => (double?)rating.Stars))
+                    .OrderByDescending(work => work.AverageRating)
+                    .ThenByDescending(work => work.RatingCount)
                     .ThenByDescending(work => work.CreatedAt)
                     .ThenByDescending(work => work.Id);
 

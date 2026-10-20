@@ -126,7 +126,7 @@ public class PersonalListMembershipIntegrationTests
         }
         finally
         {
-            await PersonalListTestSupport.CleanupSystemListItemsAsync(_fixture, systemListId);
+            await PersonalListTestSupport.CleanupSystemListItemsAsync(_fixture, systemListId, workIds[0]);
             await FavoriteTestSupport.CleanupAsync(_fixture, user.Id, workIds);
         }
     }

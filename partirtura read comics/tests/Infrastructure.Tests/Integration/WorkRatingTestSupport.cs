@@ -138,6 +138,11 @@ internal static class WorkRatingTestSupport
         await dbContext.SaveChangesAsync(default);
     }
 
+    public static async Task SetAccumulatorsAsync(IntegrationTestFixture fixture, long workId, int ratingCount, double averageRating)
+    {
+        await RestoreAccumulatorsAsync(fixture, workId, ratingCount, averageRating);
+    }
+
     private static async Task RestoreAccumulatorsAsync(IntegrationTestFixture fixture, long workId, int ratingCount, double averageRating)
     {
         using var scope = fixture.ScopeFactory.CreateScope();

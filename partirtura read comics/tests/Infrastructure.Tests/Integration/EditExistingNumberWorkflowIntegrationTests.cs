@@ -68,6 +68,15 @@ public class EditExistingNumberWorkflowIntegrationTests
             break;
         }
 
+        if (targetWorkId == 0)
+        {
+            // The test must not depend on the data that other tests leave behind: when no Number work
+            // is available inside an active series, it creates its own.
+            targetSeriesId = allSeries.Items.First().Id;
+            var languageId = await dbContext.Languages.Select(language => language.Id).FirstAsync();
+            targetWorkId = await CreateNumberWorkAsync(workService, workType.Id, targetSeriesId.Value, languageId, coverData);
+        }
+
         Assert.NotEqual(0, targetWorkId);
         Console.WriteLine($"DEBUG: Selected Work Id={targetWorkId}");
 
@@ -147,6 +156,29 @@ public class EditExistingNumberWorkflowIntegrationTests
         Assert.Equal(newTagName, verifiedWork?.Tags?[0].Name);
         Assert.NotNull(verifiedWork?.UrlCover);
         Console.WriteLine($"DEBUG: Work verified Id={verifiedWork.Id}");
+    }
+
+    private static async Task<long> CreateNumberWorkAsync(IWorkService workService, long workTypeId, long seriesId, long languageId, byte[] coverData)
+    {
+        var created = await workService.CreateAsync(new CreateWorkRequest(
+            WorkTypeId: workTypeId,
+            Title: "Test Number_" + Guid.NewGuid().ToString("N").Substring(0, 8),
+            Description: "Created by the edit workflow integration test",
+            LanguageId: languageId,
+            PublicationDate: DateTime.UtcNow,
+            CoverImageId: null,
+            SeriesId: seriesId,
+            FranchiseId: null,
+            PublisherId: null,
+            NumberValue: "TEST-" + Guid.NewGuid().ToString("N").Substring(0, 4),
+            PreviousNumberId: null,
+            NextNumberId: null,
+            PersonByRoles: new List<PersonByRoleRequest>(),
+            Tags: new List<TagRequest>(),
+            CoverData: coverData,
+            CoverFileName: "number-cover.webp"), default);
+
+        return created.Id;
     }
 
     private static async Task<WorkType> EnsureWorkTypeAsync(ApplicationDbContext dbContext, string name)

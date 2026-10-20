@@ -43,9 +43,10 @@ Ordering:
   percentage ranks above a work with a single completed reader, and works with no reading activity
   (sum 0) rank last, ordered by `CreatedAt` descending between them.
 - `RecentlyAdded`: `CreatedAt` descending, then `Id` descending.
-- `MostRated`: works with at least one active rating first, then `AverageRating` (average of
-  `WorkRating.Stars` over active ratings, zero-star votes included) descending, ties by `CreatedAt`
-  descending, then `Id` descending. Works without ratings appear after the rated ones.
+- `MostRated`: the persisted accumulators of the work, `AverageRating` descending, then `RatingCount`
+  descending, ties by `CreatedAt` descending, then `Id` descending. Works without ratings
+  (`AverageRating = 0` and `RatingCount = 0`) appear after the rated ones. The accumulators are the same
+  source of truth the card displays, so the order always matches the rating shown on each card.
 
 Response:
 - 200 OK
