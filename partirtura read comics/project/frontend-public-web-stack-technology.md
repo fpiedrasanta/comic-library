@@ -15,6 +15,8 @@
 | Validation | Zod |
 | Styling | Tailwind CSS |
 | UI Components | shadcn/ui |
+| Dialogs | Radix UI (`@radix-ui/react-dialog`) |
+| Drag and Drop | dnd-kit (`@dnd-kit/core`, `@dnd-kit/sortable`) |
 | API Contract | OpenAPI |
 | API Client | Generated TypeScript client |
 | Unit Testing | Vitest |
@@ -32,6 +34,7 @@
 6. Dependencies only when they add concrete value.
 7. Generated code (OpenAPI client) stays separate from manual code. Never edit generated code manually. Regenerate on contract changes.
 8. No technology replacement without explicit architectural decision. This document is the technology source of truth.
+9. Radix UI provides the primitives the app had no equivalent for: the dialog (focus trap, escape, scroll lock and accessible name) and dnd-kit the reordering of works, with keyboard and touch support. Both are used through the components of `components/ui`, never directly in the features.
 
 ## Environment
 

@@ -7,6 +7,7 @@ import {
 } from '../api'
 import { CATALOG_LISTS_KEY, PERSONAL_LISTS_KEY, listDetailQueryKey } from './query-keys'
 import { useWorksListingCache } from './work-listing-cache'
+import type { CatalogListDetailDto } from '../types/lists'
 
 /**
  * Whether a list is a personal list of the authenticated user.
@@ -54,7 +55,7 @@ export function usePersonalListWorks(listId: number) {
     onSuccess: (_data, workId) => {
       // The work leaves the list as soon as the backend confirms it, and the
       // count of works follows.
-      queryClient.setQueryData(listDetailQueryKey(listId), (detail) => {
+      queryClient.setQueryData<CatalogListDetailDto>(listDetailQueryKey(listId), (detail) => {
         if (!detail) return detail
         return {
           ...detail,
