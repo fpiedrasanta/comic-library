@@ -74,6 +74,7 @@ Public Web communicates exclusively via API. No direct database, storage, worker
 - **Local UI state**: component-specific (modal open, expanded filter, selected tab, temp search field). Keep as close to UI as possible.
 - **Feature state**: shared within a feature (search results, current filters, catalog state, reading session state). Stay within feature boundary.
 - **Remote state**: backend is source of truth (comic info, persisted progress, favorites, history, ratings, recommendations, statistics). Frontend may cache temporarily but backend is authority.
+- **Remote state without a cache**: the screens the user administers (the lists) ask the backend every time they open, so what is on screen is never a copy that is already out of date. The listings of works keep the query cache, because they are read far more often than they change.
 - **Session state**: authenticated user, identity, permissions, auth status. Frontend uses for experience; real authorization always validated by backend.
 
 ### Shared UI
