@@ -2,6 +2,13 @@ export { useWorks, useInfiniteWorks, extractEntities, WORKS_PAGE_SIZE } from './
 export { useWorksPagination } from './use-works-pagination'
 export type { WorksPageFetcher } from './use-works-pagination'
 export { useToggleFavorite } from './use-favorite'
+export {
+  PERSONAL_LISTS_VISIBLE_STEP,
+  personalListsQueryKey,
+  usePersonalListActions,
+  usePersonalLists,
+} from './use-personal-lists'
+export { useWorksListingCache } from './work-listing-cache'
 export { useReadingHistory } from './use-reading-history'
 export { useContinueReading } from './use-continue-reading'
 export { useRecommendedWorks } from './use-recommended-works'

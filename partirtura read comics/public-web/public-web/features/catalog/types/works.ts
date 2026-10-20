@@ -39,6 +39,12 @@ export interface WorkCatalogItemDto {
    * works, so the star never needs a query of its own.
    */
   isFavorite: boolean
+  /**
+   * Whether the work belongs to one or more personal lists of the
+   * authenticated user. The backend resolves it for the catalog, the reading
+   * history and the recommended works.
+   */
+  isInPersonalList: boolean
 }
 
 export type WorkCatalogListResponse = ListResponse<WorkCatalogItemDto>

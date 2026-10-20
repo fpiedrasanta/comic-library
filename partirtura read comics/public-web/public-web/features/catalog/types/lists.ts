@@ -5,13 +5,18 @@
  * Only official, active lists are returned, and no administrative data
  * travels with them: no `isActive`, `ownerType`, `visibility` or
  * `createdAt`.
+ *
+ * US-0036 added the personal lists of the user to the same endpoint, so the
+ * list type is optional: a personal list has no type of list.
  */
 
 export interface CatalogListCardDto {
   id: number
   name: string
-  listTypeId: number
-  listTypeName: string
+  /** Null for a personal list, which has no type of list. */
+  listTypeId: number | null
+  /** Null for a personal list, which has no type of list. */
+  listTypeName: string | null
   /** Null when the list has no color. */
   color: string | null
   /** Null when the list has no cover image. */
@@ -69,8 +74,10 @@ export interface CatalogListWorkItemDto {
 export interface CatalogListDetailDto {
   id: number
   name: string
-  listTypeId: number
-  listTypeName: string
+  /** Null for a personal list, which has no type of list. */
+  listTypeId: number | null
+  /** Null for a personal list, which has no type of list. */
+  listTypeName: string | null
   description: string | null
   color: string | null
   urlCover: string | null
@@ -93,4 +100,30 @@ export interface CatalogListDetailDto {
   currentWorkId: number | null
   /** Ordered by `WorkListItem.Position`, as defined by the list. */
   works: CatalogListWorkItemDto[]
+}
+
+/**
+ * One of the personal lists of the authenticated user, with the membership of
+ * the work the selector is showing. Delivered by `GET /api/users/me/lists`.
+ */
+export interface PersonalListMembershipDto {
+  id: number
+  name: string
+  description: string | null
+  color: string | null
+  urlCover: string | null
+  workCount: number
+  /** Whether the work of the query belongs to this list. */
+  containsWork: boolean
+}
+
+/** Summary of a personal list, as the administration operations return it. */
+export interface PersonalListSummaryDto {
+  id: number
+  name: string
+  description: string | null
+  color: string | null
+  urlCover: string | null
+  workCount: number
+  createdAt: string
 }

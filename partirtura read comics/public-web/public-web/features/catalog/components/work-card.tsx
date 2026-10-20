@@ -5,6 +5,7 @@ import { ProtectedImage } from '@/components/protected-image'
 import { colorWithAlpha, readableBackgroundColor, readablePillTextColor } from '../utils/entity-color'
 import { readingProgressAppearance } from '../utils/reading-progress-color'
 import { FavoriteButton } from './favorite-button'
+import { PersonalListButton } from './personal-list-button'
 import { ReadingProgressOverlay } from './reading-progress-overlay'
 
 const PILL_BACKGROUND_ALPHA = 0.85
@@ -163,8 +164,9 @@ export function WorkCard({ work, _onSelectEntity, hiddenPills = [] }: WorkCardPr
               <span className="text-[10px] text-transparent select-none">&nbsp;</span>
             )}
 
-            <div className="pointer-events-auto">
+            <div className="flex items-center gap-1 pointer-events-auto">
               <FavoriteButton work={work} />
+              <PersonalListButton work={work} />
             </div>
           </div>
 

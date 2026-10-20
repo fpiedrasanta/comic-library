@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ProtectedImage } from '@/components/protected-image'
 import { readableAccentColor } from '../utils/entity-color'
 import { FavoriteButton } from './favorite-button'
+import { PersonalListButton } from './personal-list-button'
 import type { WorkCatalogItemDto } from '../types/works'
 
 /** Card surface the accent colors are read against. */
@@ -70,8 +71,9 @@ export function RecommendedWorkCard({ work, averageRating }: RecommendedWorkCard
           <h3 className="text-xs font-bold text-white truncate group-hover:text-neps-primary transition-colors flex-1">
             {work.title}
           </h3>
-          <div className="pointer-events-auto">
+          <div className="flex items-center gap-1 pointer-events-auto">
             <FavoriteButton work={work} />
+            <PersonalListButton work={work} />
           </div>
         </div>
         {editorialDetails && <p className="text-[11px] text-neps-muted">{editorialDetails}</p>}
