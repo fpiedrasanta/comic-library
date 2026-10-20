@@ -84,3 +84,53 @@ Antes de cerrar:
 - Confirmar que las pruebas cubren los tres endpoints y los límites entre listas personales y del sistema.
 - Confirmar que no se modificaron funcionalidades ajenas al alcance.
 - Documentar commits, pruebas, estado final y bloqueos pendientes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Nuevo atributo de respuesta **`isInPersonalList`** (boolean) en los Works devueltos por `GET /api/works`,
+  `GET /api/users/me/reading-history` y `GET /api/works/recommended`.
+  - `true`: existe al menos un `WorkListItem` que relaciona la obra con una lista personal
+    (`OwnerType = User`) del usuario autenticado.
+  - `false`: no existe esa relación.
+- Solo se consideran listas personales del usuario autenticado: **no** cuentan las listas del sistema ni las
+  listas personales de otros usuarios.
+- El atributo es **exclusivamente de respuesta**: no se agregó a ningún request ni se modificaron los
+  parámetros, filtros, ordenamiento o paginación de los tres endpoints.
+- La pertenencia se resuelve con **una única consulta por página**
+  (`IWorkListItemRepository.GetPersonalWorkIdsAsync`), nunca con una consulta por Work. Es el mismo patrón que
+  ya usa `isFavorite`, y comparte la lógica de mapeo (`WorkCardMapper`), de modo que los tres endpoints
+  exponen el dato sin duplicar código.
+
+**Qué se cambió**:
+- `api/Application/DTOs/WorkCatalogDtos.cs`: `WorkCatalogItemDto.IsInPersonalList`.
+- `api/Application/Helpers/WorkCardMapper.cs`: `ToCard(Work, WorkReadingProgress?, bool isFavorite, bool isInPersonalList)`.
+- `api/Application/Interfaces/IWorkListItemRepository.cs` +
+  `api/Infrastructure/Repositories/WorkListItemRepository.cs`: `GetPersonalWorkIdsAsync`.
+- `api/Application/Services/WorkService.cs`, `ReadingHistoryService.cs`, `RecommendedWorksService.cs`: resolución
+  batched del estado y mapeo del nuevo atributo.
+- `project/endpoints/endpoints-works.md`, `endpoints-reading-history.md`, `endpoints-recommended-works.md`,
+  `project/services.md`, `project/repositories.md`, `project/repositories/repositories-catalog.md`.
+
+**Decisiones relevantes**:
+- El nombre definitivo del campo es **`isInPersonalList`** (propiedad `IsInPersonalList` en el DTO), en línea con
+  `isFavorite`. Semántica: `true` cuando la obra pertenece a **una o más** listas personales del usuario
+  autenticado. Cuando el usuario no tiene listas personales, el valor es siempre `false` (no es `null` ni
+  desaparece del contrato).
+- Se reutiliza el DTO y el mapper existentes de la WorkCard, de modo que el atributo llega a los tres endpoints
+  con un solo cambio y sin duplicar la lógica de pertenencia.
+- La resolución se hace con una consulta `DISTINCT` sobre `WorkListItems` filtrando por
+  `WorkList.OwnerType = User` y `WorkList.Owner.Id = userId`: las listas del sistema y las de otros usuarios
+  quedan excluidas por la propia consulta, no por un filtro en memoria.
+
+**Notas**:
+- Commit: `db2c712`. Trabajo directo sobre `main` (fast-forward), según la indicación de no crear rama.
+- Tests: `PersonalListMembershipIntegrationTests` cubre obra en una lista propia (`true`), en varias listas
+  propias (`true`), sin listas propias (`false`), solo en lista del sistema (`false`), solo en lista de otro
+  usuario (`false`), y la presencia del atributo en catálogo, historial y recomendados.
+- La suite completa queda en **449/449 pass** (435 previos + 14 nuevos), sin regresiones: los filtros, el orden y
+  la paginación de los tres endpoints siguen verificados por las pruebas existentes.
+- No se modificó ninguna funcionalidad ajena al alcance: no se tocó la administración de listas personales
+  (TASK-API-0319..0323) ni el comportamiento de favoritos.

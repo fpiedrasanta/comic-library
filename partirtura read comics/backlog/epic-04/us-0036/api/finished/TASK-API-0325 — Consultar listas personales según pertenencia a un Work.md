@@ -131,3 +131,59 @@ Antes de cerrar:
 - Confirmar el aislamiento por usuario, el orden y los límites de consulta.
 - Confirmar que no se modificaron funcionalidades ajenas al alcance.
 - Documentar commits, pruebas, estado final y bloqueos pendientes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Nueva operación de consulta `GET /api/users/me/lists` con los parámetros de query `search` (opcional),
+  `pageSize` (opcional, por defecto `PaginationGuard.DefaultPageSize` = 12, máximo 50) y `workId` (opcional).
+- Devuelve **exclusivamente** las listas personales del usuario autenticado. Cada elemento incluye los datos de
+  la lista (id, nombre, descripción, color, portada y cantidad de obras) y el booleano **`containsWork`**:
+  `true` cuando el Work de `workId` pertenece a esa lista, `false` cuando no.
+- Orden: primero las listas que contienen el Work, después las que no, y dentro de cada grupo por nombre
+  ascendente. El filtro `search` no altera ese orden.
+- La búsqueda, el cálculo de pertenencia, el orden y el límite `pageSize` se aplican **en la base de datos**
+  antes de materializar los resultados (`IWorkListRepository.GetPersonalWithMembershipAsync`): una sola
+  consulta, sin N+1.
+- El propietario se obtiene de la identidad autenticada; la solicitud no acepta ningún identificador de
+  usuario. La operación es de solo lectura.
+
+**Qué se cambió**:
+- `api/Api/Controllers/MyListsController.cs`: `GET api/users/me/lists` (la acción de una sola lista pasó a
+  llamarse `GetById` para que `CreatedAtAction` no quedara ambiguo).
+- `api/Application/DTOs/PersonalListDtos.cs`: `GetPersonalListsRequest` y `PersonalListMembershipDto`.
+- `api/Application/DTOs/PersonalListMembershipData.cs` (nuevo): proyección de la consulta.
+- `api/Application/Interfaces/IPersonalListService.cs` y
+  `api/Application/Services/PersonalListService.cs`: `GetWithMembershipAsync`.
+- `api/Application/Interfaces/IWorkListRepository.cs` y
+  `api/Infrastructure/Repositories/WorkListRepository.cs`: `GetPersonalWithMembershipAsync`.
+- `project/endpoints/endpoints-personal-lists.md` (sección del endpoint), `project/services.md`,
+  `project/services/services-catalog.md`, `project/repositories.md`,
+  `project/repositories/repositories-catalog.md`.
+
+**Decisiones relevantes**:
+- El nombre definitivo del booleano es **`containsWork`** (propiedad `ContainsWork` en el DTO), en línea con la
+  convención camelCase de los DTOs del proyecto. Semántica: `true` cuando el Work solicitado pertenece a esa
+  lista personal.
+- La respuesta no es paginada porque el contrato funcional no requiere `currentPage`: `pageSize` es el límite
+  de resultados. Se usa `ApiResponse<IReadOnlyList<PersonalListMembershipDto>>`.
+- `workId` es opcional: si no se envía, `containsWork` es `false` en todas las listas (no se consulta ninguna
+  pertenencia).
+- `pageSize` con valor cero o negativo devuelve 422 (`ValidationException`), el mismo mecanismo de validación
+  del proyecto; los valores mayores que el máximo se limitan a `PaginationGuard.MaxPageSize`.
+- El orden se aplica **antes** de la proyección: EF Core no puede ordenar por una propiedad del record
+  proyectado, así que la consulta ordena por la expresión de pertenencia y luego por nombre, y recién después
+  proyecta.
+
+**Notas**:
+- Commit: `db2c712`. Trabajo directo sobre `main` (fast-forward), según la indicación de no crear rama.
+- Tests: `PersonalListMembershipIntegrationTests` cubre que solo se devuelven listas personales del usuario
+  autenticado, que nunca se incluyen listas del sistema ni de otros usuarios, que las listas que contienen el
+  Work aparecen primero, que dentro de cada grupo van por nombre ascendente, que `search` filtra sin alterar el
+  orden, que `pageSize` limita los resultados, que la pertenencia se calcula por lista y que un `pageSize`
+  inválido devuelve 422. `MyListsControllerContractTests` verifica la ruta de colección y la de una sola lista.
+- La suite completa queda en **449/449 pass** (435 previos + 14 nuevos), sin regresiones.
+- No se modificó ninguna funcionalidad ajena al alcance: ni la administración de listas personales
+  (TASK-API-0319..0323) ni los endpoints de Works, historial o recomendados (TASK-API-0324).
