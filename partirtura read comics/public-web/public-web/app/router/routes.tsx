@@ -19,6 +19,7 @@ import {
   FranchisesPage,
   SeriesPage,
   ListsPage,
+  MyListsPage,
   ListRoutePage,
   MyCollectionPage,
   FavoritesPage,
@@ -118,6 +119,14 @@ export const protectedRoutes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <ListsPage />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: '/my-lists',
+    element: (
+      <ProtectedRoute>
+        <MyListsPage />
       </ProtectedRoute>
     ),
   },

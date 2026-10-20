@@ -36,14 +36,14 @@ export const CATALOG_MENU_GROUPS: NavMenuGroup[] = [
     items: [
       { label: 'Mi colección', to: '/my-collection' },
       { label: 'Favoritos', to: '/favorites' },
-      { label: 'Mis listas' },
+      { label: 'Mis listas', to: '/my-lists' },
     ],
   },
 ]
 
 /** True when the path belongs to the catalog, listing, collection or favorites pages. */
 export function isCatalogPath(pathname: string): boolean {
-  return ['/catalog', '/publishers', '/franchises', '/series', '/lists', '/my-collection', '/favorites'].some(
+  return ['/catalog', '/publishers', '/franchises', '/series', '/lists', '/my-lists', '/my-collection', '/favorites'].some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   )
 }

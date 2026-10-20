@@ -98,16 +98,18 @@ export function ListCard({ list }: { list: CatalogListCardDto }) {
 
       <div className="p-3.5 space-y-2 flex-1 flex flex-col justify-between">
         <div className="space-y-1.5">
-          <span
-            className="inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border"
-            style={{
-              backgroundColor: readableBackgroundColor(list.color, PILL_BACKGROUND_ALPHA),
-              borderColor: colorWithAlpha(list.color, PILL_BORDER_ALPHA),
-              color: readablePillTextColor(list.color, PILL_BACKGROUND_ALPHA, CARD_SURFACE),
-            }}
-          >
-            {list.listTypeName}
-          </span>
+          {list.listTypeName && (
+            <span
+              className="inline-block text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border"
+              style={{
+                backgroundColor: readableBackgroundColor(list.color, PILL_BACKGROUND_ALPHA),
+                borderColor: colorWithAlpha(list.color, PILL_BORDER_ALPHA),
+                color: readablePillTextColor(list.color, PILL_BACKGROUND_ALPHA, CARD_SURFACE),
+              }}
+            >
+              {list.listTypeName}
+            </span>
+          )}
           <h3 className="text-xs sm:text-sm font-bold text-white group-hover:text-sky-300 transition-colors line-clamp-2 leading-snug">
             {list.name}
           </h3>

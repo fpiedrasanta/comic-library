@@ -1,5 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { getCatalogLists } from '../api/lists-repository'
+import { CATALOG_LISTS_KEY } from './query-keys'
 
 /** Multiple of 12, so the card grid fills evenly on every breakpoint. */
 export const LIST_CARD_PAGE_SIZE = 24
@@ -14,10 +15,15 @@ export interface ListCardsFilters {
   franchiseId?: number | null
   seriesId?: number | null
   listTypeId?: number | null
+  /**
+   * Only the personal lists of the authenticated user when `true`. Any other
+   * value keeps the lists of the system.
+   */
+  myLists?: boolean
 }
 
 /**
- * Infinite listing for `/lists`.
+ * Infinite listing for `/lists` and `/my-lists`.
  *
  * Every filter is part of the query key, so changing one starts a fresh
  * query at page 1 and the pages of the previous combination stop
@@ -27,10 +33,12 @@ export interface ListCardsFilters {
  */
 export function useCatalogLists(filters: ListCardsFilters) {
   const trimmedSearch = filters.search?.trim() ?? ''
+  const myLists = filters.myLists ?? false
 
   return useInfiniteQuery({
     queryKey: [
-      'catalog-lists',
+      CATALOG_LISTS_KEY,
+      myLists,
       trimmedSearch,
       filters.publisherId ?? null,
       filters.franchiseId ?? null,
@@ -46,6 +54,7 @@ export function useCatalogLists(filters: ListCardsFilters) {
         franchiseId: filters.franchiseId ?? undefined,
         seriesId: filters.seriesId ?? undefined,
         listTypeId: filters.listTypeId ?? undefined,
+        myLists,
       }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.hasNextPage ? lastPage.nextPage ?? null : null),

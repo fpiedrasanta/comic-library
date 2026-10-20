@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { CatalogSearch } from '../components/catalog-search'
 import { EntityAutocomplete } from '../components/entity-autocomplete'
 import { ListCard } from '../components/list-card'
@@ -14,14 +15,27 @@ import type { EntityOption } from '../types/works'
 /** How close to the end of the list the next page is requested. */
 const SCROLL_ROOT_MARGIN = '300px'
 
+interface ListsPageProps {
+  /**
+   * Shows the personal lists of the authenticated user instead of the lists of
+   * the system. The cards, the filters, the pagination and the states are the
+   * ones of `/lists`: the only difference is the criterion of the query.
+   */
+  myLists?: boolean
+}
+
 /**
- * `/lists` — the exploration of the official lists.
+ * `/lists` — the exploration of the official lists, and `/my-lists` — the
+ * exploration of the personal lists of the user.
  *
  * Search, the Editorial → Franquicia → Serie cascade and the
  * list type filter all live in the URL, so a filtered listing
  * is shareable. The list itself is one infinite grid of cards.
+ *
+ * A personal list has no type of list, so that filter is not offered in the
+ * personal mode.
  */
-export function ListsPage() {
+export function ListsPage({ myLists = false }: ListsPageProps) {
   const { filters, updateFilters, clearAll } = useListingFilters()
   const {
     setPublisherSearch,
@@ -39,7 +53,7 @@ export function ListsPage() {
   } = useEntityFilterOptions(filters)
 
   const loaderRef = useRef<HTMLDivElement>(null)
-  const query = useCatalogLists(filters)
+  const query = useCatalogLists({ ...filters, myLists })
 
   // List types come from the dedicated public endpoint.
   const [listTypeSearch, setListTypeSearch] = useState('')
@@ -122,14 +136,23 @@ export function ListsPage() {
       <section className="space-y-6">
         <div className="space-y-1">
           <span className="inline-block text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-neps-primary/10 text-neps-primary border border-neps-primary/20">
-            Colecciones Temáticas
+            {myLists ? 'Listas Personales' : 'Colecciones Temáticas'}
           </span>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
-            Listas de Lectura
+            {myLists ? 'Mis listas' : 'Listas de Lectura'}
           </h1>
           <p className="text-xs text-neps-muted max-w-2xl">
-            Descubre guías de lectura, arcos argumentales y colecciones curadas
-            organizadas por el sistema.
+            {myLists
+              ? 'Tus propias listas de obras, con las que organizás tu lectura.'
+              : 'Descubre guías de lectura, arcos argumentales y colecciones curadas organizadas por el sistema.'}
+          </p>
+          <p className="text-xs pt-1">
+            <Link
+              to={myLists ? '/lists' : '/my-lists'}
+              className="text-neps-primary hover:underline font-semibold"
+            >
+              {myLists ? 'Ver las listas del sistema' : 'Ver mis listas'}
+            </Link>
           </p>
         </div>
 
@@ -140,7 +163,11 @@ export function ListsPage() {
             placeholder="Buscar listas por nombre o descripción..."
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-2 border-t border-neps-border/60">
+          <div
+            className={`grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-neps-border/60 ${
+              myLists ? 'lg:grid-cols-3' : 'lg:grid-cols-4'
+            }`}
+          >
             <EntityAutocomplete
               label="Editorial"
               placeholder="Buscar editorial..."
@@ -212,15 +239,17 @@ export function ListsPage() {
               isLoading={seriesLoading}
             />
 
-            <EntityAutocomplete
-              label="Tipo de Lista"
-              placeholder="Buscar tipo de lista..."
-              value={currentListTypeOption}
-              options={listTypeOptions}
-              onSelect={(option) => updateFilters({ listTypeId: option?.id ?? null })}
-              onClear={() => updateFilters({ listTypeId: null })}
-              onSearch={setListTypeSearch}
-            />
+            {!myLists && (
+              <EntityAutocomplete
+                label="Tipo de Lista"
+                placeholder="Buscar tipo de lista..."
+                value={currentListTypeOption}
+                options={listTypeOptions}
+                onSelect={(option) => updateFilters({ listTypeId: option?.id ?? null })}
+                onClear={() => updateFilters({ listTypeId: null })}
+                onSearch={setListTypeSearch}
+              />
+            )}
           </div>
         </div>
       </section>
@@ -228,7 +257,9 @@ export function ListsPage() {
       {isInitialLoading && (
         <section className="space-y-4">
           <p className="text-xs text-neps-muted border-b border-neps-border/60 pb-2">
-            <span className="font-mono animate-pulse">Cargando listas de lectura...</span>
+            <span className="font-mono animate-pulse">
+              {myLists ? 'Cargando tus listas...' : 'Cargando listas de lectura...'}
+            </span>
           </p>
           <ListCardSkeletonGrid count={LIST_CARD_SKELETON_COUNT} />
         </section>
@@ -255,7 +286,11 @@ export function ListsPage() {
         <EntityListingState
           tone="empty"
           title="No se encontraron listas"
-          message="No existen colecciones que coincidan con los términos de búsqueda o los filtros seleccionados."
+          message={
+            myLists
+              ? 'Todavía no creaste ninguna lista personal, o ninguna coincide con los términos de búsqueda o los filtros seleccionados.'
+              : 'No existen colecciones que coincidan con los términos de búsqueda o los filtros seleccionados.'
+          }
           action={
             <button
               type="button"

@@ -15,6 +15,11 @@ export interface GetCatalogListsParams {
   franchiseId?: number
   seriesId?: number
   listTypeId?: number
+  /**
+   * Only the personal lists of the authenticated user when `true`. Any other
+   * value keeps the lists of the system, which is the previous behavior.
+   */
+  myLists?: boolean
   orderBy?: CatalogListOrderBy
   orderDir?: CatalogListOrderDir
 }
@@ -26,6 +31,9 @@ export interface GetCatalogListsParams {
  * hierarchical filters match lists that contain at least one work of
  * the given publisher, franchise or series. All of them combine with
  * `AND`, and so does the search.
+ *
+ * `myLists=true` returns the personal lists of the authenticated user
+ * instead of the lists of the system.
  *
  * No `orderBy`/`orderDir` is sent by the client: the ordering of the
  * listing is a rule of the use case and the endpoint defaults to
@@ -43,6 +51,7 @@ export function getCatalogLists(
   if (params.franchiseId !== undefined) searchParams.set('franchiseId', String(params.franchiseId))
   if (params.seriesId !== undefined) searchParams.set('seriesId', String(params.seriesId))
   if (params.listTypeId !== undefined) searchParams.set('listTypeId', String(params.listTypeId))
+  if (params.myLists !== undefined) searchParams.set('myLists', String(params.myLists))
   if (params.orderBy) searchParams.set('orderBy', params.orderBy)
   if (params.orderDir) searchParams.set('orderDir', params.orderDir)
 
