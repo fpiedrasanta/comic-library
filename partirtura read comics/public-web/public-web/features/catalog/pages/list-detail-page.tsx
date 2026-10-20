@@ -43,9 +43,12 @@ const DRAG_ACTIVATION_DISTANCE = 6
  * the reading, the progress and the ratings of the works are the same in both.
  */
 export function ListDetailPage({ entityId }: { entityId: number }) {
-  const { entity: list, isLoading, notFound, error } = useCatalogListDetail(entityId)
+  const { entity: list, isLoading, notFound, error, reload } = useCatalogListDetail(entityId)
   const { isPersonal } = useIsPersonalList(entityId)
-  const { reorder, removeWork } = usePersonalListWorks(entityId)
+  const { reorder, removeWork, isPending, error: actionError } = usePersonalListWorks(
+    entityId,
+    reload
+  )
 
   /**
    * The order shown while a reordering waits for the backend to confirm it.
@@ -77,11 +80,9 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
       return
     }
 
-    reorder.mutate(changes, {
-      onError: () => {
-        // The confirmed order is the one of the backend.
-        setPendingWorks(null)
-      },
+    void reorder(changes).then((succeeded) => {
+      // The confirmed order is the one of the backend.
+      if (!succeeded) setPendingWorks(null)
     })
   }
 
@@ -156,9 +157,9 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
             </div>
           </div>
 
-          {(reorder.error || removeWork.error) && (
+          {actionError && (
             <p role="alert" className="text-xs text-neps-accent">
-              {(reorder.error ?? removeWork.error)?.message}
+              {actionError.message}
             </p>
           )}
 
@@ -186,10 +187,8 @@ export function ListDetailPage({ entityId }: { entityId: number }) {
                       canMoveUp={index > 0}
                       canMoveDown={index < works.length - 1}
                       onMove={(direction) => handleMove(item.work.id, direction)}
-                      onRemove={() => removeWork.mutate(item.work.id)}
-                      isRemoving={
-                        removeWork.isPending && removeWork.variables === item.work.id
-                      }
+                      onRemove={() => void removeWork(item.work.id)}
+                      isRemoving={isPending}
                     />
                   ))}
                 </div>

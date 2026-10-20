@@ -12,7 +12,6 @@ import {
 import { useDebouncedCallback } from '../hooks/use-debounced-callback'
 import {
   PERSONAL_LISTS_VISIBLE_STEP,
-  usePersonalListActions,
   usePersonalLists,
 } from '../hooks/use-personal-lists'
 import type { PersonalListMembershipDto } from '../types/lists'
@@ -50,50 +49,45 @@ export function PersonalListsModal({ work, open, onOpenChange }: PersonalListsMo
     setVisibleCount(PERSONAL_LISTS_VISIBLE_STEP)
   }, SEARCH_DEBOUNCE_MS)
 
-  const listsQuery = usePersonalLists(work.id, search)
   const {
+    lists,
+    isLoading,
+    error: queryError,
+    isPending,
+    actionError,
+    reload,
     addWork,
     removeWork,
     createList,
     renameList,
     deleteList,
-    isMembershipPending,
-  } = usePersonalListActions(work.id, search)
+  } = usePersonalLists(work.id, search)
 
-  const lists = listsQuery.data ?? []
   const visibleLists = lists.slice(0, visibleCount)
   const hasMoreLists = visibleLists.length < lists.length
 
-  function handleToggle(list: PersonalListMembershipDto) {
+  async function handleToggle(list: PersonalListMembershipDto) {
     if (list.containsWork) {
-      removeWork.mutate(list.id)
+      await removeWork(list.id)
       return
     }
-    addWork.mutate(list.id)
+    await addWork(list.id)
   }
 
-  function handleCreate(name: string) {
-    createList.mutate(name, {
-      onSuccess: () => {
-        setIsNameDialogOpen(false)
-        setVisibleCount(PERSONAL_LISTS_VISIBLE_STEP)
-      },
-    })
+  async function handleCreate(name: string) {
+    if (!(await createList(name))) return
+    setIsNameDialogOpen(false)
+    setVisibleCount(PERSONAL_LISTS_VISIBLE_STEP)
   }
 
-  function handleRename(name: string) {
+  async function handleRename(name: string) {
     if (!listToEdit) return
-    renameList.mutate(
-      { listId: listToEdit.id, name },
-      { onSuccess: () => setListToEdit(null) }
-    )
+    if (await renameList(listToEdit.id, name)) setListToEdit(null)
   }
 
-  function handleDelete() {
+  async function handleDelete() {
     if (!listToDelete) return
-    deleteList.mutate(listToDelete.id, {
-      onSuccess: () => setListToDelete(null),
-    })
+    if (await deleteList(listToDelete.id)) setListToDelete(null)
   }
 
   return (
@@ -147,24 +141,24 @@ export function PersonalListsModal({ work, open, onOpenChange }: PersonalListsMo
             </Button>
           </div>
 
-          {listsQuery.isLoading && (
+          {isLoading && (
             <p className="text-xs text-neps-muted text-center py-6">
               Cargando listas...
             </p>
           )}
 
-          {listsQuery.isError && (
+          {queryError && (
             <div className="text-center py-4 space-y-2">
               <p role="alert" className="text-xs text-neps-accent">
                 No se pudieron cargar las listas.
               </p>
-              <Button type="button" variant="secondary" size="sm" onClick={() => listsQuery.refetch()}>
+              <Button type="button" variant="secondary" size="sm" onClick={reload}>
                 Reintentar
               </Button>
             </div>
           )}
 
-          {!listsQuery.isLoading && !listsQuery.isError && lists.length === 0 && (
+          {!isLoading && !queryError && lists.length === 0 && (
             <p className="text-xs text-neps-muted text-center py-6">
               {search
                 ? 'No hay listas que coincidan con la búsqueda.'
@@ -178,7 +172,7 @@ export function PersonalListsModal({ work, open, onOpenChange }: PersonalListsMo
                 <PersonalListRow
                   key={list.id}
                   list={list}
-                  isPending={isMembershipPending}
+                  isPending={isPending}
                   onToggle={handleToggle}
                   onEdit={setListToEdit}
                   onDelete={setListToDelete}
@@ -207,9 +201,9 @@ export function PersonalListsModal({ work, open, onOpenChange }: PersonalListsMo
             </div>
           )}
 
-          {(addWork.error || removeWork.error || deleteList.error) && (
+          {actionError && (
             <p role="alert" className="text-[11px] text-neps-accent">
-              {(addWork.error ?? removeWork.error ?? deleteList.error)?.message}
+              {actionError.message}
             </p>
           )}
 
@@ -226,8 +220,8 @@ export function PersonalListsModal({ work, open, onOpenChange }: PersonalListsMo
         onOpenChange={setIsNameDialogOpen}
         title="Crear lista"
         submitLabel="Guardar"
-        isPending={createList.isPending}
-        error={createList.error?.message}
+        isPending={isPending}
+        error={actionError?.message}
         onSubmit={handleCreate}
       />
 
@@ -239,8 +233,8 @@ export function PersonalListsModal({ work, open, onOpenChange }: PersonalListsMo
         title="Editar nombre"
         initialName={listToEdit?.name ?? ''}
         submitLabel="Guardar"
-        isPending={renameList.isPending}
-        error={renameList.error?.message}
+        isPending={isPending}
+        error={actionError?.message}
         onSubmit={handleRename}
       />
 
@@ -258,7 +252,7 @@ export function PersonalListsModal({ work, open, onOpenChange }: PersonalListsMo
           </>
         }
         confirmLabel="Sí, eliminar"
-        isPending={deleteList.isPending}
+        isPending={isPending}
         onConfirm={handleDelete}
       />
     </>

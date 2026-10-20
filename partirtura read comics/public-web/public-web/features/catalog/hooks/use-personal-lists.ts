@@ -1,5 +1,4 @@
-import { useCallback } from 'react'
-import { useIsMutating, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useState } from 'react'
 import {
   PERSONAL_LISTS_MAX_PAGE_SIZE,
   addWorkToPersonalList,
@@ -10,66 +9,73 @@ import {
   renamePersonalList,
 } from '../api'
 import type { PersonalListMembershipDto } from '../types/lists'
-import { CATALOG_LISTS_KEY, PERSONAL_LISTS_KEY } from './query-keys'
+import { useRemoteData } from './use-remote-data'
 import { useWorksListingCache } from './work-listing-cache'
 
 /** Number of lists the selector shows at once. */
 export const PERSONAL_LISTS_VISIBLE_STEP = 5
 
-/** Key of the query with the personal lists of the user and the membership of a work. */
-export function personalListsQueryKey(workId: number, search: string) {
-  return [PERSONAL_LISTS_KEY, { search: search.trim(), workId }] as const
-}
-
-/** Key of the mutations that add or remove a work from a personal list. */
-export function personalListMembershipKey(workId: number) {
-  return ['personal-list-membership', workId] as const
+export interface PersonalLists {
+  /** The personal lists of the user, with the membership of the work. */
+  lists: PersonalListMembershipDto[]
+  isLoading: boolean
+  /** The error of the query. */
+  error: Error | null
+  /** An operation is in flight. */
+  isPending: boolean
+  /** The error of the last operation. */
+  actionError: Error | null
+  /** Asks the backend again. */
+  reload: () => void
+  /** Adds the work to a list. Resolves `false` when the operation failed. */
+  addWork: (listId: number) => Promise<boolean>
+  /** Removes the work from a list. Resolves `false` when the operation failed. */
+  removeWork: (listId: number) => Promise<boolean>
+  /** Creates a list with the given name. */
+  createList: (name: string) => Promise<boolean>
+  /** Renames a list. */
+  renameList: (listId: number, name: string) => Promise<boolean>
+  /** Deletes a list. */
+  deleteList: (listId: number) => Promise<boolean>
 }
 
 /**
- * The personal lists of the authenticated user with the membership of a work.
+ * The personal lists of the user and the administration of the membership of a
+ * work.
  *
- * The endpoint returns the lists that contain the work first and the rest
- * after them, and the search does not change that order, so the order of the
- * response is kept as it comes.
+ * The lists are asked for every time the selector opens and every time the
+ * search changes, with no cache in between: what the selector shows is the
+ * last answer of the backend. The membership of the work is also written to
+ * the state of the listings that show works, so the button of the card follows
+ * the operation.
  */
-export function usePersonalLists(workId: number, search: string) {
+export function usePersonalLists(workId: number, search: string): PersonalLists {
   const trimmedSearch = search.trim()
 
-  return useQuery({
-    queryKey: personalListsQueryKey(workId, trimmedSearch),
-    queryFn: () =>
+  const {
+    data,
+    isLoading,
+    error,
+    reload,
+    setData,
+  } = useRemoteData<PersonalListMembershipDto[]>(
+    () =>
       getPersonalLists({
         search: trimmedSearch || undefined,
         pageSize: PERSONAL_LISTS_MAX_PAGE_SIZE,
         workId,
       }),
-    // The membership is the state of the user, so it is asked again on every
-    // mount instead of waiting for the cache to go stale.
-    staleTime: 0,
-  })
-}
+    [workId, trimmedSearch]
+  )
 
-/**
- * The operations over the personal lists of the user.
- *
- * The state of a work is shared by every listing that shows it, so a change
- * of membership updates the card of the work everywhere at once.
- */
-export function usePersonalListActions(workId: number, search: string) {
-  const queryClient = useQueryClient()
+  const [isPending, setIsPending] = useState(false)
+  const [actionError, setActionError] = useState<Error | null>(null)
   const { updateWork, invalidateWorksListings } = useWorksListingCache()
-  const queryKey = personalListsQueryKey(workId, search)
 
-  /** The count of works of the lists changes with every membership change. */
-  const refreshCatalogLists = useCallback(() => {
-    queryClient.invalidateQueries({
-      predicate: (query) => query.queryKey[0] === CATALOG_LISTS_KEY,
-    })
-  }, [queryClient])
+  const lists = data ?? []
 
   /**
-   * Records the membership of a work in a list and updates the state of the
+   * Records the membership of the work in a list and updates the state of the
    * work in the listings that show it.
    *
    * The work belongs to a personal list while it is in at least one of them:
@@ -77,80 +83,108 @@ export function usePersonalListActions(workId: number, search: string) {
    */
   const setMembership = useCallback(
     (listId: number, containsWork: boolean) => {
-      const lists = queryClient.getQueryData<PersonalListMembershipDto[]>(queryKey) ?? []
       const nextLists = lists.map((list) =>
         list.id === listId ? { ...list, containsWork } : list
       )
 
-      queryClient.setQueryData(queryKey, nextLists)
+      setData(nextLists)
       updateWork(workId, (work) => ({
         ...work,
         isInPersonalList: nextLists.some((list) => list.containsWork),
       }))
     },
-    [queryClient, queryKey, updateWork, workId]
+    [lists, setData, updateWork, workId]
   )
 
-  const addWork = useMutation({
-    mutationKey: personalListMembershipKey(workId),
-    mutationFn: (listId: number) => addWorkToPersonalList(listId, workId),
-    onSuccess: (_data, listId) => {
+  const run = useCallback(
+    async (operation: () => Promise<unknown>): Promise<boolean> => {
+      setIsPending(true)
+      setActionError(null)
+
+      try {
+        await operation()
+        return true
+      } catch (reason) {
+        setActionError(reason instanceof Error ? reason : new Error(String(reason)))
+        return false
+      } finally {
+        setIsPending(false)
+      }
+    },
+    []
+  )
+
+  const addWork = useCallback(
+    async (listId: number) => {
+      const succeeded = await run(() => addWorkToPersonalList(listId, workId))
+      if (!succeeded) return false
+
       setMembership(listId, true)
-      refreshCatalogLists()
+      return true
     },
-  })
+    [run, setMembership, workId]
+  )
 
-  const removeWork = useMutation({
-    mutationKey: personalListMembershipKey(workId),
-    mutationFn: (listId: number) => removeWorkFromPersonalList(listId, workId),
-    onSuccess: (_data, listId) => {
+  const removeWork = useCallback(
+    async (listId: number) => {
+      const succeeded = await run(() => removeWorkFromPersonalList(listId, workId))
+      if (!succeeded) return false
+
       setMembership(listId, false)
-      refreshCatalogLists()
+      return true
     },
-  })
+    [run, setMembership, workId]
+  )
 
-  const createList = useMutation({
-    mutationFn: (name: string) => createPersonalList(name),
-    onSuccess: () => {
+  const createList = useCallback(
+    async (name: string) => {
+      const succeeded = await run(() => createPersonalList(name))
+      if (!succeeded) return false
+
       // The order of the lists is a rule of the endpoint, so the new list is
       // asked for again instead of being placed by the client.
-      queryClient.invalidateQueries({ queryKey })
-      refreshCatalogLists()
+      reload()
+      return true
     },
-  })
+    [run, reload]
+  )
 
-  const renameList = useMutation({
-    mutationFn: ({ listId, name }: { listId: number; name: string }) =>
-      renamePersonalList(listId, name),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey })
-      refreshCatalogLists()
+  const renameList = useCallback(
+    async (listId: number, name: string) => {
+      const succeeded = await run(() => renamePersonalList(listId, name))
+      if (!succeeded) return false
+
+      reload()
+      return true
     },
-  })
+    [run, reload]
+  )
 
-  const deleteList = useMutation({
-    mutationFn: (listId: number) => deletePersonalList(listId),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey })
-      refreshCatalogLists()
+  const deleteList = useCallback(
+    async (listId: number) => {
+      const succeeded = await run(() => deletePersonalList(listId))
+      if (!succeeded) return false
+
+      reload()
       // The works of the deleted list may stop belonging to any list, and only
       // the backend knows which ones.
       invalidateWorksListings()
+      return true
     },
-  })
-
-  // A work can be on screen more than once, so the pending state is counted
-  // over every mutation of the work and not over this one only.
-  const pendingMemberships = useIsMutating({
-    mutationKey: personalListMembershipKey(workId),
-  })
+    [run, reload, invalidateWorksListings]
+  )
 
   return {
+    lists,
+    isLoading,
+    error,
+    isPending,
+    actionError,
+    reload,
     addWork,
     removeWork,
     createList,
     renameList,
     deleteList,
-    isMembershipPending: pendingMemberships > 0,
   }
 }

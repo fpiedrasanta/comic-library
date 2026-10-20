@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { getListReaderContext, setListCurrentWork } from '../api/reader-repository'
 import type { ListReaderContextDto, ListReaderListItemDto, ListReaderPageDto } from '../types/list-reader-context'
 
@@ -27,15 +27,10 @@ export function useListReaderContext(listId: number, workId: number) {
  * alters the page progress of any work (TASK-API-0309).
  */
 export function useSetListCurrentWork(listId: number) {
-  const queryClient = useQueryClient()
-
   const mutationFn = useCallback((workId: number) => setListCurrentWork(listId, workId), [listId])
 
   return useMutation({
     mutationFn,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['catalog', 'list-detail', listId] })
-    },
     onError: (error) => {
       console.warn('Error al actualizar el Work actual de la lista:', error)
     },

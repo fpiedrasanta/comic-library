@@ -8,7 +8,6 @@ import { EntityListingState } from '../components/entity-listing-state'
 import { useCatalogLists, LIST_CARD_SKELETON_COUNT } from '../hooks/use-catalog-lists'
 import { useEntityFilterOptions } from '../hooks/use-entity-filter-options'
 import { useListingFilters } from '../hooks/use-listing-filters'
-import { flattenEntityCards } from '../hooks/use-entity-cards'
 import { useListTypes } from '../hooks/use-list-types'
 import type { EntityOption } from '../types/works'
 
@@ -53,7 +52,7 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
   } = useEntityFilterOptions(filters)
 
   const loaderRef = useRef<HTMLDivElement>(null)
-  const query = useCatalogLists({ ...filters, myLists })
+  const lists = useCatalogLists({ ...filters, myLists })
 
   // List types come from the dedicated public endpoint.
   const [listTypeSearch, setListTypeSearch] = useState('')
@@ -63,14 +62,10 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
     [listTypesData?.items],
   )
 
-  const lists = useMemo(
-    () => flattenEntityCards(query.data?.pages.map((page) => page.items)),
-    [query.data?.pages],
-  )
-  const totalCount = query.data?.pages[0]?.totalCount ?? 0
-  const isInitialLoading = query.isPending
-  const isFailing = query.isError
-  const isEmpty = !isInitialLoading && !isFailing && lists.length === 0
+  const totalCount = lists.totalCount
+  const isInitialLoading = lists.isLoading
+  const isFailing = lists.error != null
+  const isEmpty = !isInitialLoading && !isFailing && lists.items.length === 0
 
   useEffect(() => {
     const node = loaderRef.current
@@ -78,10 +73,10 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        // React Query ignores this while a page is already in flight,
-        // so the observer can fire freely without stacking requests.
-        if (entries[0].isIntersecting && query.hasNextPage) {
-          query.fetchNextPage()
+        // A page that is already in flight is not asked again, so the
+        // observer can fire freely without stacking requests.
+        if (entries[0].isIntersecting) {
+          lists.loadMore()
         }
       },
       { rootMargin: SCROLL_ROOT_MARGIN },
@@ -89,7 +84,7 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
 
     observer.observe(node)
     return () => observer.disconnect()
-  }, [query.hasNextPage, query.fetchNextPage])
+  }, [lists.hasNextPage, lists.loadMore])
 
   const currentPublisherOption = useMemo<EntityOption | null>(() => {
     if (filters.publisherId === null) return null
@@ -273,7 +268,7 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
           action={
             <button
               type="button"
-              onClick={() => query.refetch()}
+              onClick={lists.refetch}
               className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 border border-red-500/40 text-xs text-red-300 font-semibold rounded-xl transition-all"
             >
               Reintentar
@@ -303,7 +298,7 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
         />
       )}
 
-      {!isInitialLoading && !isFailing && lists.length > 0 && (
+      {!isInitialLoading && !isFailing && lists.items.length > 0 && (
         <section className="space-y-4">
           <div className="flex items-center justify-between text-xs text-neps-muted border-b border-neps-border/60 pb-2">
             <p>
@@ -314,7 +309,7 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
-            {lists.map((list) => (
+            {lists.items.map((list) => (
               <ListCard key={list.id} list={list} />
             ))}
           </div>
@@ -326,13 +321,13 @@ export function ListsPage({ myLists = false }: ListsPageProps) {
            */}
           <div ref={loaderRef} aria-hidden className="h-px w-full" />
 
-          {query.isFetchingNextPage && (
+          {lists.isFetchingMore && (
             <p className="text-center text-xs text-neps-muted font-mono animate-pulse">
               Cargando más listas...
             </p>
           )}
 
-          {!query.hasNextPage && (
+          {!lists.hasNextPage && (
             <p className="text-center text-xs text-neps-muted">Fin del listado.</p>
           )}
         </section>

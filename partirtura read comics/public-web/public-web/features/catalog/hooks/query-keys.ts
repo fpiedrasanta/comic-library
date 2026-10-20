@@ -10,16 +10,8 @@ export const FAVORITES_LISTING_KEY = 'favorites'
 export const READING_HISTORY_KEY = 'reading-history'
 export const RECOMMENDED_WORKS_KEY = 'recommended-works'
 
-/** The lists of the catalog, of the system and the personal ones. */
-export const CATALOG_LISTS_KEY = 'catalog-lists'
-
 /** The personal lists of the user, with the membership of a work. */
 export const PERSONAL_LISTS_KEY = 'personal-lists'
-
-/** Key of the detail of a list, of the system or of a personal one. */
-export function listDetailQueryKey(listId: number) {
-  return ['catalog', 'list-detail', listId] as const
-}
 
 /**
  * Listings that show the favorite state of every work they return, except the
