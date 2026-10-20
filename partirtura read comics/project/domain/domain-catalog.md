@@ -160,7 +160,7 @@
   - `string? Description`
   - `virtual Image? Cover`
   - `string? Color`
-  - `virtual ListType ListType`
+  - `virtual ListType? ListType`
   - `OwnerType OwnerType`
   - `virtual User? Owner`
   - `Visibility Visibility`
@@ -170,7 +170,7 @@
   - `double AverageRating` (default `0`)
 - **Navigation Properties**:
   - `virtual ICollection<WorkListItem> WorkListItems`
-- **Notes**: Logical deletion via `IsActive`. Navigation properties are `virtual` for lazy loading. `OwnerType` determines whether `Owner` (User) is null (`System`) or set (`User`). Database check constraint enforces that `System` lists have no owner and `User` lists have an owner. `Name` is indexed for catalog searches. **Rating accumulators**: `RatingCount` (active ratings) and `AverageRating` (average of the active ratings on a 1-5 scale) are stored on the list to avoid recalculating them on every read; they are maintained when a `ListRating` is created or edited. A list without ratings has `RatingCount = 0` and `AverageRating = 0`.
+- **Notes**: Logical deletion via `IsActive`. Navigation properties are `virtual` for lazy loading. `OwnerType` determines whether `Owner` (User) is null (`System`) or set (`User`). Database check constraint enforces that `System` lists have no owner and `User` lists have an owner. `Name` is indexed for catalog searches. **Rating accumulators**: `RatingCount` (active ratings) and `AverageRating` (average of the active ratings on a 1-5 scale) are stored on the list to avoid recalculating them on every read; they are maintained when a `ListRating` is created or edited. A list without ratings has `RatingCount = 0` and `AverageRating = 0`. **`ListType` is optional** (added 2026-10 for US-0036): system lists always have a type, personal lists (`OwnerType = User`) have none, so the `ListTypeId` column is nullable. Personal lists are not rated, so their accumulators stay at `0`.
 
 ## WorkListItem
 
@@ -180,4 +180,4 @@
   - `virtual WorkList WorkList`
   - `virtual Work Work`
   - `int Position`
-- **Notes**: Position determines order of works within a list. Foreign keys (`WorkListId`, `WorkId`) are shadow properties in EF Core configuration. Navigation properties are `virtual` for lazy loading. Unique database indexes enforce one row per work per list and one work per position per list. No physical deletion of works when removed from a list.
+- **Notes**: Position determines order of works within a list. Foreign keys (`WorkListId`, `WorkId`) are shadow properties in EF Core configuration. Navigation properties are `virtual` for lazy loading. Unique database indexes enforce one row per work per list and one work per position per list. No physical deletion of works when removed from a list. **Positions are 0-based** and may contain gaps: removing a work from a list does not renumber the remaining ones, and the position only determines the order. When the order of a personal list is updated, the affected rows are first moved to a temporary negative offset and then to their final position, so the unique `(WorkListId, Position)` index is never violated while the rows swap places.

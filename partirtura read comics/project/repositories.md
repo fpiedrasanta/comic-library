@@ -7,7 +7,7 @@ Quick reference for repository interfaces and their operations. The per-module d
 | File | Contents |
 | --- | --- |
 | `repositories/repositories-users.md` | UserRepository, RefreshTokenRepository, PasswordResetTokenRepository, PasswordResetAuthorizationRepository, AccountDeletionTokenRepository, BanRepository, ImageRepository |
-| `repositories/repositories-catalog.md` | CountryRepository, PublisherRepository, FranchiseRepository, SeriesRepository, LanguageRepository, PersonRepository, RoleRepository, TagRepository, ListTypeRepository, WorkListRepository, WorkRepository, WorkTypeRepository, FavoriteRepository |
+| `repositories/repositories-catalog.md` | CountryRepository, PublisherRepository, FranchiseRepository, SeriesRepository, LanguageRepository, PersonRepository, RoleRepository, TagRepository, ListTypeRepository, WorkListRepository, WorkListItemRepository, WorkRepository, WorkTypeRepository, FavoriteRepository |
 | `repositories/repositories-numbers.md` | PageRepository, UnitOfWork |
 
 ## Conventions (enforced as of 2026-09 audit)
@@ -19,6 +19,9 @@ Quick reference for repository interfaces and their operations. The per-module d
 - No `DbSet.Remove` / `DbSet.RemoveRange`. Deactivation uses `IsActive = false`.
   - **Exception**: `FavoriteRepository.RemoveAsync` performs a physical deletion. US-0035 requires that removing a
     favorite deletes its record instead of deactivating it, and the `Favorite` entity has no `IsActive` property.
+  - **Exception**: `WorkListRepository.DeleteAsync` and `WorkListItemRepository.RemoveAsync` perform physical
+    deletions. US-0036 requires that deleting a personal list removes it together with its `WorkListItem` rows, and
+    that removing a work from a list deletes only the relation. The `Work` entities are never deleted.
 
 ## Quick reference
 
@@ -33,7 +36,8 @@ Quick reference for repository interfaces and their operations. The per-module d
 | PersonRepository | `IPersonRepository` | 5 |
 | RoleRepository | `IRoleRepository` | 5 |
 | ListTypeRepository | `IListTypeRepository` | 5 |
-| WorkListRepository | `IWorkListRepository` | 5 |
+| WorkListRepository | `IWorkListRepository` | 10 |
+| WorkListItemRepository | `IWorkListItemRepository` | 6 |
 | WorkRepository | `IWorkRepository` | 6 |
 | WorkTypeRepository | `IWorkTypeRepository` | 7 |
 | PageRepository | `IPageRepository` | 6 |

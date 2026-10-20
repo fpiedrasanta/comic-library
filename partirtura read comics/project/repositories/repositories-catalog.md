@@ -94,11 +94,26 @@ Task<(IReadOnlyList<TEntity>, int)> GetCatalogPagedAsync(int currentPage, int pa
 - **Location**: `Infrastructure/Repositories/WorkListRepository.cs`
 - **Operations**: 
   - `GetPagedAsync` (official `System` lists only; search by list name, work title, and work number; filters by franchise, publisher, list type, active state, and UTC creation range; ordering by name or creation date; pagination)
-  - `GetCatalogPagedAsync` (public catalog query: active `System` lists only, partial `LIKE` search across Name and Description, hierarchical publisher/franchise/series filters, optional listTypeId filter, ordering by name or creation date with Id tie-breaker, pagination. Added 2026-10 for US-0034: accepts the optional `long? userId` of the authenticated reader as the first parameter and projects, in the same SQL statement, `WorkCount` (`WorkListItems.Count`), `ReadingProgressPercentage`, and `AverageRating`. See "WorkList catalog reading progress" below.)
-  - `GetCatalogByIdAsync` (fully loaded detail with WorkListItems ordered by Position, including Work, WorkType, Series.Franchise.Publisher, Franchise.Publisher, Publisher, and Work.Cover; `AsSplitQuery` + `AsNoTracking`. For US-0034 the per-Work reading progress is resolved by the Service through the batched `IWorkReadingProgressRepository.GetByWorkIdsAndUserIdAsync`, so this query is unchanged.)
+  - `GetCatalogPagedAsync` (public catalog query: active `System` lists only, partial `LIKE` search across Name and Description, hierarchical publisher/franchise/series filters, optional listTypeId filter, ordering by name or creation date with Id tie-breaker, pagination. Added 2026-10 for US-0034: accepts the optional `long? userId` of the authenticated reader as the first parameter and projects, in the same SQL statement, `WorkCount` (`WorkListItems.Count`), `ReadingProgressPercentage`, and `AverageRating`. See "WorkList catalog reading progress" below. Added 2026-10 for US-0036: the optional `bool myLists` parameter selects the personal lists of `userId` instead of the system lists; the filter is applied before counting and paginating.)
+  - `GetCatalogByIdAsync` (fully loaded detail with WorkListItems ordered by Position, including Work, WorkType, Series.Franchise.Publisher, Franchise.Publisher, Publisher, and Work.Cover; `AsSplitQuery` + `AsNoTracking`. For US-0034 the per-Work reading progress is resolved by the Service through the batched `IWorkReadingProgressRepository.GetByWorkIdsAndUserIdAsync`, so this query is unchanged. Added 2026-10 for US-0036: accepts the optional `long? userId` so the detail of a personal list is only returned to its owner.)
+  - `GetPersonalByIdAsync` (personal list of a given owner, with `ListType` and `Cover` loaded)
+  - `GetPersonalWithItemsAsync` (personal list of a given owner with its `WorkListItems` and their `Work` loaded, `AsSplitQuery`)
   - `GetByIdAsync` (fully loaded edit detail ordered by `Position`)
   - `GetByNameAsync`, `AddAsync`, `UpdateAsync`
-- **Notes**: `AsNoTracking` for all reads. The paged query includes `ListType` and `Cover` to avoid N+1 access and returns the cover metadata needed by the application. The detail query includes `Work`, `Franchise`, `Publisher`, `Series`, and work cover relationships with `AsSplitQuery`. WorkListItems are managed through the aggregate navigation by Application; no physical deletion is performed. **Indexes**: `Name`, `ListTypeId`, `CoverId`, `OwnerId`, `Visibility`, `IsActive`, `(WorkListId, WorkId)` unique, `(WorkListId, Position)` unique, plus the owner check constraint.
+  - `DeleteAsync` (physical deletion of a list and its items; personal list deletion use case)
+- **Notes**: `AsNoTracking` for all reads. The paged query includes `ListType` and `Cover` to avoid N+1 access and returns the cover metadata needed by the application. The detail query includes `Work`, `Franchise`, `Publisher`, `Series`, and work cover relationships with `AsSplitQuery`. WorkListItems are managed through the aggregate navigation by Application; the only physical deletion is `DeleteAsync`, used by the personal list deletion use case (US-0036). **Indexes**: `Name`, `ListTypeId`, `CoverId`, `OwnerId`, `Visibility`, `IsActive`, `(WorkListId, WorkId)` unique, `(WorkListId, Position)` unique, plus the owner check constraint.
+
+## WorkListItemRepository
+
+- **Interface**: `IWorkListItemRepository`
+- **Location**: `Infrastructure/Repositories/WorkListItemRepository.cs`
+- **Operations**:
+  - `GetAsync` (the relation between a list and a work, with the `Work` loaded)
+  - `GetByWorkListAsync` (all the items of a list ordered by `Position`, with the `Work` loaded)
+  - `GetMaxPositionAsync` (highest position of the list, or `-1` when the list has no items, so the first work of a list takes position 0)
+  - `AddAsync`, `UpdateAsync`
+  - `RemoveAsync` (physical deletion of the relation; the `Work` is never deleted)
+- **Notes**: Explicit repository for the relation between a list and a work, added 2026-10 for US-0036 (personal lists). `RemoveAsync` is the second documented exception to the "no physical deletion" convention: removing a work from a list deletes the `WorkListItem` row instead of deactivating it, and the `Work` itself is never touched. **Indexes**: `(WorkListId, WorkId)` unique, `(WorkListId, Position)` unique.
 
 ### WorkList catalog reading progress (US-0034)
 

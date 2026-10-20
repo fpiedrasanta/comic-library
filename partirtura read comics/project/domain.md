@@ -120,7 +120,7 @@ graph LR
 | `User` | `WorkList` | One-to-many |
 | `WorkList` | `WorkListItem` | One-to-many |
 | `WorkListItem` | `Work` | Many-to-one |
-| `WorkList` | `ListType` | Many-to-one |
+| `WorkList` | `ListType` | Many-to-one, optional (a personal list has no list type) |
 | `User` | `WorkRating` | One-to-many (one rating per Work) |
 | `Work` | `WorkRating` | One-to-many (one rating per User) |
 | `User` | `WorkReadingProgress` | One-to-many (one progress per Work) |

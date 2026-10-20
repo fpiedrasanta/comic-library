@@ -250,7 +250,7 @@ Notes:
 Description:
 Returns the paginated list of official lists used to render the list cards of the Public Web
 explore page (`/lists`). Only lists that are active **and** owned by System (`OwnerType = System`)
-are returned.
+are returned, unless the `myLists` parameter asks for the personal lists of the authenticated user.
 
 Controller:
 CatalogController
@@ -270,6 +270,11 @@ Request parameters:
 - listTypeId: long (optional, filters lists by their list type)
 - orderBy: string (optional, `name` or `createdat`; default `createdat`)
 - orderDir: string (optional, `ASC` or `DESC`; default `DESC`)
+- myLists: string (optional, US-0036). Only the literal value `true` returns the personal lists of the
+  authenticated user; any other value (`false`, omitted, empty or not recognized) keeps returning the
+  system lists, without producing a conversion error. Personal and system lists are never mixed in the
+  same response. The filter is applied in the database before counting and paginating, so `totalCount`,
+  `totalPages` and `hasNextPage` describe the filtered set.
 
 Response:
 - 200 OK
@@ -329,6 +334,11 @@ Notes:
 Description:
 Returns the detail of an official list, including its works in the order defined by the list
 (`WorkListItem.Position`). Used by the Public Web list detail page (`/lists/{id}`).
+
+Since US-0036 the same endpoint also returns the detail of a **personal list** when it belongs to the
+authenticated user, so the Public Web reuses the same list detail page for both kinds of list. A personal
+list has no list type, so `listTypeId` and `listTypeName` are `null`, and it is never rated, so
+`averageRating` is `null` and `ratingCount` is `0`.
 
 Controller:
 CatalogController
@@ -395,7 +405,7 @@ Response Type:
 `ApiResponse<CatalogListDetailDto>`
 
 DTO:
-`Application/DTOs/CatalogListDtos.cs` â€” `CatalogListDetailDto` (Id, Name, ListTypeId, ListTypeName, Description, Color, UrlCover, WorkCount, ReadingProgressPercentage, AverageRating, RatingCount, Works) with `Works` as `IReadOnlyList<CatalogListWorkItemDto>` (Position, Work). `CatalogListWorkDto` exposes all fields needed to render the existing WorkCard: Id, Title, Description, Publisher (Id, Name, Color), Franchise (Id, Name, Color), Series (Id, Name, Color), PublicationDate, UrlCover, WorkType (Id, Name), NumberValue, CreatedAt, ReadingProgressPercentage.
+`Application/DTOs/CatalogListDtos.cs` â€” `CatalogListDetailDto` (Id, Name, ListTypeId, ListTypeName, Description, Color, UrlCover, WorkCount, ReadingProgressPercentage, AverageRating, RatingCount, Works) with `Works` as `IReadOnlyList<CatalogListWorkItemDto>` (Position, Work). `CatalogListWorkDto` exposes all fields needed to render the existing WorkCard: Id, Title, Description, Publisher (Id, Name, Color), Franchise (Id, Name, Color), Series (Id, Name, Color), PublicationDate, UrlCover, WorkType (Id, Name), NumberValue, CreatedAt, ReadingProgressPercentage. Since US-0036, `ListTypeId` and `ListTypeName` are nullable (a personal list has no list type).
 
 Notes:
 - Works are returned ordered by `WorkListItem.Position` (the order defined by the list). No client-side sorting or filtering is applied.
@@ -403,6 +413,7 @@ Notes:
 - No N+1 queries: all relationships required for WorkCard are eager-loaded.
 - Colors are populated from the entity color, resolving the parent chain when the work does not have the level directly: PublisherColor comes from Work.Publisher â†’ Work.Franchise?.Publisher â†’ Work.Series?.Franchise?.Publisher; FranchiseColor from Work.Franchise â†’ Work.Series?.Franchise; SeriesColor from Work.Series.
 - If the list exists but is inactive or not owned by System, returns 404 (same message as non-existent, so existence of a deactivated list is not disclosed).
+- Since US-0036, a personal list is also returned when it belongs to the authenticated user; for a personal list of another user the response is 404. A personal list exposes `listTypeId: null` and `listTypeName: null`, and it is never rated (`averageRating: null`, `ratingCount: 0`).
 - Administrative data is never exposed: no `ownerType`, `ownerUserId`, `visibility`, `isActive`, `createdAt`.
 - Read-only. No side effects.
 - List-level `readingProgressPercentage` (US-0034, authenticated reader): `completedWorks * 100 / totalWorks` using `ReadingState.Completed`. An empty list returns `0`; when the user has no reading progress for any work of the list it is `null`.

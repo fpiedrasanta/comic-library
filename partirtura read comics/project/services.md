@@ -7,7 +7,7 @@ Application and infrastructure services. The per-service details live in the per
 | File | Contents |
 | --- | --- |
 | `services/services-users.md` | UserService, UserQueryService, AdminUserService, AuthService, PasswordResetService, AccountDeletionService, BanService |
-| `services/services-catalog.md` | CountryService, PublisherService, FranchiseService, SeriesService, PersonService, RoleService, ListTypeService, WorkTypeService, WorkService, WorkContentService, WorkAnalysisService, WorkListService, WorkRatingService, FavoriteService, ReadingHistoryService, RecommendedWorksService |
+| `services/services-catalog.md` | CountryService, PublisherService, FranchiseService, SeriesService, PersonService, RoleService, ListTypeService, WorkTypeService, WorkService, WorkContentService, WorkAnalysisService, WorkListService, PersonalListService, WorkRatingService, FavoriteService, ReadingHistoryService, RecommendedWorksService |
 
 ## Infrastructure services
 

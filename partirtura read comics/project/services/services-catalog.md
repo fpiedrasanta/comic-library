@@ -148,6 +148,50 @@ Application services for catalog and content management.
 - **Mapping**: `WorkRatingListItemDto` exposes Id, UserId, UserName (first name + last name), UrlAvatar, Stars, Review and CreatedAt of each rating. Zero-star votes are ordinary rows and are included. The visual presentation belongs to the Frontend and is not part of the service.
 - **Ordering**: `Stars` or `CreatedAt`, ascending or descending, with `Id` as deterministic tie-breaker; unknown or missing `orderBy` falls back to `CreatedAt`.
 
+## PersonalListService
+
+- **Location**: `Application/Services/PersonalListService.cs`
+- **Controller**: `MyListsController`
+- **Dependencies**: `IFileStorageService`, `IUnitOfWork`, `ILogger<PersonalListService>`
+- **Operations**: `CreateAsync`, `GetSummaryAsync`, `RenameAsync`, `DeleteAsync`, `AddWorkAsync`, `RemoveWorkAsync`, `ReorderWorksAsync`
+- **Notes**: Serves US-0036 (administrar listas personales de obras). Dedicated service for the personal work lists of the authenticated user (`OwnerType = User`); the system lists keep their own administration rules in `WorkListService` and `/api/admin-work-lists`. The user identity is resolved from the authenticated context (`userId` received from the controller, extracted from the JWT `sub` claim); a client-supplied `UserId` is never trusted and is not part of any request contract, so a user can never administer the personal lists of another user, nor reach a system list through these operations. A personal list is persisted with `OwnerType = User`, `Visibility = Private`, `IsActive = true`, no `ListType`, the brand blue as color and the description `Lista creada por {nombre de usuario}`; its cover is a copy of the packaged generic cover asset, persisted through the regular image flow so every list owns an independent file. The service never touches the reading progress, the reading history, the ratings, the comments, the favorites or the membership of the works in the system lists.
+
+### CreateAsync
+
+- **Signature**: `CreateAsync(CreatePersonalListRequest request, long userId, CancellationToken)`.
+- **Responsibilities**: validates the name (required, trimmed, max 200 characters) and that it is not already used by another list (the name is unique in the system, as in the administration endpoints); persists the generic cover as an independent image; creates the list with the values defined by the backend and saves it inside a transaction.
+- **Errors**: `ValidationException` (422) when the name is empty or too long; `BusinessNotFoundException` (404) when the user does not exist; `BusinessConflictException` (409) when the name is already used. When the persistence fails, the transaction is rolled back and the copied cover file is removed.
+
+### RenameAsync
+
+- **Signature**: `RenameAsync(long listId, UpdatePersonalListRequest request, long userId, CancellationToken)`.
+- **Responsibilities**: loads the personal list of the user, validates the new name and updates **only** `Name`.
+- **Errors**: `ValidationException` (422), `BusinessNotFoundException` (404) when the list does not exist, is not personal or belongs to another user, `BusinessConflictException` (409) when the name is already used.
+
+### DeleteAsync
+
+- **Signature**: `DeleteAsync(long listId, long userId, CancellationToken)`.
+- **Responsibilities**: loads the personal list of the user, physically deletes the list and its work items inside a transaction and removes the cover file from the image storage.
+- **Errors**: `BusinessNotFoundException` (404) when the list does not exist, is not personal or belongs to another user. The works of the list, their reading progress, ratings, comments and favorites are never deleted.
+
+### AddWorkAsync
+
+- **Signature**: `AddWorkAsync(long listId, AddWorkToPersonalListRequest request, long userId, CancellationToken)`.
+- **Responsibilities**: validates that the work exists and is active, that it does not already belong to the list and creates the `WorkListItem` at the end of the list (highest position plus one, 0-based).
+- **Errors**: `BusinessNotFoundException` (404) for an unknown/inactive work or an unknown list, `BusinessConflictException` (409) when the work already belongs to the list.
+
+### RemoveWorkAsync
+
+- **Signature**: `RemoveWorkAsync(long listId, long workId, long userId, CancellationToken)`.
+- **Responsibilities**: physically deletes the `WorkListItem`. The work, its data and its membership in the other lists are not affected, and the remaining works are not renumbered (a gap in the positions is expected).
+- **Errors**: `BusinessNotFoundException` (404) when the list does not exist, is not personal, belongs to another user, or the work does not belong to the list.
+
+### ReorderWorksAsync
+
+- **Signature**: `ReorderWorksAsync(long listId, ReorderPersonalListWorksRequest request, long userId, CancellationToken)`.
+- **Responsibilities**: validates that every work of the request belongs to the list and updates the positions of the affected works inside a transaction. The affected rows are first moved to a temporary negative offset and then to their final position, so the unique `(WorkListId, Position)` index is respected and the order is never left half applied. The request only contains the works whose position changed.
+- **Errors**: `BusinessNotFoundException` (404) when the list does not exist, is not personal, belongs to another user, or one of the works does not belong to the list; `BusinessConflictException` (409) when the request repeats a position or when a requested position is still held by a work that is not part of the request.
+
 ## WorkContentService
 
 - **Location**: `Application/Services/WorkContentService.cs`
