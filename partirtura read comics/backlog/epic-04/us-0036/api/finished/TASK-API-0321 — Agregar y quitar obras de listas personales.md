@@ -65,3 +65,42 @@ Reutilizar los servicios y repositorios existentes de `Work`, `WorkList` y `Work
 6. Crear uno o mÃ¡s commits y publicar los cambios en la rama de trabajo.
 7. Registrar el resultado en esta misma task mediante **append**, sin sobrescribir el contenido previo.
 8. Mover el archivo a `finished` o `blocked` conforme a `communication.md`, documentando los resultados y los pendientes.
+
+## Resultado de ejecución
+
+**Estado**: Cumplido — criterios de aceptación verificados.
+
+**Qué se implementó**:
+- Agregar una obra a una lista personal (`POST /api/users/me/lists/{listId}/works` con `workId`): valida que la
+  lista exista, sea personal y pertenezca al usuario autenticado; valida que la obra exista y esté activa; evita
+  relaciones duplicadas (409) y crea el `WorkListItem` al final de la lista.
+- Quitar una obra de una lista personal (`DELETE /api/users/me/lists/{listId}/works/{workId}`): valida la
+  pertenencia de la obra a la lista y **elimina físicamente** el `WorkListItem`, sin tocar la obra.
+- Posiciones **0-based** (la primera obra de una lista toma la posición 0, igual que las listas del sistema).
+  Al quitar una obra **no se renumeran** las restantes: queda un hueco en la numeración, que es inocuo porque la
+  posición solo determina el orden.
+
+**Qué se cambió**:
+- `api/Application/Services/PersonalListService.cs`: `AddWorkAsync` y `RemoveWorkAsync`.
+- `api/Application/Interfaces/IPersonalListService.cs` y `api/Application/DTOs/PersonalListDtos.cs`.
+- `api/Api/Controllers/MyListsController.cs`: `POST {listId}/works` y `DELETE {listId}/works/{workId}`.
+- `api/Infrastructure/Repositories/WorkListItemRepository.cs` + `IWorkListItemRepository.cs` (nuevos):
+  `GetAsync`, `AddAsync`, `RemoveAsync`, `GetMaxPositionAsync`.
+- `api/Infrastructure/Repositories/UnitOfWork.cs` e `IUnitOfWork.cs`: `WorkListItemRepository`.
+- `project/endpoints/endpoints-personal-lists.md` (nuevo), `project/repositories/repositories-catalog.md`,
+  `project/repositories.md`, `project/domain/domain-catalog.md`.
+
+**Decisiones relevantes**:
+- La pertenencia de la obra se valida siempre contra los `WorkListItem` de la lista; no se confía en la
+  validación del frontend y no se acepta el identificador de otra lista.
+- La eliminación del `WorkListItem` es física (excepción documentada a la regla de borrado lógico). La obra
+  conserva sus datos, su progreso de lectura, sus valoraciones, sus comentarios y su pertenencia a las listas
+  del sistema.
+- No se renumeran las posiciones restantes: la task lo deja abierto ("si el modelo actual requiere posiciones
+  consecutivas") y el modelo no lo requiere.
+
+**Notas**:
+- Commit: `8f989cd`. Branch: `feature/us-0036-api`.
+- Tests: `AddWork_CreatesTheRelationAndRejectsDuplicates`, `AddWork_RejectsAnUnknownWork` y
+  `RemoveWork_DeletesOnlyTheRelationAndKeepsTheWork` (verifican que la obra sigue existiendo en el catálogo y que
+  la lista queda vacía).
