@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import { ProtectedImage } from '@/components/protected-image'
 import { hasVisibleProgress } from '../utils/list-metrics'
@@ -31,6 +32,15 @@ interface ListWorkRowProps {
   position: number
   /** The list the work belongs to, for the reading action route. */
   listId: number
+  /**
+   * Controls that reorder the row. They are only rendered when the list can
+   * be reordered, which is the case of the personal lists of the user.
+   */
+  reorderControls?: ReactNode
+  /** Removes the work from the list, when the list can be edited. */
+  onRemove?: () => void
+  /** The work is being removed from the list. */
+  isRemoving?: boolean
 }
 
 /**
@@ -40,10 +50,20 @@ interface ListWorkRowProps {
  * a reading position, not a catalog card, so it shows the order, the individual
  * progress and the action that resumes the reading. The reading action opens the
  * Reader at `/lists/{listId}/work/{workId}`, the contextual route resolved by
- * TASK-PUBLIC-WEB-0093; the row itself does not navigate and cannot be
- * reordered: the order belongs to the list and is defined by the backend.
+ * TASK-PUBLIC-WEB-0093; the row itself does not navigate and does not reorder
+ * itself: the order belongs to the list and is defined by the backend.
+ *
+ * The controls of the personal lists —the reordering and the removal of the
+ * work— are optional, so the same row serves the lists of the system.
  */
-export function ListWorkRow({ work, position, listId }: ListWorkRowProps) {
+export function ListWorkRow({
+  work,
+  position,
+  listId,
+  reorderControls,
+  onRemove,
+  isRemoving = false,
+}: ListWorkRowProps) {
   const action = resolveAction(work.readingProgressPercentage)
   const isCompleted = work.readingProgressPercentage !== null && work.readingProgressPercentage >= FULL_PERCENTAGE
 
@@ -53,6 +73,8 @@ export function ListWorkRow({ work, position, listId }: ListWorkRowProps) {
 
   return (
     <article className="group bg-neps-card border border-neps-border hover:border-slate-600 rounded-xl p-3 flex items-center justify-between gap-3 sm:gap-4 transition-all duration-200">
+      {reorderControls && <div className="flex items-center gap-1 flex-shrink-0">{reorderControls}</div>}
+
       <span className="font-mono text-xs font-bold text-neps-muted w-6 text-center flex-shrink-0">
         {String(position).padStart(POSITION_PAD, '0')}
       </span>
@@ -88,6 +110,26 @@ export function ListWorkRow({ work, position, listId }: ListWorkRowProps) {
           </div>
         )}
       </div>
+
+      {onRemove && (
+        <button
+          type="button"
+          onClick={onRemove}
+          disabled={isRemoving}
+          title="Quitar de la lista"
+          aria-label={`Quitar ${work.title} de la lista`}
+          className="flex-shrink-0 p-2 rounded-lg text-neps-muted hover:text-neps-accent hover:bg-neps-accent/10 transition-colors disabled:opacity-50"
+        >
+          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
+      )}
 
       <Link
         to={`/lists/${listId}/work/${work.id}`}

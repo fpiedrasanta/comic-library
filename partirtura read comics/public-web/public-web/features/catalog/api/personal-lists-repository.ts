@@ -37,6 +37,15 @@ export function getPersonalLists(
 }
 
 /**
+ * `GET /api/users/me/lists/{listId}`.
+ * The summary of one personal list of the user. A list of the system, or of
+ * another user, is a 404.
+ */
+export function getPersonalList(listId: number): Promise<PersonalListSummaryDto> {
+  return fetchApi<PersonalListSummaryDto>(`/users/me/lists/${listId}`)
+}
+
+/**
  * `POST /api/users/me/lists`.
  * Creates a personal list. Only the name is sent: the backend defines the
  * owner, the visibility, the color and the cover.
@@ -94,4 +103,27 @@ export function removeWorkFromPersonalList(
   workId: number
 ): Promise<null> {
   return fetchApi<null>(`/users/me/lists/${listId}/works/${workId}`, { method: 'DELETE' })
+}
+
+/** The new position of a work of a personal list. */
+export interface PersonalListWorkPosition {
+  workId: number
+  position: number
+}
+
+/**
+ * `PUT /api/users/me/lists/{listId}/works/order`.
+ * Persists the order of the works of a personal list.
+ *
+ * Only the works whose position changed travel: the ones that keep their
+ * position are not sent, and the backend keeps them where they are.
+ */
+export function reorderPersonalListWorks(
+  listId: number,
+  works: PersonalListWorkPosition[]
+): Promise<null> {
+  return fetchApi<null>(`/users/me/lists/${listId}/works/order`, {
+    method: 'PUT',
+    body: JSON.stringify({ works }),
+  })
 }

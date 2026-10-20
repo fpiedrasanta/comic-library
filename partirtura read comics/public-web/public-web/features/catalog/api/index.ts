@@ -13,10 +13,15 @@ export {
   addWorkToPersonalList,
   createPersonalList,
   deletePersonalList,
+  getPersonalList,
   getPersonalLists,
   removeWorkFromPersonalList,
   renamePersonalList,
+  reorderPersonalListWorks,
 } from './personal-lists-repository'
-export type { GetPersonalListsParams } from './personal-lists-repository'
+export type {
+  GetPersonalListsParams,
+  PersonalListWorkPosition,
+} from './personal-lists-repository'
 export { getReadingHistory } from './reading-history-repository'
 export { getRecommendedWorks } from './recommended-works-repository'

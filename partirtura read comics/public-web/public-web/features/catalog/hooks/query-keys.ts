@@ -16,8 +16,10 @@ export const CATALOG_LISTS_KEY = 'catalog-lists'
 /** The personal lists of the user, with the membership of a work. */
 export const PERSONAL_LISTS_KEY = 'personal-lists'
 
-/** The detail of a list, of the system or of a personal one. */
-export const LIST_DETAIL_KEY = 'catalog-list-detail'
+/** Key of the detail of a list, of the system or of a personal one. */
+export function listDetailQueryKey(listId: number) {
+  return ['catalog', 'list-detail', listId] as const
+}
 
 /**
  * Listings that show the favorite state of every work they return, except the

@@ -1,5 +1,6 @@
 import { getCatalogListDetail } from '../api/lists-repository'
 import { useEntityDetail } from './use-entity-detail'
+import { listDetailQueryKey } from './query-keys'
 import type { CatalogListDetailDto } from '../types/lists'
 
 /**
@@ -9,7 +10,7 @@ import type { CatalogListDetailDto } from '../types/lists'
  */
 export function useCatalogListDetail(id: number) {
   return useEntityDetail<CatalogListDetailDto>({
-    key: ['catalog', 'list-detail', id],
+    key: listDetailQueryKey(id),
     load: () => getCatalogListDetail(id),
     enabled: Number.isFinite(id),
   })
