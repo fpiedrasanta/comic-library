@@ -262,10 +262,11 @@ app.UseHttpsRedirection();
 app.UseMiddleware<RateLimitResponseMiddleware>();
 app.UseMiddleware<GlobalExceptionHandlerMiddleware>();
 app.UseCors("DefaultCors");
-app.UseRateLimiter();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseRateLimiter();
 
 app.UseHangfireDashboard("/hangfire");
 

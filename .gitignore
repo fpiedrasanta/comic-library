@@ -7,6 +7,8 @@ partirtura read comics/api/Api/appsettings*.json
 # ---- .NET / C# ----
 [Bb]in/
 [Oo]bj/
+# Salida de 'dotnet publish': copia los appsettings con secretos reales
+partirtura read comics/api/publish/
 *.user
 *.userosscache
 *.suo
@@ -16,7 +18,7 @@ partirtura read comics/api/Api/appsettings*.json
 
 # ---- Node / React / Vite ----
 node_modules/
-dist/
+# dist/
 dist-ssr/
 .vite/
 *.tsbuildinfo
