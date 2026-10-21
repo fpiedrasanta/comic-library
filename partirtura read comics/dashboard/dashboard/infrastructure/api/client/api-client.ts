@@ -1,7 +1,13 @@
 import type { ApiError, ApiResponse } from '@/types/api'
 import { getAccessToken, refreshAccessToken } from '@/features/authentication/services/auth-interceptor'
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000/api'
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5131/api'
+
+const REFRESH_TOKEN_ENDPOINT = 'users/refresh-token'
+
+function isRefreshTokenEndpoint(endpoint: string): boolean {
+  return endpoint.replace(/^\//, '') === REFRESH_TOKEN_ENDPOINT
+}
 
 type ApiErrorHandler = (message: string, code: number, status: number) => void
 const apiErrorHandlers: Set<ApiErrorHandler> = new Set()
@@ -66,6 +72,7 @@ async function makeRequest<T>(endpoint: string, options?: RequestInit): Promise<
 
   const response = await fetch(url, {
     ...options,
+    credentials: 'include',
     headers: {
       'Content-Type': 'application/json',
       ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
@@ -82,13 +89,14 @@ export async function apiClient<T>(endpoint: string, options?: RequestInit): Pro
   } catch (error) {
     const apiError = error as ApiError
 
-    if (apiError.status === 401) {
+    if (apiError.status === 401 && !isRefreshTokenEndpoint(endpoint)) {
       try {
         const newToken = await refreshAccessToken()
         if (newToken) {
           const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
           const response = await fetch(url, {
             ...options,
+            credentials: 'include',
             headers: {
               'Content-Type': 'application/json',
               Authorization: `Bearer ${newToken}`,
@@ -116,6 +124,7 @@ export async function apiClientBlob(endpoint: string, options?: RequestInit): Pr
 
   const response = await fetch(url, {
     ...options,
+    credentials: 'include',
     headers: {
       ...(accessToken && { Authorization: `Bearer ${accessToken}` }),
       ...options?.headers,

@@ -1,6 +1,6 @@
 import { useAuth } from '@/features/authentication/hooks/use-auth'
 
-const PUBLIC_WEB_URL = import.meta.env.VITE_PUBLIC_WEB_URL || 'http://localhost:5173'
+const PUBLIC_WEB_URL = import.meta.env.VITE_PUBLIC_WEB_URL || 'https://comics.neps.com.ar'
 
 function UnauthorizedPage() {
   const { logout } = useAuth()

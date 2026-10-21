@@ -8,7 +8,7 @@ partirtura read comics/api/Api/appsettings*.json
 [Bb]in/
 [Oo]bj/
 # Salida de 'dotnet publish': copia los appsettings con secretos reales
-partirtura read comics/api/publish/
+partirtura read comics/api/publish/appsettings*.json
 *.user
 *.userosscache
 *.suo
