@@ -68,7 +68,7 @@ async function handleResponse<T>(response: Response): Promise<T> {
 async function makeRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
 
-  const accessToken = getAccessToken()
+  const accessToken = isRefreshTokenEndpoint(endpoint) ? null : getAccessToken()
 
   const response = await fetch(url, {
     ...options,

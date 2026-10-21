@@ -1,6 +1,10 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { authenticationRepository } from '@/features/authentication/api'
-import { storeAccessToken, clearAccessToken } from '@/infrastructure/auth/token-storage'
+import {
+  storeAccessToken,
+  clearAccessToken,
+  onSessionExpired,
+} from '@/infrastructure/auth/token-storage'
 import type { AuthResponse } from '@/types/api'
 
 export type AuthState = 'initializing' | 'authenticated' | 'unauthenticated'
@@ -103,6 +107,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     return () => {
       isMounted = false
     }
+  }, [])
+
+  useEffect(() => {
+    return onSessionExpired(() => {
+      clearAccessToken()
+      setUser(null)
+      setRole(null)
+      setAuthState('unauthenticated')
+    })
   }, [])
 
   const login = (payload: AuthResponse) => {

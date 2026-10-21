@@ -1,8 +1,18 @@
 import type { ApiError } from '@/types/api'
-import { getAccessToken, clearAccessToken } from '@/infrastructure/auth/token-storage'
+import {
+  getAccessToken,
+  clearAccessToken,
+  notifySessionExpired,
+} from '@/infrastructure/auth/token-storage'
 import { authenticationRepository } from '@/features/authentication/api'
 
 const API_BASE_URL = import.meta.env.VITE_API_URL ?? '/api'
+
+const REFRESH_TOKEN_ENDPOINT = 'users/refresh-token'
+
+function isRefreshTokenEndpoint(endpoint: string): boolean {
+  return endpoint.replace(/^\//, '') === REFRESH_TOKEN_ENDPOINT
+}
 
 let refreshPromise: Promise<void> | null = null
 
@@ -22,6 +32,7 @@ async function refreshSession(): Promise<void> {
       }
     } catch {
       clearAccessToken()
+      notifySessionExpired()
     } finally {
       refreshPromise = null
     }
@@ -110,8 +121,12 @@ function normalizeApiError(response: Response, json: unknown): ApiError {
 async function executeRequest(endpoint: string, options?: RequestInit): Promise<Response> {
   const url = `${API_BASE_URL}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`
 
-  const headers: Record<string, string> = {
-    Authorization: `Bearer ${getAccessToken() ?? ''}`,
+  const isRefresh = isRefreshTokenEndpoint(endpoint)
+  const accessToken = getAccessToken()
+  const headers: Record<string, string> = {}
+
+  if (accessToken && !isRefresh) {
+    headers.Authorization = `Bearer ${accessToken}`
   }
 
   if (!(options?.body instanceof FormData)) {
@@ -124,7 +139,7 @@ async function executeRequest(endpoint: string, options?: RequestInit): Promise<
     credentials: 'include',
   })
 
-  if (response.status === 401 && endpoint !== '/users/refresh-token') {
+  if (response.status === 401 && !isRefresh) {
     await refreshSession()
 
     const newToken = getAccessToken()

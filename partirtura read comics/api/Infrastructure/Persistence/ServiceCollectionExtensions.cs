@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,7 +16,9 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<ApplicationDbContext>(options =>
             options
                 .UseLazyLoadingProxies()
-                .UseMySQL(connectionString));
+                .UseMySQL(connectionString)
+                // El lock de migraciones del proveedor usa GET_LOCK(..., -1), que MariaDB rechaza.
+                .ReplaceService<IHistoryRepository, MariaDbCompatibleHistoryRepository>());
 
         return services;
     }
