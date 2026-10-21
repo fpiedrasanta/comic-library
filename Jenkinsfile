@@ -35,20 +35,20 @@ pipeline {
             }
         }
 
-        // Todo el despliegue se ejecuta en el agente Windows (sin SSH)
+        // Todo el despliegue se ejecuta en el agente Windows (sin SSH, sin VPN)
         stage('Desplegar en NEPS-APP01') {
             agent { label 'NEPS-APP01' }
 
             environment {
-                DEPLOY_PATH          = "D:\\Sistemas\\neps\\comic-library\\partirtura read comics\\public-web"
-                BACKUP_PATH          = "D:\\Sistemas\\backup\\comic-library\\partirtura read comics\\public-web"
+                DEPLOY_PATH          = "D:\\Sistemas\\neps\\comic-library\\"
+                BACKUP_PATH          = "D:\\Sistemas\\backup\\comic-library\\"
                 LOCAL_BACKUP_DIR     = "\\\\neps-app01\\D\\Sistemas\\backup\\comic-library\\bd"
                 SQL_INSTANCE         = "NEPS-DEV02"
                 DB_NAME              = "bd_neps_comics"
                 MAX_BACKUPS          = "5"
                 DEPLOY_SCRIPTS_PATH  = "Jenkins"
                 SCRIPTS_PATH         = "00 - src\\Scripts"
-                APPPOOL_NAMES        = "comics"
+                APPPOOL_NAMES        = "comics,comics-api,comics-dashboard"
                 SQL_PORT             = "3307"
                 NEED_RESTORE         = "false"
             }
@@ -84,7 +84,7 @@ pipeline {
                                     else {
                                         git config user.email "jenkins@neps.com.ar"
                                         git config user.name "Jenkins"
-                                        git remote set-url origin https://${safePAT}@github.com/fpiedrasanta/prode-neps-app.git
+                                        git remote set-url origin https://${safePAT}@github.com/fpiedrasanta/comic-library.git
                                     }
                                 """
                             }
