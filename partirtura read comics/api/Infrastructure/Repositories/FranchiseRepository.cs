@@ -77,7 +77,11 @@ public class FranchiseRepository(ApplicationDbContext context) : IFranchiseRepos
     {
         IQueryable<Franchise> query = _context.Franchises
             .AsNoTracking()
-            .Where(f => f.IsActive && f.Publisher.IsActive);
+            .Where(f => f.IsActive && f.Publisher.IsActive)
+            .Where(f => _context.Works.Any(w => w.IsActive && (
+                (w.Franchise != null && w.Franchise.Id == f.Id) ||
+                (w.Series != null && w.Series.Franchise.Id == f.Id)
+            )));
 
         query = ApplyCatalogSearch(query, search);
 

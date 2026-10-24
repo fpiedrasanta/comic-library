@@ -68,7 +68,12 @@ public class PublisherRepository(ApplicationDbContext context) : IPublisherRepos
     {
         IQueryable<Publisher> query = _context.Publishers
             .AsNoTracking()
-            .Where(p => p.IsActive);
+            .Where(p => p.IsActive)
+            .Where(p => _context.Works.Any(w => w.IsActive && (
+                (w.Publisher != null && w.Publisher.Id == p.Id) ||
+                (w.Franchise != null && w.Franchise.Publisher.Id == p.Id) ||
+                (w.Series != null && w.Series.Franchise.Publisher.Id == p.Id)
+            )));
 
         query = ApplyCatalogSearch(query, search);
 

@@ -85,7 +85,8 @@ public class SeriesRepository(ApplicationDbContext context) : ISeriesRepository
     {
         IQueryable<Series> query = _context.Series
             .AsNoTracking()
-            .Where(s => s.IsActive && s.Franchise.IsActive && s.Franchise.Publisher.IsActive);
+            .Where(s => s.IsActive && s.Franchise.IsActive && s.Franchise.Publisher.IsActive)
+            .Where(s => _context.Works.Any(w => w.IsActive && w.Series != null && w.Series.Id == s.Id));
 
         query = ApplyCatalogSearch(query, search);
 
