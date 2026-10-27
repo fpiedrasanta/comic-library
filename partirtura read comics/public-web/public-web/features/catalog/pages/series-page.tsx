@@ -1,3 +1,4 @@
+import { useSearchParams } from 'react-router-dom'
 import { getCatalogSeries } from '../api/entity-cards-repository'
 import { EntityListingPage } from '../components/entity-listing-page'
 import type { CatalogEntityCard, CatalogSeriesCardDto } from '../types/entity-cards'
@@ -15,14 +16,14 @@ function toCard(series: CatalogSeriesCardDto): CatalogEntityCard {
         id: series.publisher.id,
         name: series.publisher.name,
         color: series.publisher.color,
-        to: `/publishers/${series.publisher.id}`,
+        to: `/franchises?publisherId=${series.publisher.id}`,
       },
       {
         level: 'franchise',
         id: series.franchise.id,
         name: series.franchise.name,
         color: series.franchise.color,
-        to: `/franchises/${series.franchise.id}`,
+        to: `/series?franchiseId=${series.franchise.id}`,
       },
     ],
     to: `/series/${series.id}`,
@@ -34,6 +35,9 @@ function toCard(series: CatalogSeriesCardDto): CatalogEntityCard {
  * is why the other two listings are the same component with fewer pills.
  */
 export function SeriesPage() {
+  const [searchParams] = useSearchParams()
+  const publisherId = Number(searchParams.get('publisherId')) || undefined
+  const franchiseId = Number(searchParams.get('franchiseId')) || undefined
   return (
     <EntityListingPage<CatalogSeriesCardDto>
       kind="series"
@@ -44,6 +48,8 @@ export function SeriesPage() {
       emptyMessage="Intenta buscar con otros términos. Puedes ingresar nombres de Series, Franquicias o Editoriales."
       fetcher={getCatalogSeries}
       toCard={toCard}
+      publisherId={publisherId}
+      franchiseId={franchiseId}
     />
   )
 }

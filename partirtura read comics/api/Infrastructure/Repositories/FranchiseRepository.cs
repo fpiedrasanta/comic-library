@@ -73,7 +73,7 @@ public class FranchiseRepository(ApplicationDbContext context) : IFranchiseRepos
         return (items, totalCount);
     }
 
-    public async Task<(IReadOnlyList<Franchise>, int)> GetCatalogPagedAsync(int currentPage, int pageSize, string? search, CancellationToken cancellationToken = default)
+    public async Task<(IReadOnlyList<Franchise>, int)> GetCatalogPagedAsync(int currentPage, int pageSize, string? search, long? publisherId = null, CancellationToken cancellationToken = default)
     {
         IQueryable<Franchise> query = _context.Franchises
             .AsNoTracking()
@@ -82,6 +82,11 @@ public class FranchiseRepository(ApplicationDbContext context) : IFranchiseRepos
                 (w.Franchise != null && w.Franchise.Id == f.Id) ||
                 (w.Series != null && w.Series.Franchise.Id == f.Id)
             )));
+
+        if (publisherId.HasValue)
+        {
+            query = query.Where(f => f.Publisher.Id == publisherId.Value);
+        }
 
         query = ApplyCatalogSearch(query, search);
 

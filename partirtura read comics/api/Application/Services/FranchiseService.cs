@@ -63,7 +63,7 @@ public class FranchiseService : IFranchiseService
         var pageSize = request.pageSize;
         PaginationGuard.Normalize(PaginationGuard.CatalogCardDefaultPageSize, PaginationGuard.CatalogCardMaxPageSize, ref currentPage, ref pageSize);
 
-        var (franchises, totalCount) = await _unitOfWork.FranchiseRepository.GetCatalogPagedAsync(currentPage, pageSize, request.search, cancellationToken);
+        var (franchises, totalCount) = await _unitOfWork.FranchiseRepository.GetCatalogPagedAsync(currentPage, pageSize, request.search, request.publisherId, cancellationToken);
 
         var items = franchises.Select(f => new CatalogFranchiseCardDto(
             f.Id,

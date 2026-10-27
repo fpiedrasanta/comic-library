@@ -24,6 +24,8 @@ export interface EntityListingPageProps<T extends { id: number }> {
   entityLabel: string
   emptyMessage: string
   fetcher: EntityCardsFetcher<T>
+  publisherId?: number
+  franchiseId?: number
   /** Builds the shared card shape, including where the card navigates. */
   toCard: (item: T) => CatalogEntityCard
 }
@@ -43,12 +45,14 @@ export function EntityListingPage<T extends { id: number }>({
   entityLabel,
   emptyMessage,
   fetcher,
+  publisherId,
+  franchiseId,
   toCard,
 }: EntityListingPageProps<T>) {
   const { search, setSearch, clearSearch } = useListingSearch()
   const loaderRef = useRef<HTMLDivElement>(null)
 
-  const query = useEntityCards<T>({ kind, search, fetcher })
+  const query = useEntityCards<T>({ kind, search, fetcher, publisherId, franchiseId })
 
   const cards = flattenEntityCards(query.data?.pages.map((page) => page.items)).map(toCard)
   const totalCount = query.data?.pages[0]?.totalCount ?? 0

@@ -10,7 +10,7 @@ function toCard(publisher: CatalogPublisherCardDto): CatalogEntityCard {
     urlImage: publisher.urlImage,
     // Nothing sits above a publisher, so the card carries no pills.
     pills: [],
-    to: `/publishers/${publisher.id}`,
+    to: `/franchises?publisherId=${publisher.id}`,
   }
 }
 

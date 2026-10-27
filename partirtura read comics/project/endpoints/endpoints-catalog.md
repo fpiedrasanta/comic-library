@@ -98,6 +98,7 @@ Request parameters:
 - pageSize: integer (default 24, max 36)
 - search: string (optional, partial case-insensitive match on the franchise name **or** the
   publisher name, combined with `OR`)
+- publisherId: long (optional, filters franchises that belong to the given publisher)
 
 No `orderBy` and no `orderDir`; the ordering is always `Franchise.Name ASC`.
 
@@ -145,8 +146,10 @@ Notes:
 - `publisher` is always present: `Franchise.PublisherId` is a required foreign key and the
   repository filters inactive publishers out in SQL, so the card always has the publisher id,
   name and color needed for the pill and for navigation to `/publishers/{id}`.
-- No `publisherId` filter is exposed here. Hierarchy navigation is handled by the franchise and
-  series detail pages.
+- The optional `publisherId` filter restricts the result to franchises whose publisher matches
+  the given id. It combines with `search` using `AND`, is applied in the database before
+  pagination, and affects `totalCount`, `totalPages` and `hasNextPage`. Hierarchy navigation is
+  otherwise handled by the franchise and series detail pages.
 - Administrative data is never exposed: no `isActive`, `isFeatured`, `isOngoing`, `createdAt`,
   `countryName` or storage information.
 - Read-only. No side effects.
@@ -171,6 +174,8 @@ Request parameters:
 - pageSize: integer (default 24, max 36)
 - search: string (optional, partial case-insensitive match on the series name, the franchise name
   or the publisher name, combined with `OR`)
+- franchiseId: long (optional, filters series that belong to the given franchise)
+- publisherId: long (optional, filters series that belong to the given publisher)
 
 No `orderBy` and no `orderDir`; the ordering is always `Series.Name ASC`.
 
@@ -223,7 +228,10 @@ Notes:
 - `franchise` and `publisher` are always present: both are required foreign keys and the
   repository filters inactive parents out in SQL, so the card always has the ids, names and
   colors needed for both pills and for navigation.
-- No `franchiseId` or `publisherId` filter is exposed here.
+- The optional `franchiseId` and `publisherId` filters restrict the result to series belonging
+  to the given franchise and/or publisher. They combine with each other and with `search` using
+  `AND`, are applied in the database before pagination, and affect `totalCount`, `totalPages`
+  and `hasNextPage`.
 - Administrative data is never exposed: no `isActive`, `isFeatured`, `isOngoing`, `createdAt`,
   `description` or storage information.
 - Read-only. No side effects.

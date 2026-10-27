@@ -15,6 +15,8 @@ export interface UseEntityCardsOptions<T> {
   /** Part of the query key, so the three listings never share a cache entry. */
   kind: CatalogEntityKind
   search?: string
+  publisherId?: number
+  franchiseId?: number
   /** A module-level function, stable across renders. */
   fetcher: EntityCardsFetcher<T>
 }
@@ -26,15 +28,15 @@ export interface UseEntityCardsOptions<T> {
  * is asked, which is what keeps a scroll from firing the same page twice or
  * two requests for it at once.
  */
-export function useEntityCards<T>({ kind, search, fetcher }: UseEntityCardsOptions<T>) {
+export function useEntityCards<T>({ kind, search, publisherId, franchiseId, fetcher }: UseEntityCardsOptions<T>) {
   const trimmedSearch = search?.trim() ?? ''
 
   return useInfiniteQuery({
     // The search is part of the key, so changing it starts a fresh query at
     // page 1 and the pages of the previous search stop counting as results.
-    queryKey: ['catalog-cards', kind, trimmedSearch],
+    queryKey: ['catalog-cards', kind, trimmedSearch, publisherId, franchiseId],
     queryFn: ({ pageParam }) =>
-      fetcher({ currentPage: pageParam, pageSize: ENTITY_CARD_PAGE_SIZE, search: trimmedSearch || undefined }),
+      fetcher({ currentPage: pageParam, pageSize: ENTITY_CARD_PAGE_SIZE, search: trimmedSearch || undefined, publisherId, franchiseId }),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => (lastPage.hasNextPage ? lastPage.nextPage ?? null : null),
     staleTime: STALE_TIME_MS,

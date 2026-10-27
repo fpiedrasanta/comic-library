@@ -346,6 +346,11 @@ export function ListReader({ listId, workId }: ListReaderProps) {
 
     const handleTouchEnd = (e: TouchEvent) => {
       if (e.changedTouches.length === 1 && dragStartRef.current) {
+        const target = e.target as HTMLElement
+        if (target.closest('button')) {
+          dragStartRef.current = null
+          return
+        }
         const touch = e.changedTouches[0]
         const dx = touch.clientX - dragStartRef.current.x
         const dy = touch.clientY - dragStartRef.current.y

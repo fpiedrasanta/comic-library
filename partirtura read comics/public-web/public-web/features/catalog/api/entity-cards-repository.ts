@@ -10,6 +10,8 @@ export interface GetCatalogCardsParams {
   currentPage?: number
   search?: string
   pageSize?: number
+  publisherId?: number
+  franchiseId?: number
 }
 
 /**
@@ -26,6 +28,8 @@ function catalogPath(entity: string, params: GetCatalogCardsParams): string {
   if (params.currentPage !== undefined) searchParams.set('currentPage', String(params.currentPage))
   if (params.pageSize !== undefined) searchParams.set('pageSize', String(params.pageSize))
   if (params.search) searchParams.set('search', params.search)
+  if (params.publisherId !== undefined) searchParams.set('publisherId', String(params.publisherId))
+  if (params.franchiseId !== undefined) searchParams.set('franchiseId', String(params.franchiseId))
 
   const query = searchParams.toString()
 

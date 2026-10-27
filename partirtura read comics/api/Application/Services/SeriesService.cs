@@ -76,7 +76,7 @@ public class SeriesService : ISeriesService
         var pageSize = request.pageSize;
         PaginationGuard.Normalize(PaginationGuard.CatalogCardDefaultPageSize, PaginationGuard.CatalogCardMaxPageSize, ref currentPage, ref pageSize);
 
-        var (series, totalCount) = await _unitOfWork.SeriesRepository.GetCatalogPagedAsync(currentPage, pageSize, request.search, cancellationToken);
+        var (series, totalCount) = await _unitOfWork.SeriesRepository.GetCatalogPagedAsync(currentPage, pageSize, request.search, request.franchiseId, request.publisherId, cancellationToken);
 
         var items = series.Select(s => new CatalogSeriesCardDto(
             s.Id,

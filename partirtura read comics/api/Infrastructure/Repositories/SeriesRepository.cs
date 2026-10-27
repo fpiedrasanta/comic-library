@@ -81,12 +81,22 @@ public class SeriesRepository(ApplicationDbContext context) : ISeriesRepository
         return (items, totalCount);
     }
 
-    public async Task<(IReadOnlyList<Series>, int)> GetCatalogPagedAsync(int currentPage, int pageSize, string? search, CancellationToken cancellationToken = default)
+    public async Task<(IReadOnlyList<Series>, int)> GetCatalogPagedAsync(int currentPage, int pageSize, string? search, long? franchiseId = null, long? publisherId = null, CancellationToken cancellationToken = default)
     {
         IQueryable<Series> query = _context.Series
             .AsNoTracking()
             .Where(s => s.IsActive && s.Franchise.IsActive && s.Franchise.Publisher.IsActive)
             .Where(s => _context.Works.Any(w => w.IsActive && w.Series != null && w.Series.Id == s.Id));
+
+        if (franchiseId.HasValue)
+        {
+            query = query.Where(s => s.Franchise.Id == franchiseId.Value);
+        }
+
+        if (publisherId.HasValue)
+        {
+            query = query.Where(s => s.Franchise.Publisher.Id == publisherId.Value);
+        }
 
         query = ApplyCatalogSearch(query, search);
 

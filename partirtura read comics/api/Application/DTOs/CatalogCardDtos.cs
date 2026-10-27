@@ -8,12 +8,15 @@ public record GetCatalogPublishersRequest(
 public record GetCatalogFranchisesRequest(
     int currentPage = 1,
     int pageSize = PaginationGuard.CatalogCardDefaultPageSize,
-    string? search = null);
+    string? search = null,
+    long? publisherId = null);
 
 public record GetCatalogSeriesRequest(
     int currentPage = 1,
     int pageSize = PaginationGuard.CatalogCardDefaultPageSize,
-    string? search = null);
+    string? search = null,
+    long? franchiseId = null,
+    long? publisherId = null);
 
 public record CatalogNodeDto(
     long Id,
