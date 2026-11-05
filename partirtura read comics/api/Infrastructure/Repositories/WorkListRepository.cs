@@ -419,7 +419,7 @@ public class WorkListRepository(ApplicationDbContext context) : IWorkListReposit
             OrderByCreatedAt => descending
                 ? query.OrderByDescending(workList => workList.CreatedAt)
                 : query.OrderBy(workList => workList.CreatedAt),
-            _ => query.OrderByDescending(workList => workList.CreatedAt)
+            _ => query.OrderBy(workList => workList.Name).ThenBy(workList => workList.Id)
         };
     }
 }
