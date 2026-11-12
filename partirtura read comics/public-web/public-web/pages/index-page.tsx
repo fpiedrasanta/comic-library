@@ -9,7 +9,7 @@ import {
   CatalogSection,
 } from '@/components/dashboard'
 
-const DEFAULT_RECOMMENDED_SORT: RecommendedSortField = 'MostPopular'
+const DEFAULT_RECOMMENDED_SORT: RecommendedSortField = 'RecentlyAdded'
 
 export default function IndexPage() {
   const navigate = useNavigate()
